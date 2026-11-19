@@ -1,0 +1,443 @@
+{
+  "case": "F01 to F29",
+  "what": "The fact audit (rule 4), as the brief's section 11 writes it: the run's facts and evidence, then each model text with the expected result and the offending tokens, in the order they appear",
+  "facts": [
+    "score.overall",
+    "score.layer.access",
+    "seal.B-03",
+    "coverage"
+  ],
+  "evidence": {
+    "titles": [
+      "Microsoft 365 in the pilot authority",
+      "BSI C5 and ISO 27001 for the data centre"
+    ],
+    "quotes": [
+      "Betrieb durch T-Systems seit 2025",
+      "Rechtsgrundlage ist § 3 OZG",
+      "2025 übernahm T-Systems den Betrieb"
+    ]
+  },
+  "cases": [
+    {
+      "id": "F01",
+      "text": "The overall score is {{fact:score.overall}}.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F02",
+      "text": "The overall score is 72.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "72"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F03",
+      "text": "Most critical blocks are run in Germany.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F04",
+      "text": "Half of the critical blocks are made in the US.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "Half"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F05",
+      "text": "The office suite is Microsoft 365.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F06",
+      "text": "The office suite is Microsoft 365 with Teams 2.0.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "2.0"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F07",
+      "text": "Block B-03 stands at {{fact:seal.B-03}}.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F08",
+      "text": "Block B-03 is SEAL-1.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "SEAL-1"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F09",
+      "text": "Das sind 40 Prozent der kritischen Bausteine.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "40",
+          "Prozent"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F10",
+      "text": "Die Quelle vom 2026-11-02 nennt das ITZBund als Betreiber.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F11",
+      "text": "Laut Quelle: „Betrieb durch T-Systems seit 2025“.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F12",
+      "text": "Laut Quelle: „Betrieb seit 2024“.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "2024"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F13",
+      "text": "Coverage is {{fact:coverage.critical}}.",
+      "expected": {
+        "pass": false,
+        "tokens": [],
+        "unknown_facts": [
+          "coverage.critical"
+        ]
+      }
+    },
+    {
+      "id": "F14",
+      "text": "A quarter of the layers lack evidence.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "A quarter"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F15",
+      "text": "Ein Viertel der Schichten ist ohne Beleg.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "Viertel"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F16",
+      "text": "The score is {{fact:score.overall}} out of 100.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "100"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F17",
+      "text": "The operator publishes a quarterly status report.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F18",
+      "text": "Lever L2 keeps three layers unchanged.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F19",
+      "text": "The app store is run by a third party outside the EU.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F20",
+      "text": "Two thirds of the blocks are made in the US.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "Two thirds"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F21",
+      "text": "The legal basis is § 3 OZG.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F22",
+      "text": "The legal basis is § 9 OZG.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "9"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F23",
+      "text": "The operator holds a BSI C5 attestation.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F24",
+      "text": "The operator also holds a PSD2 licence.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "PSD2"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F25",
+      "text": "Operations are certified to ISO 27001.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F26",
+      "text": "Laut Quelle: „2025 übernahm T-Systems den Betrieb“.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F27",
+      "text": "Laut Quelle: „2024 übernahm T-Systems den Betrieb“.",
+      "expected": {
+        "pass": false,
+        "tokens": [
+          "2024"
+        ],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F28",
+      "text": "A third-party provider runs the app store.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    },
+    {
+      "id": "F29",
+      "text": "The operator is a third-country company.",
+      "expected": {
+        "pass": true,
+        "tokens": [],
+        "unknown_facts": []
+      }
+    }
+  ],
+  "nbsp_variants": {
+    "what": "F21 and F22 a second time with a non-breaking space after the section sign; the results stay the same",
+    "cases": [
+      {
+        "id": "F21-nbsp",
+        "text": "The legal basis is § 3 OZG.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "F22-nbsp",
+        "text": "The legal basis is § 9 OZG.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "9"
+          ],
+          "unknown_facts": []
+        }
+      }
+    ]
+  },
+  "decisions": {
+    "what": "Cases for decisions D9 (a four-digit year passes when the run's evidence contains it) and D10 (cardinal number words above twelve are blocked, compounds included), written for this build; the same facts and evidence",
+    "cases": [
+      {
+        "id": "D9-1",
+        "text": "The operator has run the service since 2025.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D9-2",
+        "text": "The operator has run the service since 2019.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "2019"
+          ],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D9-3",
+        "text": "Der Betrieb läuft seit 2025, laut der Quelle vom 2026-11-02.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-1",
+        "text": "Seventy-two of the blocks are scored.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "Seventy-two"
+          ],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-2",
+        "text": "Zweiundsiebzig Bausteine sind bewertet.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "Zweiundsiebzig"
+          ],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-3",
+        "text": "Thirteen blocks lack evidence.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "Thirteen"
+          ],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-4",
+        "text": "The service rests on twelve building blocks in five layers.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-5",
+        "text": "Der Dienst ruht auf zwölf Bausteinen.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-6",
+        "text": "Hundreds of authorities use the service.",
+        "expected": {
+          "pass": false,
+          "tokens": [
+            "Hundreds"
+          ],
+          "unknown_facts": []
+        }
+      },
+      {
+        "id": "D10-7",
+        "text": "Das Rechenzentrum stammt aus dem letzten Jahrhundert.",
+        "expected": {
+          "pass": true,
+          "tokens": [],
+          "unknown_facts": []
+        }
+      }
+    ]
+  }
+}

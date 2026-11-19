@@ -1,0 +1,28 @@
+{
+  "case": "S4",
+  "what": "Portfolio: two base services and one platform, by the levels of their scored critical blocks, as the brief's section 11 writes them. Musterdienst is the S2 assessment; for the other two the brief gives only the levels, so each has blocks built to give exactly those levels (the test checks they do).",
+  "assessments": [
+    { "service": "Musterdienst", "category": "base_service", "from": "s2-assessment.json", "critical_levels": [1, 3, 4, 4, 0] },
+    {
+      "service": "Beispieldienst", "category": "base_service", "critical_levels": [0, 2, 4, 4],
+      "blocks": [
+        { "id": "B-01", "layer": "access", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "NON_EU" },
+        { "id": "B-02", "layer": "platform", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+        { "id": "B-03", "layer": "infrastructure", "criticality": "critical", "made_in": "DE", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+        { "id": "B-04", "layer": "applications", "criticality": "critical", "made_in": "DE", "licence": "open_source", "run_by": "DE", "hosting": "EU" }
+      ]
+    },
+    {
+      "service": "Probeportal", "category": "platform_or_access", "critical_levels": [1, 1, 3],
+      "blocks": [
+        { "id": "B-01", "layer": "infrastructure", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "EU" },
+        { "id": "B-02", "layer": "platform", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "EU" },
+        { "id": "B-03", "layer": "access", "criticality": "critical", "made_in": "US", "licence": "open_source", "run_by": "DE", "hosting": "EU" }
+      ]
+    }
+  ],
+  "expected": {
+    "base_service": { "count": "3 of 9", "exact": "1/3", "en": "33%", "de": "33 %" },
+    "platform_or_access": { "count": "2 of 3", "exact": "2/3", "en": "67%", "de": "67 %" }
+  }
+}
