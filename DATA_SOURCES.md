@@ -79,4 +79,4 @@ The brief's section 11, unchanged: the level rules R01 to R13, the assessment "M
 
 ## 6. What the app does not use
 
-No client, company or personal data; no tracking; no fonts, scripts or styles from another site (Vici's fonts ship in `vici/`); no open-data APIs called from the browser. The pre-run assessments of version 0.2.0 are researched from public sources, with every quote kept in `research/` with its URL, title and the date it was read.
+No client, company or personal data; no tracking; no fonts, scripts or styles from another site (Vici's fonts ship in `vici/`); no open-data APIs called from the browser. The pre-run assessments of version 0.2.0 are researched from public sources, with every quote kept in the repository's research folder with its URL, title and the date it was read.
