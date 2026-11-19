@@ -109,12 +109,26 @@ export function missingKeys() {
   return [...missing];
 }
 
+/** The values of an element's data-i18n-vars (JSON), or null. */
+function varsOf(el) {
+  const raw = el.dataset.i18nVars;
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
 /**
- * Replaces index.html's static English defaults: data-i18n="key" sets an element's text,
- * data-i18n-attr="aria-label:key; title:key" its attributes, and the document title follows.
+ * Re-translates every element that names its key: index.html's static English defaults and the text
+ * the app's views create with js/text.js. data-i18n="key" sets an element's text (with
+ * data-i18n-vars='{"name": value}' for its placeholders, and data-i18n-n="n" for a plural form);
+ * data-i18n-attr="aria-label:key; title:key" sets its attributes. The document title follows.
+ * Open dialogs, the drawer and the console are in the document, so a switch reaches them too.
  */
 export function applyStatic(root = document) {
-  for (const el of root.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of root.querySelectorAll("[data-i18n]")) {
+    const vars = varsOf(el);
+    const n = el.dataset.i18nN;
+    el.textContent = n !== undefined ? tn(el.dataset.i18n, Number(n), vars || {}) : t(el.dataset.i18n, vars);
+  }
   for (const el of root.querySelectorAll("[data-i18n-attr]")) {
     for (const pair of el.dataset.i18nAttr.split(";")) {
       const [attr, key] = pair.split(":").map((s) => s.trim());

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The browser enforces where this page may connect: the API key can only ever reach api.anthropic.com,
+       the one outside host (web search and web fetch run on Anthropic's servers). Scripts, styles, fonts
+       and images come from this site only: the app loads nothing from a third party. js/config.js holds
+       the same policy, and Diagnostics and tests/accept.mjs compare the two. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.anthropic.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" data-i18n-attr="content:app.description" content="An AI agent that assesses how digitally sovereign a German public service is: who makes and who runs each of its building blocks, scored per layer of the Deutschland-Stack, with a source for every finding. A prototype, not an official service.">
+  <title>Sovereignty Assessment</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <!-- The look comes from Victor's design system Vici, copied unchanged into vici/ (vici/README.md).
+       It sits in cascade layers, so the app's own stylesheets below refine it without !important. -->
+  <link rel="stylesheet" href="vici/dist/vici.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/console.css">
+  <link rel="stylesheet" href="css/drawer.css">
+  <link rel="stylesheet" href="css/modals.css">
+
+  <!-- The theme before the page is drawn (light unless the visitor chose dark), then Vici's script. -->
+  <script src="js/theme.js"></script>
+  <script src="vici/dist/vici.js" defer></script>
+
+  <!-- The catalogue, the reference facts and the data contracts: plain scripts that set window globals
+       (the security policy allows no fetch from this site). Every text in English and German. -->
+  <script src="data/catalogue.js" defer></script>
+  <script src="data/ref_facts.js" defer></script>
+  <script src="data/schemas.js" defer></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body class="app-shell">
+  <!-- The texts below are the English defaults: each element names its key in js/i18n/ (data-i18n, or
+       data-i18n-attr for attributes), and the app writes them in the chosen language at start-up. -->
+  <a class="vc-skip-link skip-link" href="#console" data-i18n="app.skip">Skip to the agent console</a>
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="vc-cell vc-cell--lilac" aria-hidden="true"><span class="vc-icon vc-icon--honeycomb"></span></span>
+      <div class="brand-text">
+        <span data-i18n="app.name" class="brand-name">Sovereignty Assessment</span>
+        <span data-i18n="app.prototype" class="brand-proto">Prototype – not an official service of the German Federal Government</span>
+      </div>
+    </div>
+
+    <div class="header-badges">
+      <span id="mode-badge" class="vc-tag mode-badge" data-mode="none" role="status" aria-live="polite" data-i18n-attr="title:badge.none.title" title="Choose a mode with Start agent"><span data-i18n="badge.none">No run active</span></span>
+      <!-- Vici's theme toggle (vici.js switches the theme and remembers the choice); its label is fixed
+           and aria-pressed carries the state. -->
+      <span class="vc-tooltip-anchor">
+        <button type="button" class="vc-icon-button theme-toggle" data-vc-theme-toggle aria-labelledby="tip-theme"><span class="vc-icon vc-icon--moon vc-when-light" aria-hidden="true"></span><span class="vc-icon vc-icon--sun vc-when-dark" aria-hidden="true"></span></button>
+        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-theme" data-i18n="header.theme">Dark theme</span>
+      </span>
+      <!-- The language switch (js/lang_switch.js): each button names its language in that language. -->
+      <div id="lang-switch" class="segmented lang-switch" role="group" data-i18n-attr="aria-label:lang.switch" aria-label="Language">
+        <button type="button" data-lang="en" lang="en" aria-pressed="true" aria-label="English (EN)">EN</button>
+        <button type="button" data-lang="de" lang="de" aria-pressed="false" aria-label="Deutsch (DE)">DE</button>
+      </div>
+      <span class="vc-tag vc-tag--feature ai-disclosure" data-i18n-attr="title:header.ai.title" title="The Sovereignty Assessment is an AI system. Its findings can be wrong: every finding shows its sources, every score is indicative, and nothing is sent anywhere.">
+        <span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span>
+        <span><span class="long" data-i18n="header.ai.long">You are interacting with an </span><span data-i18n="header.ai.short">AI system</span></span>
+      </span>
+    </div>
+
+    <div id="kpis" class="kpis" role="group" data-i18n-attr="aria-label:header.kpis" aria-label="Key figures of the assessment"></div>
+  </header>
+
+  <nav id="controls" class="controls" data-i18n-attr="aria-label:controls.label" aria-label="Run controls"></nav>
+
+  <main class="workspace">
+    <!-- The sovereignty map: before a run, the catalogue to choose from; the spider diagram, the mix and
+         the honeycomb arrive with the agent in version 0.2.0. -->
+    <section class="map-panel" data-i18n-attr="aria-label:map.label" aria-label="Sovereignty map">
+      <div id="map" class="map"></div>
+    </section>
+    <section id="console" class="console-panel" data-i18n-attr="aria-label:console.title" aria-label="Agent console" tabindex="-1"></section>
+  </main>
+
+  <section id="drawer" class="drawer" data-i18n-attr="aria-label:drawer.label" aria-label="Building blocks, review, levers, outbox and audit log"></section>
+
+  <div id="banners" class="banner-stack"></div>
+
+  <!-- Boot screen: removed by js/main.js once the workspace is running. Without JavaScript modules
+       (for example when opened from disk via file://) it stays and explains what to do, in English. -->
+  <div id="boot" class="boot" data-state="loading">
+    <div class="boot-card">
+      <div class="boot-brand">
+        <span class="vc-cell vc-cell--lilac vc-cell--xl" aria-hidden="true"><span class="vc-icon vc-icon--honeycomb"></span></span>
+        <span data-i18n="app.name" class="brand-name">Sovereignty Assessment</span>
+      </div>
+      <p class="boot-status" role="status" aria-live="polite"><span class="vc-spinner" aria-hidden="true"></span><span id="boot-status" data-i18n="boot.status">Starting the Sovereignty Assessment…</span></p>
+      <p id="boot-detail" class="vc-alert vc-alert--danger boot-detail" hidden></p>
+      <div class="boot-help">
+        <p>Still on this screen? The Sovereignty Assessment has to be served over http or https. Browsers block its program modules when <code>index.html</code> is opened straight from disk, at an address starting with <code>file://</code>.</p>
+        <p>To run it on your computer, open a terminal in this folder, run <code>python -m http.server 8000</code>, then open <code>http://localhost:8000</code>. Published on GitHub Pages, it works as is. Use a current Chrome or Edge.</p>
+      </div>
+      <noscript><p class="boot-detail">The Sovereignty Assessment needs JavaScript. Allow it for this site and reload the page.</p></noscript>
+    </div>
+  </div>
+</body>
+</html>

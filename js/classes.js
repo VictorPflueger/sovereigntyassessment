@@ -17,7 +17,7 @@ export const CLASSES = ["DE", "EU", "US", "CN", "OTHER", "UNKNOWN"];
 
 /**
  * The 26 member states of the European Union other than Germany, by ISO 3166-1 alpha-2 code, as
- * the EU's own country list names them (verified on 19 November 2026; TECH_NOTES §3).
+ * the EU's own country list names them (verified on 19 November 2026; TECH_NOTES §7).
  */
 export const EU_OTHER = Object.freeze([
   "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GR", "HU", "IE",

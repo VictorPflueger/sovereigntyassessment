@@ -38,7 +38,7 @@ export const SERVER_TOOLS = [
   { type: "web_fetch_20250910", name: "web_fetch", max_uses: 10, max_content_tokens: 8000, citations: { enabled: true } }
 ];
 
-// Prices in USD per million tokens (TECH_NOTES §2, verified 19 Nov 2026; equal to the sister apps').
+// Prices in USD per million tokens (TECH_NOTES §1, verified 19 Nov 2026; equal to the sister apps').
 // The model names are product names and stay as they are in both languages; the hints are i18n keys.
 export const MODELS = [
   {

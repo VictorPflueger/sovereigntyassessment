@@ -279,3 +279,98 @@ html { font-size: clamp(93.75%, 0.48vw + 50%, 112.5%); }
 /* ------------------------------------------------------------------------------------------ */
 /* App-specific: not part of the shared shell (tests/parity.mjs compares the file above this)  */
 /* ------------------------------------------------------------------------------------------ */
+
+/* Header: the prototype line stays visible at every width (brief §4, Honesty); it wraps rather than
+   being cut. The language switch sits with the badges, 40 px like the theme toggle. */
+.brand-proto {
+  margin-top: 3px;
+  max-width: 36ch;
+  color: var(--vc-text-muted);
+  font-size: var(--fs-xs);
+  line-height: 1.25;
+}
+.lang-switch button { min-width: 44px; letter-spacing: 0.02em; }
+
+/* A tile's second line wraps (two lines at most) at every width, as the shell does below 1,700 px, so a
+   longer German note is never cut; contained, so the note never widens its tile. */
+.kpi-sub.vc-stat__note { contain: inline-size; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; text-overflow: clip; }
+
+/* Laptop widths: the four tiles take a row of their own under the brand and the badges, so neither
+   the prototype line nor a tile is squeezed (PLAN.md f.2). */
+@media (max-width: 1500px) {
+  .app-header { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px; }
+  .header-badges { justify-content: flex-end; }
+  .kpis { grid-column: 1 / -1; }
+  .kpi.vc-stat { flex: 1 1 0; max-width: none; }
+}
+
+/* Control bar: the service field with the catalogue's suggestions (a combobox on Vici's input and menu). */
+.service-field { position: relative; flex: 0 1 360px; min-width: 220px; }
+.service-input.vc-input { width: 100%; min-height: var(--hit); }
+.service-suggestions.vc-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  /* As wide as its longest name needs (at least the field's width), so no name is cut. */
+  min-width: 100%;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  z-index: 900;
+  max-height: 340px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+.service-suggestions[hidden] { display: none; }
+/* Each suggestion: its name, and its category under it. */
+.service-option { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; cursor: pointer; }
+.service-option .menu-title { white-space: normal; }
+.service-option[aria-selected="true"] { background: var(--vc-accent-soft); color: var(--vc-on-accent-soft); }
+.service-option .menu-hint { color: var(--vc-text-muted); font-size: var(--fs-xs); }
+@media (max-width: 1600px) {
+  .service-field { flex-basis: 280px; min-width: 190px; }
+}
+
+/* The centrepiece before a run: the catalogue, grouped by category, and the chosen entry. */
+.map { height: 100%; overflow-y: auto; padding: 22px 28px 28px; scrollbar-width: thin; scrollbar-color: var(--vc-border) transparent; }
+.catalogue-head h2 { margin: 0 0 6px; font-family: var(--vc-font-display); font-size: var(--fs-xl); font-weight: var(--vc-weight-semibold); letter-spacing: var(--vc-tracking-heading); }
+.catalogue-lead { margin: 0 0 4px; max-width: 72ch; color: var(--vc-text-muted); }
+.catalogue-asof { margin: 0 0 18px; color: var(--vc-text-subtle); font-size: var(--fs-xs); }
+.catalogue-group + .catalogue-group { margin-top: 18px; }
+.catalogue-group h3 { margin: 0 0 10px; color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); letter-spacing: 0.04em; text-transform: uppercase; }
+.catalogue-chip.vc-chip { --_h: max(2.5rem, 40px); font-size: var(--vc-font-size-md); }
+.catalogue-chip .prerun-mark { display: inline-flex; align-items: center; color: inherit; }
+.catalogue-detail { margin-top: 22px; max-width: 82ch; }
+.catalogue-hint { margin: 0; color: var(--vc-text-subtle); }
+.catalogue-detail-name { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 0 0 6px; font-family: var(--vc-font-display); font-size: var(--fs-lg); font-weight: var(--vc-weight-semibold); }
+.catalogue-cat-tag.vc-tag { font-family: var(--vc-font-text); font-size: var(--fs-xs); font-weight: var(--vc-weight-medium); }
+.catalogue-detail-text, .catalogue-detail-status { margin: 0 0 8px; }
+.catalogue-detail-status { color: var(--vc-text-muted); }
+.catalogue-detail-status strong { color: var(--vc-text); }
+.catalogue-detail h4 { margin: 14px 0 6px; font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); color: var(--vc-text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.catalogue-sources { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.catalogue-sources li { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+.catalogue-sources li .vc-icon { align-self: center; color: var(--vc-text-subtle); }
+.catalogue-sources .source-meta { color: var(--vc-text-subtle); font-size: var(--fs-xs); }
+
+/* The intro's steps in this app's colour grammar (DESIGN.md): lilac where the AI works on its own,
+   fjord where it checks (the shared "check" tone), neutral where code computes, merlot where the
+   person decides, ink for the levers. */
+.intro-step[data-tone="ai"] .vc-step__marker { color: var(--vc-feature-text); }
+.intro-step[data-tone="ai"] .vc-step__marker::before { background: var(--vc-feature-bg); }
+.intro-step[data-tone="code"] .vc-step__marker { color: var(--vc-text); }
+.intro-step[data-tone="code"] .vc-step__marker::before { background: var(--vc-bg-sunken); }
+.intro-step[data-tone="person"] .vc-step__marker { color: var(--vc-on-accent-soft); }
+.intro-step[data-tone="person"] .vc-step__marker::before { background: var(--vc-accent-soft); }
+.intro-step[data-tone="ink"] .vc-step__marker { color: var(--vc-surface); }
+.intro-step[data-tone="ink"] .vc-step__marker::before { background: var(--vc-text); }
+
+/* The console's start-up hint: what Live sends and what Simulation needs. */
+.log-empty .log-empty-note { color: var(--vc-text-subtle); font-size: var(--fs-xs); }
+
+/* A banner's text that is not ours to translate (a browser's error message). */
+.banner-extra { font-family: var(--vc-font-mono); font-size: var(--fs-xs); }
+
+/* Diagnostics: the local checks in one column, so a long line stays readable. */
+.diag-checks.world-checks { columns: 1; }
