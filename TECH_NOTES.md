@@ -1,6 +1,6 @@
 # Sovereignty Assessment: technical notes
 
-Version 0.1.0 (milestone M1: shell, method and languages), 19 November 2026. What the code relies on, where each fact comes from and when it was checked, the decisions in force and the deviations from the brief. The build plan with the full probe log is [PLAN.md](PLAN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md); the shared shell and the adapted modules are in [REVIEW.md](REVIEW.md).
+Version 0.2.0 (milestone M2: agent, pre-runs and levers), 19 November 2026. What the code relies on, where each fact comes from and when it was checked, the decisions in force and the deviations from the brief. The build plan with the full probe log is [PLAN.md](PLAN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md); the shared shell and the adapted modules are in [REVIEW.md](REVIEW.md).
 
 ## 1. Models, prices and the cost meter
 
@@ -44,7 +44,7 @@ The key is asked for only when a live run starts and is checked with the free `G
 | `sa.diag` | session | the last API result of Diagnostics, for "earlier this session" |
 | `sa.model` | session | the chosen model |
 | `sa.speed` | session | the replay speed |
-| `sa.sessionCostEur` | session | live spend in this tab (from version 0.2.0) |
+| `sa.sessionCostEur` | session | reserved for the live spend across runs in this tab; version 0.2.0 shows each run's cost in its run facts and writes nothing here |
 | `sa.introSeen` | local | the intro opens by itself only on a first visit |
 | `sa.lang` | local | the language choice |
 | `vc-theme` | local | Vici's theme choice, shared by Victor's pages |
@@ -101,20 +101,59 @@ Victor approved the plan's defaults on 19 November 2026 ("Continue with the next
 ## 12. Deviations and open issues
 
 - **Hygiene without the private term list.** The brief has Victor add the list as the `HYGIENE_TERMS` secret; he cannot provide it. CI therefore runs `tests/hygiene.mjs` in its generic mode (e-mail addresses only), which says so ("HYGIENE GENERIC OK"). Before each push the build session runs the same test with its own list from a file outside the repository (`HYGIENE_TERMS_FILE`), which must print "HYGIENE OK". The list itself never enters the repository. The test's header is reworded neutrally; its code is the Timetable Translator's.
-- **No run in version 0.1.0.** Start agent, the mode dialog and the key dialog work in full. Simulation is unavailable because no pre-run ships yet (the dialog says why); an accepted key ends with a notice that the live agent comes with the next version, and nothing runs or costs anything.
-- **The method panel** arrives with the sovereignty map in version 0.2.0. The Commission's implementation guidance (PLAN.md, M3) needed an approval in Phase 0 that was not given and is still unread; the panel quotes the framework's v1.2.1 and names the version (I10).
+- **Not yet run against the real API.** Version 0.2.0 runs the live agent against a stand-in that streams the real protocol (§13, `tests/live.mjs`); no key is part of the build. The first live run is Victor's (AC-21; the README's run book), and it is where the citations of fetched pages (I2, I3) are confirmed on the real API.
+- **The method view** (brief §9: the layers, the level rules and their source, the editable weights, the class and evidence rules, what the score is not) was announced here for version 0.2.0, but no milestone of PLAN.md h holds it, and version 0.2.0 does not have it. The engine already takes layer weights (§8). Proposed for version 0.3.0, with Compare and Portfolio; an open decision for Victor. The Commission's implementation guidance (PLAN.md, M3) needed an approval in Phase 0 that was not given and is still unread; the view will quote the framework's v1.2.1 and name the version (I10).
+- **Pages the fetch tool could not read** while the pre-runs were researched: the Federal Portal's own pages return only a JavaScript notice; one paywalled teaser, SAP's imprint and one press article refused the tool; one procurement notice came back empty. None of them is cited; §17 lists what was used instead. One redirect target needed an approval that went unanswered and was not used.
 - **Header at laptop widths.** Below 1,500 px the four tiles take a row of their own, so the prototype line and the tiles keep their full text (DESIGN.md §6).
 
-| Issue | Topic | Status in 0.1.0 |
+| Issue | Topic | Status in 0.2.0 |
 |---|---|---|
 | I1 | No schema validator in the sister apps | Done: `js/schema.js` (§10) |
-| I2 | Fetched-document citations carry no URL | Version 0.2.0: the agent's document registry |
-| I3 | Cited sentences may arrive as thinking blocks | Version 0.2.0, tested live in AC-21 |
-| I4 | No pre-check for web fetch | Version 0.2.0: Diagnostics says so; a switched-off tool stops Live with a clear message |
+| I2 | Fetched-document citations carry no URL | Done: the document registry maps a citation's index to the fetched document's URL (§14); confirmed live in AC-21 |
+| I3 | Cited sentences may arrive as thinking blocks | Done: citations are read from text and thinking blocks alike (§14); confirmed live in AC-21 |
+| I4 | No pre-check for web fetch | Done: a switched-off tool stops Live with a message that offers Simulation (§13) |
 | I5 | Newer server-tool versions | Basic versions kept (§2) |
 | I6 | API version 2026-10-21 | Staying on 2023-06-01 (§2) |
 | I7 | The shell's paid probe fails on Sonnet 5.5 | Not used (§3) |
 | I8 | Number words and years in the audit | Done: D9 and D10 (§9) |
 | I9 | Deutschland-App is a prototype in a pilot | Done: the catalogue's status and aliases (DATA_SOURCES.md §3) |
-| I10 | SEAL-3's name differs between sources | Version 0.2.0: the method panel |
+| I10 | SEAL-3's name differs between sources | Open: the method view, proposed for version 0.3.0 (§12) |
 | I11 | The portfolio's share | Done: pooled over the blocks (§8) |
+
+## 13. The live agent
+
+`js/agent.js` runs the Claude tool-use loop in the browser, adapted from Rebate Hunter's agent, the sister app that already sends the server-side web search. One run is a series of streaming `POST /v1/messages` calls with the same `tools` array every time: the fifteen client tools of `js/tools.js` (`cat_lookup`, `ref_facts`, `rec_profile`, `rec_block`, `rec_block_update`, `rec_block_remove`, `rec_layer`, `eng_score`, `eng_whatif`, `ui_progress`, `ui_choose_service`, `ui_request_review`, `ui_propose_levers`, `ui_draft_memo`, `ui_final_report`) and the two server tools of `js/config.js`, `web_search_20250305` (at most 12 uses a turn, approximate location Germany) and `web_fetch_20250910` (at most 10 uses, 8,000 content tokens, citations on). `tool_choice` is `auto`; no tool carries `strict`.
+
+- **The conversation.** Every assistant block goes back unchanged, encrypted search content, citations and thinking with its signature included. `stop_reason` drives the loop: `tool_use` runs the client tools and answers with `tool_result` blocks only, also in a mixed turn where a server tool ran in the same response; `pause_turn` resends the conversation unchanged; `max_tokens` retries once with more room when a tool call was cut off; `end_turn` before the report sends at most two nudges, each saying what is left of the budgets.
+- **Errors inside results.** A search or fetch that fails inside an HTTP 200 (`max_uses_exceeded`, `url_not_accessible` and the like) is shown as the tool's failure and the run goes on. A 400 saying that web search or web fetch is switched off for the organisation stops Live at once with a message that offers Simulation; no further request is sent.
+- **Caps** are checked before every call: no 41st model call, and none once €3.00 is spent. The cost meter adds each response's usage at the model's listed prices (§1) and $0.01 per web search, converted at 0.894 euros per dollar; `tests/live.mjs` checks it against the stand-in's usage to within 1e-9.
+- **Searches and fetches** count only when the response that ran them is kept; their results then feed the evidence registry (§14).
+- **The system prompt** (`js/prompt.js`) and every tool result are English, as the model reads them; whatever the person reads (narration, block names, reasons, levers, memo, report) is written in the run's language, and code's own lines come from the dictionaries. `tests/i18n.mjs` therefore leaves the model-facing files (`js/prompt.js`, `js/tools.js`, `js/guards.js`, `js/runs_check.js`) out of its stray-string check: their English strings never reach the screen as they are.
+- **The audit** (`js/audit.js`) records every call: what was sent without the key, what came back, the usage and the timing; page texts and encrypted search results are left out. The Audit tab exports it as JSON.
+
+## 14. Evidence verification
+
+`js/evidence.js` holds one registry per run, used alike by the live agent, the simulation player, `tools/check-runs.mjs` and the tests (PLAN.md d).
+
+- **Provenance.** An evidence URL counts only if this run's search results or fetched pages returned it, or `cat_lookup` or `ref_facts` listed it; a replayed pre-run lists its own research steps. A tool call citing any other URL is refused with `is_error: true`, naming the URLs it may cite. URLs compare with lower-case scheme and host and without the fragment; the path compares exactly.
+- **Quotes.** A quote of at most 150 characters is verified when, with whitespace normalised, it occurs in the text of its URL's page as fetched in this run, or in the `cited_text` of a citation of that URL in this run. Search citations carry their URL. Fetched-document citations carry only a `document_index`: the registry numbers the fetched documents in the order the conversation holds them and maps the index to that document's URL, and refuses the mapping when the index points at no document or the citation's title differs from the document's (I2). Citations count from text and thinking blocks alike (I3). An evidence item without a quote takes this run's latest citation of its URL.
+- **Gating.** A field without a verified quote counts as unknown for scoring: Made in becomes `UNKNOWN` when `tech` or a recorded `tech.parent` lacks one, Run by likewise with `operator` and `operator.parent`; hosting becomes `UNKNOWN`, licence and exit `unknown`. The block shows which fields are unverified and why, and an unknown is never a finding against a provider. A reviewer's correction needs a reason, not evidence, and counts as the reviewer set it.
+
+## 15. Guardrails in code
+
+- **The fact audit** (§9) runs on every audited field of every tool call: narration, the profile's texts, each block's name, role and note, each layer reason, each lever's title and rationale, the memo and the report. A failure returns `is_error: true` with the blocked tokens; after two failed retries the text is kept with an "Unchecked" tag and a notice, never silently.
+- **The sequence rules** (`js/guards.js`), one function for the live agent, the player and `tools/check-runs.mjs`: nothing runs after the report; once the person has reviewed, the findings are frozen and only the person changes blocks; the review waits until every layer has blocks or a recorded status and `eng_score` has run on the current blocks; levers come after the review, one decision per run; the memo follows the decision and names the same lever; an "assessed" report needs the review, the decision and the memo; "not_a_service" ends a run only without blocks; "stopped" may end a run before a report; a service is chosen among candidates only before any block is recorded.
+- **The person's steps** (`ui_choose_service`, `ui_request_review`, `ui_propose_levers`) wait for the person in both modes; the tool returns only what the person decided.
+
+## 16. The simulation format and the recorder
+
+A pre-run is a script `data/runs/<entry>.js` that sets `window.SA_RUNS["<entry>"]` (a script, because the security policy allows no fetch from the page's own origin): `{ id, entry_id, source: "hand_authored" | "recorded", as_of, method_version, query, steps }`. A step has one key: `say` (one sentence, `{ en, de }`), `search` (`{ query, results: [{ url, title }] }`), `fetch` (`{ url, title, pdf? }`; a page's text is never stored), `tool` with its `input` (texts as `{ en, de }`, evidence items with their `verified` flag), `memo: true` (the memo for the person's choice, from the template) or `report` (`{ findings: { en, de } }`, followed by code's closing part). Figures appear only as placeholders.
+
+- **Playback** (`js/simulation.js`) runs the steps through the same tool executors as Live, so the engine recomputes every figure, the guardrails apply, and a review correction or another lever yields consistent tiles, memo and report (AC-11). The run's language is the one active at its start; the pauses (`STEP_MS`) divide by the speed ×1, ×2 or ×4. Nothing leaves the page.
+- **`tools/check-runs.mjs`** checks each pre-run under the rules of section 8 of the brief: both languages in every model-written text, the same placeholders in both, the fact audit, known fact keys, evidence on every block, URLs the run's research steps or the catalogue or the reference facts returned, quotes of at most 150 characters, every quote listed under its URL in `research/<entry>.md` with a "Read on" date, no key-like string, no thinking block. It then plays each pre-run in both languages along every lever choice. With `--write` it sets each quote's `verified` flag from `research/`; without it, flags that differ from `research/` are a failure. `tests/runs.mjs` plants a defect for each rule.
+- **Research notes** (`research/<entry>.md`) list, per source, `### [Title](URL)`, `Read on YYYY-MM-DD (German|English).` and each quote as a `> ` line. Quotes of the reference facts were verified when the facts were built (§4 of DATA_SOURCES.md) and are not repeated there.
+- **The recorder** (`js/recorder.js`, "Save run as simulation" after a live run) writes the same format from a run's events: narration, research steps, every client tool call with its input and its checked evidence, template steps for the memo and the report; no thinking, no key, no figure. The file is marked "recorded" and holds the run's one language; curating it means adding the second language and running `tools/check-runs.mjs`.
+
+## 17. How the pre-runs were researched and verified
+
+The six pre-runs were written by hand on 19 November 2026 from public pages found with the build session's web search and read with its web fetch tool. That tool answers with a small model's reading of the page, so each check asked for the sentence verbatim, and only a quote the tool returned verbatim (or returned as consecutive verbatim parts) was used. The build session kept a log with one row per quote (URL, quote, result, date, the tool's answer); it is not part of the repository, and `research/` holds every quote the pre-runs cite, with its URL, title and read date. Where a page could not be read, nothing from it is cited (§12): the Federal Portal's pre-run rests on § 9a EGovG, the BMDS's Deutschland-Stack paper, a Bundestag news item on a parliamentary answer and the BundID's imprint; SAP's seat comes from SAP's corporate governance statement. Facts that only a press report gives (the Deutschland-App's cloud, platform and messenger) say so in the block's note and carry low confidence, and a block whose maker no source names (ePayBL's software, the Federal Portal's platform) is recorded as a gap rather than guessed.

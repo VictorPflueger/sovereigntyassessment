@@ -113,3 +113,10 @@
  * its width and never says "Your review" twice (this app's review step is itself called "Your review").
  * The tag and the visually hidden line still say whose turn it is. */
 .rail-step[data-state="yours"] .rail-label { display: none; }
+
+/* The drawer's bar now carries the tabs' counts, so the byline's label gives way below 1,340 px rather
+ * than the shared stylesheet's 1,180 px, and the bar keeps one row in German too. Below 1,101 px the
+ * shared stylesheet moves the byline to a row of its own, with its label. */
+@media (max-width: 1340px) and (min-width: 1101px) {
+  .drawer-tabs .vc-byline__label { display: none; }
+}

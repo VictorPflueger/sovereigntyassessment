@@ -1,5 +1,5 @@
-// Smoke tests of the start flow, both languages and the failure modes of loading (version 0.1.0 has no
-// run yet: the agent and the simulation player arrive in 0.2.0):
+// Smoke tests of the start flow, both languages and the failure modes of loading (the runs themselves
+// are tests/live.mjs and tests/sims.mjs):
 //   lang-first-visit  a German browser's first visit opens in English, and nothing is stored
 //   lang-url          ?lang=de opens in German and is stored; a reload keeps it; ?lang=en wins again
 //   lang-switch       the EN and DE switch without a reload: <html lang>, the header, the tiles, the

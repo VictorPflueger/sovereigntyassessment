@@ -1,6 +1,6 @@
 # Sovereignty Assessment: design
 
-Version 0.1.0, 19 November 2026. How the interface looks and why. The look is Vici, Victor's design system, copied unchanged into `vici/`, through the sister prototypes' shared shell (REVIEW.md). The screens of the finished prototype are sketched in PLAN.md, section f; this version builds the header, the control bar, the catalogue in the centrepiece, the console with its rail, the drawer and the dialogs.
+Version 0.2.0, 19 November 2026. How the interface looks and why. The look is Vici, Victor's design system, copied unchanged into `vici/`, through the sister prototypes' shared shell (REVIEW.md). The screens of the finished prototype are sketched in PLAN.md, section f; version 0.1.0 built the header, the control bar, the catalogue in the centrepiece, the console with its rail, the drawer and the dialogs, and version 0.2.0 adds the sovereignty map, the drawer's panels and the run in the console (§9).
 
 ## 1. Principles
 
@@ -33,7 +33,7 @@ The intro window's five steps take the same grammar: lilac where the AI works on
 
 ## 4. Hexagons
 
-Hexagons replace circles everywhere, with no exception: Vici's cells, chips, tags, stepper markers, status dots and avatars are hexagons, and the spider diagram's markers will be too. `tests/hexagon.mjs` scans the app's files and the rendered app in both themes, through the start screen, the catalogue and its suggestions, Diagnostics, the mode and key dialogs, every drawer tab and the German interface, and fails on anything round.
+Hexagons replace circles everywhere, with no exception: Vici's cells, chips, tags, stepper markers, status dots and avatars are hexagons, and so are the spider diagram's rings and markers and the honeycomb's cells. `tests/hexagon.mjs` scans the app's files and the rendered app in both themes, through the start screen, the catalogue and its suggestions, Diagnostics, the mode and key dialogs, every drawer tab and the German interface, and fails on anything round.
 
 ## 5. Type and sizes
 
@@ -53,3 +53,19 @@ The EN and DE switch is two toggle buttons with `aria-pressed`, drawn as the she
 - **The catalogue's chips are radio buttons.** Vici's toggle chips (`aria-pressed`) let a second click undo the choice, and vici.js toggles them by itself; one service at a time is a single choice, so each chip wraps a radio button, Vici's other chip pattern, with its tick and the arrow keys across the whole catalogue.
 - **A row of its own for the tiles below 1,500 px** (§6), where the sister apps keep the tiles beside the badges down to 1,180 px: this app's header carries a two-line prototype line and a language switch the others do not have.
 - **The intro's step tones** are this app's (§3): the shared stylesheet's tones name the Timetable Translator's steps.
+- **The person's turn on the rail** replaces the step's label with the merlot tag ("Your review") instead of standing beside it: this app's review step is itself called "Your review", and five steps with a tag beside one do not fit the console's width. The rule is in `css/panels.css`; the shared rail is unchanged.
+- **The byline's label** gives way below 1,340 px instead of the shared stylesheet's 1,180 px, because the drawer's tabs now carry counts and the bar must stay one row in German (`css/panels.css`).
+
+## 9. The sovereignty map and the drawer (version 0.2.0)
+
+**The map** takes the centrepiece once a run starts; the catalogue gives way and returns with Reset.
+
+- **The spider diagram** opens by layer: six axes in the portal's order (Infrastructure, Development, security and operations, Platform, Base services, Applications and services, Interface and access), so the web is a hexagon; "By building block" draws one axis per block at 25 × its level, labelled with its id, its two codes and its name. Rings mark the levels; a layer or block without a score is a dashed axis with its status in muted italics, never a zero. The service is teal on its pastel fill (§8). The diagram is drawn at its host's size in pixels: the web takes the room its labels leave, and the labels keep their size, so a short map (a laptop screen, the drawer open) shows a smaller web with labels that stay legible rather than shrinking everything; a very small web drops the ring labels.
+- **The Made-in and Run-by mix** stands beside it: one bar per origin class, sorted by count, the class named by its code and, on hover and for screen readers, in words, with the critical blocks' count.
+- **The honeycomb** below groups the blocks by layer, one hexagon cell per block, filled on the diverging scale (§3) with the level and both codes written in the cell; a gap is an empty cell with a dashed outline; "?" marks a partly unknown level. A short map folds it into one strip per layer with small cells that keep their level.
+- **The table** is one click away and holds the same numbers: the layer scores with their statuses and the block levels with their classes.
+- **Searching and reading** pulse a fjord outline around the map, never a fill; the console's pages-read count says the same in words.
+
+**The console** carries the agent's narration with the lilac AI label, code's own lines without it, each tool call as one plain sentence with its details one click away, and the run facts underneath (calls against the cap, the cost, searches, pages read). In Simulation the neutral tape names the pre-run's date and the word SIMULATION stands faintly behind the log.
+
+**The drawer's tabs** follow the run: Building blocks (the blocks with filters; each opens its evidence: the quote, the source, the date read and the fields it supports, and marks unverified fields), Review, Levers, Outbox and Audit. Merlot is the person in charge: the Review's Confirm, a block's "corrected by reviewer" tag, the levers' one Approve. A tab that needs the person shows its count in merlot and opens by itself; the others stay quiet. The Outbox's drafts carry "Draft. Nothing is sent." and the AI label; a draft in the other language says so.

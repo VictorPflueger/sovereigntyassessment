@@ -8,7 +8,7 @@
 //           and api.anthropic.com is refused, so this check never calls the real API (up to three tries
 //           a minute apart, for a deployment the CDN is still taking up)
 // In GitHub Actions every problem is also printed as an annotation (::error / ::warning).
-// Taken from the Timetable Translator's tests/live_site.mjs; version 0.1.0 has no simulation to run yet.
+// Taken from the Timetable Translator's tests/live_site.mjs; the simulations are tests/sims.mjs's.
 // Usage: node tests/live_site.mjs [url]   (default: the repository's GitHub Pages address; LIVE_URL)
 import fs from "node:fs";
 import path from "node:path";

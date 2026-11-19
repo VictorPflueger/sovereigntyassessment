@@ -19,7 +19,7 @@ export function inLang(value, lang = getLang()) {
   return value ?? "";
 }
 
-/** True when a pre-run assessment ships for this entry (window.SA_RUNS, from version 0.2.0). */
+/** True when a pre-run assessment ships for this entry (window.SA_RUNS, data/runs/). */
 export function hasPreRun(id) {
   return !!(globalThis.SA_RUNS && Object.hasOwn(globalThis.SA_RUNS, id));
 }

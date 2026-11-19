@@ -4,7 +4,7 @@
 export const APP = {
   id: "sa",
   name: "Sovereignty Assessment",
-  version: "0.1.0"
+  version: "0.2.0"
 };
 
 // The page's content security policy, exactly as index.html's meta tag carries it (TECH_NOTES §4).
@@ -31,8 +31,8 @@ export const ANTHROPIC = {
   consoleWorkspacesUrl: "https://platform.claude.com/settings/workspaces"
 };
 
-// The two server tools of the live agent, fixed for the whole run (brief §7; TECH_NOTES §2). The
-// agent arrives in version 0.2.0; the definitions are here so Diagnostics and the tests see them.
+// The two server tools of the live agent, fixed for the whole run (brief §7; TECH_NOTES §2 and §13);
+// Diagnostics and the tests read them from here too.
 export const SERVER_TOOLS = [
   { type: "web_search_20250305", name: "web_search", max_uses: 12, user_location: { type: "approximate", country: "DE", timezone: "Europe/Berlin" } },
   { type: "web_fetch_20250910", name: "web_fetch", max_uses: 10, max_content_tokens: 8000, citations: { enabled: true } }

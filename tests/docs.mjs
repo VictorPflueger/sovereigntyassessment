@@ -4,7 +4,7 @@
 //   - every section the code cites ("TECH_NOTES §3", "DATA_SOURCES.md §4", "DESIGN.md §3") exists;
 //   - every repository path a document names (in backticks or as a relative link) exists;
 //   - the README links the live site and names the version js/config.js carries.
-// Taken from the Timetable Translator's tests/docs.mjs, with this app's documents for version 0.1.0;
+// Taken from the Timetable Translator's tests/docs.mjs, with this app's documents for version 0.2.0;
 // the minimum lengths grow with the milestones (PLAN.md h).
 // Usage: node tests/docs.mjs
 import fs from "node:fs";
