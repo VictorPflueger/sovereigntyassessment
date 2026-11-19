@@ -65,6 +65,20 @@ export function wrapWords(text, width, maxLines = 3) {
  * labels keep their size in the stylesheet, so a short map (a small screen, the drawer open) draws a
  * smaller web with labels that stay legible instead of shrinking the whole picture (PLAN.md f.1).
  */
+/** About how wide a character of a label is, in pixels, at the label's size in the stylesheet. */
+const CHAR_PX = { layer: 8.2, block: 6.8 };
+
+/**
+ * A label's lines for a narrow box: re-wrapped to at most `width` characters (a long word keeps its own
+ * line). In the block view the first line (the id and the codes) stays as it is.
+ */
+export function fitLabel(lines, width, kind) {
+  const keep = kind === "block" ? lines.slice(0, 1) : [];
+  const rest = kind === "block" ? lines.slice(1) : lines;
+  if (!rest.length || rest.every((l) => String(l).length <= width)) return lines;
+  return [...keep, ...wrapWords(rest.join(" "), width, kind === "block" ? 3 : 4)];
+}
+
 export function spiderGeometry(kind, n, box = null, longest = 0) {
   if (!box || !(box.w > 0) || !(box.h > 0)) {
     const W = 760;
@@ -76,7 +90,7 @@ export function spiderGeometry(kind, n, box = null, longest = 0) {
   // Room for the labels beside and above or below the web, from the longest label line at the label's
   // size in the stylesheet (15 px in the layer view, 12 px in the block view, about half an em a
   // character); three lines of a block's label need more height.
-  const perChar = kind === "layer" ? 7.9 : 6.6;
+  const perChar = CHAR_PX[kind] || CHAR_PX.layer;
   const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longest * perChar + 6);
   const padY = kind === "layer" ? 50 : 60;
   const r = Math.max(48, Math.min(230, (W - 2 * padX) / 2, (H - 2 * padY) / 2));
@@ -85,8 +99,27 @@ export function spiderGeometry(kind, n, box = null, longest = 0) {
 
 export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "", box = null }) {
   const n = axes.length;
-  const big = kind === "layer" || n <= 8;
-  const longest = Math.max(0, ...axes.map((ax) => Math.max(0, ...(ax.lines || []).map((l) => String(l).length))));
+  // A short box: the block view's labels keep only the id and the codes, at the small size (each axis's
+  // tooltip, the honeycomb and the table still name the block).
+  const shortBox = !!box && kind === "block" && (box.h < 340 || box.w < 520);
+  const big = !shortBox && (kind === "layer" || n <= 8);
+  // Each label with the status line a dashed axis adds; in a box narrower than the labels need beside a
+  // web of the smallest radius, the labels wrap narrower so they stay inside the drawing.
+  const statusLines = axes.map((ax) => ((ax.value === null || ax.value === undefined) && ax.valueText ? 1 : 0));
+  let labels = axes.map((ax, i) => [...(ax.lines || []), ...(statusLines[i] ? [ax.valueText] : [])].map(String));
+  if (shortBox) labels = labels.map((l, i) => (statusLines[i] ? [l[0], l[l.length - 1]] : [l[0]]));
+  if (box && box.w > 0 && !shortBox) {
+    const room = (Math.max(320, Math.round(box.w)) - 2 * 60) / 2 - (kind === "layer" ? 22 : 16) - 8;
+    const fit = Math.max(8, Math.floor(room / (CHAR_PX[kind] || CHAR_PX.layer)));
+    labels = labels.map((l, i) => {
+      // The status line of a dashed axis wraps on its own, after the name.
+      if (!statusLines[i]) return fitLabel(l, fit, kind);
+      const status = wrapWords(l[l.length - 1], fit, 2);
+      statusLines[i] = status.length;
+      return [...fitLabel(l.slice(0, -1), fit, kind), ...status];
+    });
+  }
+  const longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
   const { W, H, ...geo } = spiderGeometry(kind, n, box, longest);
   // A small web (a short map): no ring labels, smaller values, so nothing crowds the markers.
   const tight = geo.r < 90;
@@ -125,12 +158,12 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     const lx = geo.cx + cos * (geo.r + gap);
     const ly = geo.cy + sin * (geo.r + gap);
     const anchor = cos > 0.3 ? "start" : cos < -0.3 ? "end" : "middle";
-    const lines = [...ax.lines, ...(dashed && ax.valueText ? [ax.valueText] : [])];
+    const lines = labels[i];
     const lh = big ? 17 : 14;
     const startY = sin < -0.3 ? ly - (lines.length - 1) * lh : sin > 0.3 ? ly + lh * 0.7 : ly - ((lines.length - 1) * lh) / 2 + 5;
     const text = svg("text", { class: big ? "sp-label" : "sp-label sp-label--small", x: r2(lx), y: r2(startY), "text-anchor": anchor });
     lines.forEach((line, k) => {
-      const cls = k === 0 && kind === "block" ? "sp-label-strong" : dashed && k === lines.length - 1 && ax.valueText ? "sp-label-muted" : null;
+      const cls = k === 0 && kind === "block" ? "sp-label-strong" : k >= lines.length - statusLines[i] ? "sp-label-muted" : null;
       text.append(svg("tspan", { x: r2(lx), dy: k === 0 ? 0 : lh, class: cls }, line));
     });
     g.append(text);

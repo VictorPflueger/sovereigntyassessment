@@ -120,3 +120,7 @@
 @media (max-width: 1340px) and (min-width: 1101px) {
   .drawer-tabs .vc-byline__label { display: none; }
 }
+
+/* A short workspace (a laptop screen with the drawer open): the console keeps to its own area and its
+ * log scrolls inside it, instead of running over the drawer's bar. */
+.console-panel { overflow: hidden; }
