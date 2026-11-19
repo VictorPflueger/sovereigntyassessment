@@ -1,0 +1,60 @@
+# Runs the test suites on every push and pull request. The app itself has no build step and no
+# dependencies; Playwright is installed here only for the browser suites (tests/README.md).
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request cancels the run still in progress.
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    name: Colour system, page icon, Vici's files, languages, client, engine, fact audit, hygiene, docs and parity (Node.js only)
+    # Pinned image: Playwright 1.56's system dependencies are known to install on Ubuntu 24.04.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The hygiene check reads its private term list from the HYGIENE_TERMS secret if the repository
+      # has one; without it only the generic checks run and say so (tests/hygiene.mjs, TECH_NOTES §12).
+      - run: node tests/run-all.mjs tokens page-icon vici-files i18n unit engine audit hygiene docs
+        env:
+          HYGIENE_TERMS: ${{ secrets.HYGIENE_TERMS }}
+      # The shared shell is compared with the sister app's (public) repository.
+      - run: git clone --depth 1 https://github.com/VictorPflueger/PROC-Rebate-Hunter "$RUNNER_TEMP/PROC-Rebate-Hunter"
+      - run: node tests/parity.mjs "$RUNNER_TEMP/PROC-Rebate-Hunter"
+
+  browser:
+    name: Browser suites (Playwright, Chromium)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs: node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cache the Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-1.56.0-chromium-${{ runner.os }}
+      - run: npm install -g playwright@1.56.0 && npx playwright install --with-deps chromium
+      - run: NODE_PATH="$(npm root -g)" node tests/run-all.mjs smoke accept hexagon
+        env:
+          SA_TEST_OUT: ${{ runner.temp }}/sovereignty-assessment-tests
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots
+          path: ${{ runner.temp }}/sovereignty-assessment-tests
