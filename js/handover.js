@@ -24,7 +24,8 @@ function set(value) {
 bus.on("run_start", () => set(null));
 bus.on("state_change", (ev) => set(HUMAN_STATES[ev.payload?.state] || null));
 bus.on("choice_decision", () => set(null));
-bus.on("review_decision", () => set(null));
+// A correction keeps the review open; confirming or skipping ends it.
+bus.on("review_decision", (ev) => { if (ev.payload?.action !== "correct") set(null); });
 bus.on("lever_decision", () => set(null));
 bus.on("run_end", () => set(null));
 

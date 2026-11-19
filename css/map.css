@@ -1,0 +1,120 @@
+/* Sovereignty Assessment — the sovereignty map in the centrepiece (brief §9; PLAN.md f.1 to f.4): the
+ * spider diagram, the Made-in and Run-by mix, the honeycomb and the table. Colour grammar (DESIGN.md §3):
+ * the assessed service in teal (--vc-data-2) on its pastel fill, because merlot means the person in
+ * charge; the levels on Vici's diverging scale with their numbers and codes written in each cell; fjord
+ * outlines a search or a fetch while it runs, never as a fill; nothing round. */
+
+.map[data-view="map"] { overflow: hidden; padding: 12px 18px 12px; }
+.sov-map { display: grid; grid-template-rows: auto minmax(150px, 1fr) auto; gap: 8px; height: 100%; min-height: 0; position: relative; }
+.sov-map[hidden] { display: none; }
+.sov-map[data-table="true"] { grid-template-rows: auto minmax(0, 1fr) auto; }
+
+/* A search or a fetch is running: a fjord outline pulses around the map, never a fill. */
+.sov-map::after { content: ""; position: absolute; inset: -6px -10px; border: 2px solid transparent; border-radius: var(--vc-radius-lg); pointer-events: none; }
+.sov-map[data-pulse="on"]::after { border-color: var(--vc-info-solid); animation: fjordPulse 1.4s ease-out 1; }
+@keyframes fjordPulse { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sov-map[data-pulse="on"]::after { animation: none; opacity: 0.8; } }
+
+.sov-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sov-heading { min-width: 0; }
+.sov-title { margin: 0; font-family: var(--vc-font-display); font-size: var(--fs-xl); font-weight: var(--vc-weight-semibold); letter-spacing: var(--vc-tracking-heading); line-height: 1.15; }
+.sov-meta { margin: 2px 0 0; color: var(--vc-text-muted); font-size: var(--fs-xs); display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; }
+.stale-tag.vc-tag { font-size: var(--fs-xs); }
+.sov-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sov-views button { min-height: 40px; padding: 0 14px; }
+.sov-table-btn.vc-button { min-height: 40px; }
+
+/* Spider and mix side by side; the honeycomb below. */
+.sov-top { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(200px, 1fr); gap: 12px; min-height: 0; }
+.sov-top > [hidden] { display: none; }
+.sov-map[data-table="true"] .sov-top { display: none; }
+.sov-spider { min-height: 0; display: flex; align-items: center; justify-content: center; }
+.sov-spider svg.spider { width: 100%; height: 100%; max-height: 100%; }
+.sov-note { color: var(--vc-text-muted); }
+
+/* Spider diagram: rings and axes in the border tones, the service's area in teal on its pastel. */
+.spider .sp-ring { fill: none; stroke: var(--vc-border); stroke-width: 1; }
+.spider .sp-ring--outer { stroke: var(--vc-border-strong); }
+.spider .sp-tick { fill: var(--vc-text-subtle); font: 500 12px var(--vc-font-text); }
+.spider .sp-axis { stroke: var(--vc-border-strong); stroke-width: 1.25; }
+.spider .sp-axis--dashed { stroke-dasharray: 5 5; }
+.spider .sp-area { fill: var(--vc-data-pastel-2); fill-opacity: 0.6; stroke: var(--vc-data-2); stroke-width: 2.5; stroke-linejoin: round; }
+.spider .sp-marker { fill: var(--vc-data-2); stroke: var(--vc-surface); stroke-width: 1.5; }
+.spider .sp-value { fill: var(--vc-text); font: 700 17px var(--vc-font-text); paint-order: stroke; stroke: var(--vc-bg-sunken); stroke-width: 4px; stroke-linejoin: round; }
+.spider .sp-value--small { font-size: 13px; }
+.spider .sp-label { fill: var(--vc-text); font: 500 15px var(--vc-font-text); }
+.spider .sp-label--small { font-size: 12px; }
+.spider .sp-label-strong { font-weight: 700; }
+.spider .sp-label-muted { fill: var(--vc-text-muted); font-style: italic; }
+
+/* Made in and Run by: sorted bars in teal, the code and the count written. */
+.sov-mix { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding-top: 6px; overflow: auto; }
+.mix-title { margin: 0 0 6px; font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); color: var(--vc-text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.mix-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.mix-row { display: grid; grid-template-columns: 3.6em minmax(0, 1fr) 2.4em; align-items: center; gap: 8px; }
+.mix-code { font-weight: 700; font-size: var(--vc-font-size-sm); }
+.mix-track { height: 14px; background: var(--vc-bg-subtle); }
+.mix-bar { display: block; height: 100%; background: var(--vc-data-2); }
+.mix-n { text-align: right; font-weight: 700; }
+.mix-empty { margin: 0; color: var(--vc-text-subtle); font-size: var(--vc-font-size-sm); }
+
+/* Table view of the same numbers. */
+.sov-table { min-height: 0; overflow: auto; display: grid; gap: 14px; align-content: start; }
+.sov-table[hidden] { display: none; }
+.map-table caption { text-align: left; font-weight: var(--vc-weight-semibold); padding-bottom: 4px; }
+.map-table .num { text-align: right; }
+
+/* Honeycomb: six groups, one per layer, cells filled by level. */
+.sov-bottom { min-height: 0; }
+.sov-hc-title { margin: 0 0 4px; font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); color: var(--vc-text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.sov-honeycomb { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 16px; }
+.hc-group { min-width: 0; }
+.hc-head { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-xs); color: var(--vc-text-muted); border-bottom: 1px solid var(--vc-border-subtle); margin-bottom: 3px; }
+.hc-layer { font-weight: var(--vc-weight-semibold); color: var(--vc-text); }
+.hc-score { font-weight: 700; color: var(--vc-text); }
+.hc-cells { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+.hc-cell { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; width: 54px; height: 47px; }
+.hc-cell--empty { cursor: default; }
+.hc-cell .hc-svg { width: 100%; height: 100%; overflow: visible; }
+.hc-hex { stroke: var(--vc-surface); stroke-width: 1.5; }
+.hc-hex--gap { fill: none; stroke: var(--vc-border-strong); stroke-dasharray: 4 3; }
+.hc-cell[data-level="0"] .hc-hex { fill: var(--vc-div-1); }
+.hc-cell[data-level="1"] .hc-hex { fill: var(--vc-div-3); }
+.hc-cell[data-level="2"] .hc-hex { fill: var(--vc-div-4); }
+.hc-cell[data-level="3"] .hc-hex { fill: var(--vc-div-5); }
+.hc-cell[data-level="4"] .hc-hex { fill: var(--vc-div-7); }
+.hc-svg text { fill: var(--vc-text); font-family: var(--vc-font-text); }
+.hc-cell[data-level="0"] .hc-svg text, .hc-cell[data-level="4"] .hc-svg text { fill: var(--vc-text-inverse); }
+.hc-cell[data-level="gap"] .hc-svg text { fill: var(--vc-text-muted); }
+.hc-id { font-size: 10px; font-weight: 600; }
+.hc-level { font-size: 17px; font-weight: 800; }
+.hc-codes { font-size: 10px; font-weight: 600; }
+.hc-cell:focus-visible { outline: 2px solid var(--vc-accent); outline-offset: 1px; }
+.hc-cell:hover .hc-hex { stroke: var(--vc-text); }
+
+/* A short map (a small screen, or the drawer open): the honeycomb folds into one strip per layer with
+   small cells that keep their level, and the spider keeps the room (PLAN.md f.2). */
+.map-panel { container-type: size; container-name: mappanel; }
+@container mappanel (max-height: 520px) {
+  .sov-map { gap: 4px; }
+  .sov-title { font-size: var(--fs-lg); }
+  .sov-honeycomb { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px 8px; }
+  .sov-hc-title { display: none; }
+  .hc-cell { width: 30px; height: 26px; }
+  .hc-id, .hc-codes { display: none; }
+  .hc-level { font-size: 22px; }
+  .hc-head .hc-score { font-size: var(--fs-xs); }
+}
+@media (max-height: 820px) {
+  .sov-honeycomb { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px 10px; }
+  .hc-cell { width: 44px; height: 38px; }
+  .sov-title { font-size: var(--fs-lg); }
+}
+@media (max-width: 1400px) {
+  .sov-top { grid-template-columns: minmax(0, 1.5fr) minmax(170px, 1fr); }
+}
+@media (forced-colors: active) {
+  .spider .sp-area { fill: none; stroke: Highlight; }
+  .spider .sp-marker { fill: Highlight; }
+  .hc-hex { stroke: CanvasText; }
+}

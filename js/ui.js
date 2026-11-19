@@ -1,9 +1,9 @@
-// UI orchestrator: builds the components, wires the controls and dialogs and translates run events into
-// drawer and state changes. Version 0.1.0 has the whole start flow (the service, Start agent, the mode
-// dialog, the key dialog) but no run: the live agent and the simulation player arrive in version 0.2.0,
-// so an accepted key ends with a notice that says so, and nothing runs or costs anything.
+// UI orchestrator: builds the components, wires the controls and dialogs, starts a run in the chosen mode
+// and translates run events into drawer and state changes. Both producers, the live agent (js/agent.js)
+// and the simulation player (js/simulation.js), emit the same run events; the screen never asks which
+// one is running, except for the mode badge, the console's tape and the audit export.
 
-import { bus } from "./events.js";
+import { bus, newRunId } from "./events.js";
 import { getState, setState, subscribe, isRunning, isFinished } from "./state.js";
 import { createConsole } from "./console.js";
 import { createKpis } from "./kpi.js";
@@ -15,12 +15,21 @@ import { openDiagnostics } from "./diagnostics_view.js";
 import { openIntro, introSeen } from "./intro.js";
 import { setUpRail } from "./rail_steps.js";
 import { initLangSwitch } from "./lang_switch.js";
-import { onLang } from "./i18n/index.js";
+import { onLang, getLang } from "./i18n/index.js";
 import { hasKey } from "./keystore.js";
 import { entryById, lookup } from "./catalogue.js";
 import { h, withTooltip } from "./dom.js";
 import { tx, attrs } from "./text.js";
 import { icon } from "./icons.js";
+import { createSovMap } from "./sovmap.js";
+import { createBlocksPanel } from "./blocks_panel.js";
+import { createReviewPanel } from "./review_panel.js";
+import { createLeversPanel } from "./levers_panel.js";
+import { createOutbox } from "./outbox.js";
+import { createAuditPanel } from "./audit_panel.js";
+import { initAudit } from "./audit.js";
+import { createLiveAgent } from "./agent.js";
+import { createSimulationPlayer } from "./simulation.js";
 
 // The drawer's tabs (brief §9): building blocks, review, levers, outbox, audit.
 export const DRAWER_TABS = Object.freeze([
@@ -35,22 +44,32 @@ export function initUI() {
   setUpRail();
   configureDrawer({ tabs: [...DRAWER_TABS], labelKey: "drawer.label", noteKey: "drawer.note" });
   setState({ keyPresent: hasKey() });
+  initAudit();
 
   // ---- components ------------------------------------------------------------------------------
   const badge = document.getElementById("mode-badge");
-  const consoleUI = createConsole(document.getElementById("console"));
-  const kpis = createKpis(document.getElementById("kpis"));
   const drawer = createDrawer(document.getElementById("drawer"));
-  // Until the agent arrives, each tab says what it will hold (Vici's empty state).
-  for (const tab of DRAWER_TABS) {
-    drawer.panel(tab.id).appendChild(h("div", { class: "vc-empty empty" },
-      tx(`drawer.emptyTitle.${tab.id}`, null, { tag: "strong", cls: "vc-empty__title" }),
-      tx(`drawer.empty.${tab.id}`, null, { tag: "p", cls: "vc-empty__text" })));
-  }
+  const openTab = (id) => drawer.show(id);
+  const consoleUI = createConsole(document.getElementById("console"), { onOpenTab: openTab });
+  const kpis = createKpis(document.getElementById("kpis"));
 
-  const catalogue = createCatalogueView(document.getElementById("map"), {
+  const blocksPanel = createBlocksPanel(drawer.panel("blocks"), { onCount: (n) => drawer.setCount("blocks", n) });
+  const reviewPanel = createReviewPanel(drawer.panel("review"), { getBlocks: () => sovmap.result()?.blocks || [] });
+  createLeversPanel(drawer.panel("levers"));
+  createOutbox(drawer.panel("outbox"), { onCount: (n) => drawer.setCount("outbox", n) });
+  createAuditPanel(drawer.panel("audit"), { onCount: (n) => drawer.setCount("audit", n) });
+
+  const mapRoot = document.getElementById("map");
+  const catalogue = createCatalogueView(mapRoot, {
     onPick: (entry) => setState({ service: { entryId: entry.id, text: inLang(entry.names) } })
   });
+  const catalogueEl = mapRoot.querySelector(".catalogue");
+  const sovmap = createSovMap(mapRoot, catalogueEl, {
+    onPickBlock: (id) => { drawer.show("blocks"); blocksPanel.openBlock(id); }
+  });
+
+  const agent = createLiveAgent({ onKeyRejected: () => setState({ keyPresent: false }) });
+  const player = createSimulationPlayer({ getSpeed: () => getState().speed });
 
   const controls = createControls(document.getElementById("controls"), {
     // Typing a catalogue entry's exact name picks the entry; anything else is a free-text service.
@@ -62,7 +81,7 @@ export function initUI() {
     onStart: () => start(),
     onSelectModel: (id) => setState({ model: id }),
     onSpeed: (n) => setState({ speed: n }),
-    onAbort: () => {},
+    onAbort: () => abortRun(),
     onReset: () => resetWorkspace(),
     onDiagnostics: () => openDiagnostics()
   });
@@ -105,7 +124,7 @@ export function initUI() {
   onLang(() => {
     const s = getState();
     const entry = s.service.entryId ? entryById(s.service.entryId) : null;
-    if (entry) setState({ service: { entryId: entry.id, text: inLang(entry.names) } });
+    if (entry && !isRunning(s)) setState({ service: { entryId: entry.id, text: inLang(entry.names) } });
     render(getState());
   });
 
@@ -115,6 +134,13 @@ export function initUI() {
     const st = ev.payload.status;
     setState({ runState: st === "done" || st === "not_a_service" ? "done" : st });
   });
+  bus.on("score_update", (ev) => kpis.show(ev.payload?.result || null));
+  // The person's turn opens the tab where it is taken, with a merlot count on the tab.
+  bus.on("review_request", () => { drawer.setCount("review", 1, true); drawer.show("review"); });
+  bus.on("review_decision", (ev) => { if (ev.payload?.action !== "correct") drawer.setCount("review", 0); });
+  bus.on("levers", (ev) => { drawer.setCount("levers", (ev.payload?.levers || []).length + 1, true); drawer.show("levers"); });
+  bus.on("lever_decision", () => drawer.setCount("levers", 0));
+  bus.on("action_draft", () => drawer.show("outbox"));
 
   // ---- run control ---------------------------------------------------------------------------------
   async function start() {
@@ -148,16 +174,44 @@ export function initUI() {
   }
 
   function begin(mode, entry, service) {
-    // The agent and the player arrive in version 0.2.0: say so, and run nothing.
-    bus.emit("notice", mode === "live"
-      ? { level: "info", key: "notice.liveNext", vars: { service } }
-      : { level: "warn", key: "notice.noPreRun", vars: { service } });
+    const def = mode === "simulation" ? globalThis.SA_RUNS?.[entry?.id] : null;
+    if (mode === "simulation" && !def) {
+      bus.emit("notice", { level: "warn", key: "notice.noPreRun", vars: { service } });
+      return;
+    }
+    clearViews();
+    const run_id = newRunId();
+    const lang = getLang();
+    bus.beginRun({ run_id, mode });
+    setState({ mode, runId: run_id, runState: "understanding" });
+    if (mode === "simulation") {
+      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry.id, lang, source: def.source, as_of: def.as_of });
+      bus.emit("state_change", { state: "understanding" });
+      player.play(def, { lang, service });
+    } else {
+      const model = getState().model;
+      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry?.id ?? null, lang, model });
+      agent.run({ query: service, entryId: entry?.id ?? null, lang, modelId: model });
+    }
+  }
+
+  function abortRun() {
+    if (agent.isActive()) agent.abort();
+    if (player.isActive()) player.abort();
+  }
+
+  function clearViews() {
+    consoleUI.reset();
+    kpis.reset();
+    for (const tab of DRAWER_TABS) drawer.setCount(tab.id, 0);
   }
 
   function resetWorkspace() {
+    abortRun();
     bus.endRun();
-    consoleUI.reset();
-    kpis.reset();
+    clearViews();
+    sovmap.reset();
+    blocksPanel.reset();
     drawer.setOpen(false);
     setState({ runState: "idle", runId: null, mode: null });
   }
@@ -167,7 +221,7 @@ export function initUI() {
     if (!introSeen() && !document.querySelector("dialog[open]")) showIntro();
   }
 
-  return { start, resetWorkspace, showIntro, introOnFirstVisit, kpis, consoleUI };
+  return { start, resetWorkspace, showIntro, introOnFirstVisit, kpis, consoleUI, reviewPending: () => reviewPanel.pending() };
 }
 
 /**
