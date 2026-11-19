@@ -1,0 +1,19 @@
+{
+  "case": "S1",
+  "what": "Level rules: one block per row, Made in and Run by as countries or UNKNOWN, as the brief's section 11 writes them",
+  "cases": [
+    { "id": "R01", "made_in": "DE", "licence": "proprietary", "run_by": "DE", "hosting": "EU", "expected": { "level": 4, "partly_unknown": false } },
+    { "id": "R02", "made_in": "US", "licence": "open_source", "run_by": "DE", "hosting": "EU", "expected": { "level": 3, "partly_unknown": false } },
+    { "id": "R03", "made_in": "US", "licence": "proprietary", "run_by": "DE", "hosting": "EU", "expected": { "level": 2, "partly_unknown": false } },
+    { "id": "R04", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "EU", "expected": { "level": 1, "partly_unknown": false } },
+    { "id": "R05", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "NON_EU", "expected": { "level": 0, "partly_unknown": false } },
+    { "id": "R06", "made_in": "CN", "licence": "open_source", "run_by": "DE", "hosting": "EU", "expected": { "level": 3, "partly_unknown": false } },
+    { "id": "R07", "made_in": "UNKNOWN", "licence": "unknown", "run_by": "DE", "hosting": "EU", "expected": { "level": 2, "partly_unknown": true } },
+    { "id": "R08", "made_in": "DE", "licence": "proprietary", "run_by": "UNKNOWN", "hosting": "UNKNOWN", "expected": { "level": 2, "partly_unknown": true } },
+    { "id": "R09", "made_in": "UNKNOWN", "licence": "unknown", "run_by": "UNKNOWN", "hosting": "UNKNOWN", "expected": { "level": null, "partly_unknown": false, "unscored": true } },
+    { "id": "R10", "made_in": "FR", "licence": "proprietary", "run_by": "US", "hosting": "EU", "expected": { "level": 1, "partly_unknown": false } },
+    { "id": "R11", "made_in": "CH", "licence": "open_source", "run_by": "NL", "hosting": "EU", "expected": { "level": 3, "partly_unknown": false } },
+    { "id": "R12", "made_in": "US", "licence": "open_source", "run_by": "US", "hosting": "UNKNOWN", "expected": { "level": 0, "partly_unknown": false } },
+    { "id": "R13", "made_in": "UNKNOWN", "licence": "unknown", "run_by": "US", "hosting": "NON_EU", "expected": { "level": 0, "partly_unknown": true } }
+  ]
+}

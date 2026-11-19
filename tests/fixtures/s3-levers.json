@@ -1,0 +1,29 @@
+{
+  "case": "S3",
+  "what": "Levers on the S2 assessment (Musterdienst), as the brief's section 11 writes them; the assessment itself stays unchanged after both what-ifs",
+  "base": "s2-assessment.json",
+  "levers": [
+    {
+      "lever_id": "L1",
+      "change": "B-01 made in EU, run by EU, hosted in the EU",
+      "changes": [{ "block_id": "B-01", "made_in": "EU", "run_by": "EU", "hosting": "EU" }],
+      "expected": {
+        "overall": { "exact": "1955/24", "en": "81", "de": "81" },
+        "delta": { "exact": "75/8", "en": "+9", "de": "+9" },
+        "weakest": { "block": "B-10", "level": 0 },
+        "exclusive_non_eu": { "exact": "1/5" }
+      }
+    },
+    {
+      "lever_id": "L2",
+      "change": "B-10 run by EU, hosted in the EU, made in US as before",
+      "changes": [{ "block_id": "B-10", "run_by": "EU", "hosting": "EU" }],
+      "expected": {
+        "overall": { "exact": "925/12", "en": "77", "de": "77" },
+        "delta": { "exact": "5", "en": "+5", "de": "+5" },
+        "weakest": { "block": "B-01", "level": 1 },
+        "exclusive_non_eu": { "exact": "1/5" }
+      }
+    }
+  ]
+}

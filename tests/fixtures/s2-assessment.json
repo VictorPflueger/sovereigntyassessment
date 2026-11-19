@@ -1,0 +1,39 @@
+{
+  "case": "S2",
+  "what": "A whole assessment: the fictional \"Musterdienst\" with eleven blocks, as the brief's section 11 writes it",
+  "service": "Musterdienst",
+  "category": "base_service",
+  "blocks": [
+    { "id": "B-01", "layer": "infrastructure", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "EU" },
+    { "id": "B-02", "layer": "infrastructure", "criticality": "supporting", "made_in": "DE", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-03", "layer": "devsecops", "criticality": "important", "made_in": "DE", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-04", "layer": "devsecops", "criticality": "important", "made_in": "UNKNOWN", "licence": "unknown", "run_by": "UNKNOWN", "hosting": "UNKNOWN" },
+    { "id": "B-05", "layer": "platform", "criticality": "critical", "made_in": "US", "licence": "open_source", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-06", "layer": "platform", "criticality": "important", "made_in": "UNKNOWN", "licence": "unknown", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-07", "layer": "base_service", "criticality": "critical", "made_in": "DE", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-08", "layer": "applications", "criticality": "critical", "made_in": "FR", "licence": "proprietary", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-09", "layer": "applications", "criticality": "supporting", "made_in": "CN", "licence": "open_source", "run_by": "DE", "hosting": "EU" },
+    { "id": "B-10", "layer": "access", "criticality": "critical", "made_in": "US", "licence": "proprietary", "run_by": "US", "hosting": "NON_EU" },
+    { "id": "B-11", "layer": "access", "criticality": "important", "made_in": "US", "licence": "open_source", "run_by": "DE", "hosting": "EU" }
+  ],
+  "expected": {
+    "layers": {
+      "infrastructure": { "exact": "175/4", "en": "44", "de": "44" },
+      "devsecops": { "exact": "100", "en": "100", "de": "100" },
+      "platform": { "exact": "65", "en": "65", "de": "65" },
+      "base_service": { "exact": "100", "en": "100", "de": "100" },
+      "applications": { "exact": "375/4", "en": "94", "de": "94" },
+      "access": { "exact": "30", "en": "30", "de": "30" }
+    },
+    "overall": { "exact": "865/12", "en": "72", "de": "72" },
+    "coverage": { "exact": "23/25", "en": "92%", "de": "92 %" },
+    "exclusive_non_eu": { "exact": "2/5", "en": "40%", "de": "40 %" },
+    "weakest": { "block": "B-10", "level": 0, "ties": 0 },
+    "unscored": ["B-04"],
+    "partly_unknown": ["B-06"],
+    "made_in_all": { "DE": 3, "EU": 1, "US": 4, "CN": 1, "OTHER": 0, "UNKNOWN": 2 },
+    "made_in_critical": { "DE": 1, "EU": 1, "US": 3, "CN": 0, "OTHER": 0, "UNKNOWN": 0 },
+    "run_by_all": { "DE": 8, "EU": 0, "US": 2, "CN": 0, "OTHER": 0, "UNKNOWN": 1 }
+  },
+  "note": "The brief lists the critical Made-in counts as DE 1, EU 1, US 3 and the Run-by counts as DE 8, US 2, UNKNOWN 1; the classes it leaves out are zero, since the listed counts already add up to the five critical and the eleven blocks."
+}
