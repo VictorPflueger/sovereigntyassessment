@@ -58,14 +58,38 @@ export function wrapWords(text, width, maxLines = 3) {
 
 /**
  * The diagram. axes: [{ id, lines: [text…] (the label), value (0 to 100, or null), valueText, title }].
- * kind: "layer" or "block". ticks: [{ f, text }] ring labels. Returns the <svg>.
+ * kind: "layer" or "block". ticks: [{ f, text }] ring labels. box: the host's size in pixels, when known.
+ * Returns the <svg>.
+ *
+ * With a box, one unit of the drawing is one pixel: the web takes what room the labels leave, and the
+ * labels keep their size in the stylesheet, so a short map (a small screen, the drawer open) draws a
+ * smaller web with labels that stay legible instead of shrinking the whole picture (PLAN.md f.1).
  */
-export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "" }) {
+export function spiderGeometry(kind, n, box = null, longest = 0) {
+  if (!box || !(box.w > 0) || !(box.h > 0)) {
+    const W = 760;
+    const H = 560;
+    return { W, H, cx: W / 2, cy: H / 2 + 6, r: kind === "layer" ? 178 : n > 12 ? 170 : 182 };
+  }
+  const W = Math.max(320, Math.round(box.w));
+  const H = Math.max(220, Math.round(box.h));
+  // Room for the labels beside and above or below the web, from the longest label line at the label's
+  // size in the stylesheet (15 px in the layer view, 12 px in the block view, about half an em a
+  // character); three lines of a block's label need more height.
+  const perChar = kind === "layer" ? 7.9 : 6.6;
+  const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longest * perChar + 6);
+  const padY = kind === "layer" ? 50 : 60;
+  const r = Math.max(48, Math.min(230, (W - 2 * padX) / 2, (H - 2 * padY) / 2));
+  return { W, H, cx: W / 2, cy: H / 2 + 4, r };
+}
+
+export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "", box = null }) {
   const n = axes.length;
   const big = kind === "layer" || n <= 8;
-  const W = 760;
-  const H = 560;
-  const geo = { cx: W / 2, cy: H / 2 + 6, r: kind === "layer" ? 178 : n > 12 ? 170 : 182 };
+  const longest = Math.max(0, ...axes.map((ax) => Math.max(0, ...(ax.lines || []).map((l) => String(l).length))));
+  const { W, H, ...geo } = spiderGeometry(kind, n, box, longest);
+  // A small web (a short map): no ring labels, smaller values, so nothing crowds the markers.
+  const tight = geo.r < 90;
   const ring = Math.max(n, 3) === n ? n : 6; // fewer than three axes: hexagon rings
   const root = svg("svg", { class: "spider", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "spider-title spider-desc", "data-view": kind, "data-axes": n, preserveAspectRatio: "xMidYMid meet" });
   root.append(svg("title", { id: "spider-title" }, title), svg("desc", { id: "spider-desc" }, desc));
@@ -80,7 +104,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     }
     rings.append(svg("polygon", { class: f === 1 ? "sp-ring sp-ring--outer" : "sp-ring", points: pts.join(" ") }));
   }
-  for (const tk of ticks) {
+  for (const tk of tight ? [] : ticks) {
     rings.append(svg("text", { class: "sp-tick", x: r2(geo.cx + 6), y: r2(geo.cy - geo.r * tk.f - 4) }, tk.text));
   }
   root.append(rings);
@@ -129,7 +153,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     const off = big ? 20 : 15;
     const tx = x + Math.cos(a + Math.PI / 2) * off * 0.9 + Math.cos(a) * 4;
     const ty = y + Math.sin(a + Math.PI / 2) * off * 0.9 + Math.sin(a) * 4 + 5;
-    marks.append(svg("text", { class: big ? "sp-value" : "sp-value sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, ax.valueText));
+    marks.append(svg("text", { class: big && !tight ? "sp-value" : "sp-value sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, ax.valueText));
   });
   root.append(marks);
   return root;

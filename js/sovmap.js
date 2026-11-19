@@ -105,25 +105,53 @@ export function createSovMap(host, catalogue, { onPickBlock } = {}) {
     tableBtn.setAttribute("aria-pressed", state.table ? "true" : "false");
     hcTitle.textContent = t("map.honeycomb");
 
-    // The spider diagram, or a note while there is nothing to draw in the block view.
-    const axes = spiderAxes(lang);
-    spiderHost.replaceChildren();
-    if (state.view === "block" && !axes.length) {
-      spiderHost.append(h("p", { class: "sov-note" }, t("map.noBlocks")));
-    } else {
-      spiderHost.append(spiderSvg({
-        axes, kind: state.view,
-        ticks: state.view === "layer" ? [25, 50, 75, 100].map((v) => ({ f: v / 100, text: fmtInt(v) })) : [1, 2, 3, 4].map((v) => ({ f: v / 4, text: fmtInt(v) })),
-        title: t(state.view === "layer" ? "map.spider.layer" : "map.spider.block", { service: run.query || "" }),
-        desc: t("map.spider.desc")
-      }));
-    }
+    drawSpider();
     renderMix(mixHost, r);
     tableHost.hidden = !state.table;
     spiderHost.hidden = state.table;
     mixHost.hidden = state.table;
     if (state.table) renderTables(tableHost, r, { layerStatus: state.layerStatus, lang: run.lang });
     renderHoneycomb(hcHost, r, { layerStatus: state.layerStatus, lang: run.lang, onPick: (id) => onPickBlock?.(id) });
+  }
+
+  /** The spider diagram, or a note while there is nothing to draw in the block view. */
+  function drawSpider() {
+    const run = state.run;
+    if (!run) return;
+    const lang = getLang();
+    const axes = spiderAxes(lang);
+    spiderHost.replaceChildren();
+    if (state.view === "block" && !axes.length) {
+      spiderHost.append(h("p", { class: "sov-note" }, t("map.noBlocks")));
+      return;
+    }
+    spiderHost.append(spiderSvg({
+      axes, kind: state.view, box: hostBox(),
+      ticks: state.view === "layer" ? [25, 50, 75, 100].map((v) => ({ f: v / 100, text: fmtInt(v) })) : [1, 2, 3, 4].map((v) => ({ f: v / 4, text: fmtInt(v) })),
+      title: t(state.view === "layer" ? "map.spider.layer" : "map.spider.block", { service: run.query || "" }),
+      desc: t("map.spider.desc")
+    }));
+  }
+
+  /** The spider's room in pixels, or null while it has none (hidden, or not yet laid out). */
+  function hostBox() {
+    const b = spiderHost.getBoundingClientRect();
+    return b.width > 0 && b.height > 0 ? { w: b.width, h: b.height } : null;
+  }
+
+  // The spider is drawn at its host's size in pixels: it follows a resize of the window or the drawer
+  // (in the next frame, so a resize never loops), and only when the size really changed.
+  let boxKey = "";
+  let boxFrame = 0;
+  if (typeof ResizeObserver === "function") {
+    new ResizeObserver(() => {
+      const b = hostBox();
+      const key = b ? `${Math.round(b.w / 4)}x${Math.round(b.h / 4)}` : "";
+      if (key === boxKey) return;
+      boxKey = key;
+      cancelAnimationFrame(boxFrame);
+      boxFrame = requestAnimationFrame(() => { if (state.run && !state.table && b) drawSpider(); });
+    }).observe(spiderHost);
   }
 
   let pulseTimer = null;

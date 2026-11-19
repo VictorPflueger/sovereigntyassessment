@@ -108,3 +108,8 @@
 @media (max-width: 1400px) {
   .review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* The person's turn on the progress rail: the merlot tag takes the step label's place, so the rail keeps
+ * its width and never says "Your review" twice (this app's review step is itself called "Your review").
+ * The tag and the visually hidden line still say whose turn it is. */
+.rail-step[data-state="yours"] .rail-label { display: none; }

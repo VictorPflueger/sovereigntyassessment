@@ -23,14 +23,16 @@ const OPTIONS = {
 };
 
 export function createReviewPanel(panel, { getBlocks } = {}) {
-  const state = { request: null, resolved: null, corrections: [], editing: null, lang: "en", message: null };
+  const state = { request: null, resolved: null, corrections: [], editing: null, lang: "en", message: null, blocks: null };
   const emptyEl = h("div", { class: "vc-empty empty" },
     tx("drawer.emptyTitle.review", null, { tag: "strong", cls: "vc-empty__title" }),
     tx("drawer.empty.review", null, { tag: "p", cls: "vc-empty__text" }));
   const body = h("div", { class: "panel-body review-body" });
   panel.append(emptyEl, body);
 
-  const blocks = () => (getBlocks?.() || []);
+  // The blocks as the latest score update published them (its own copy, so the panel never draws the
+  // blocks of a view that has not taken the update yet); getBlocks only before the first update.
+  const blocks = () => state.blocks || getBlocks?.() || [];
   const textOf = (v) => (typeof v === "string" ? v : v?.[state.lang] || "");
 
   function select(name, value, options, labelKey) {
@@ -160,6 +162,7 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
     state.resolved = null;
     state.corrections = [];
     state.editing = null;
+    state.blocks = null;
     state.lang = ev.payload?.lang || "en";
     render();
   });
@@ -175,7 +178,10 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
     state.corrections.push(...fresh);
     render();
   });
-  bus.on("score_update", () => { if (state.request && !state.resolved) render(); });
+  bus.on("score_update", (ev) => {
+    state.blocks = ev.payload?.result?.blocks || state.blocks;
+    if (state.request && !state.resolved) render();
+  });
   onLang(render);
   render();
 
