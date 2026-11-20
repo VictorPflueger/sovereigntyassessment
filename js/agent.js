@@ -19,6 +19,7 @@ import { bus } from "./events.js";
 import { MODELS, AGENT, SERVER_TOOLS } from "./config.js";
 import { streamMessage, withRetry, ApiError } from "./anthropic.js";
 import { toolDefinitions, createToolbox, UI_BLOCKING_TOOLS, SERVER_TOOL_NAMES } from "./tools.js";
+import { getWeights } from "./weights.js";
 import { buildSystemPrompt, buildOpeningMessage, buildNudge } from "./prompt.js";
 import { createEvidenceRegistry } from "./evidence.js";
 import { createCostTracker } from "./cost.js";
@@ -47,6 +48,7 @@ export function disabledServerTool(err) {
  */
 export function createLiveAgent(hooks = {}) {
   let current = null;
+  let last = null; // the latest run, ended or not: its toolbox stays readable for the exports
 
   async function run({ query, entryId = null, lang = "en", modelId }) {
     const modelDef = MODELS.find((m) => m.id === modelId) || MODELS[0];
@@ -64,6 +66,7 @@ export function createLiveAgent(hooks = {}) {
       exchanges: 0
     };
     current = r;
+    last = r;
     const decisions = createDecisionQueue(() => r.ended, () => r.cancelled, ABORT);
     r.decisions = decisions;
 
@@ -74,7 +77,8 @@ export function createLiveAgent(hooks = {}) {
       next: (type, pred) => decisions.next(type, pred),
       onPhase: (s) => setPhase(r, s),
       now: () => todayDate,
-      service: { query, entry_id: entryId }
+      service: { query, entry_id: entryId },
+      weights: getWeights()
     });
     r.toolbox = toolbox;
 
@@ -404,7 +408,7 @@ export function createLiveAgent(hooks = {}) {
     finish(r, "aborted", "controls.aborted");
   }
 
-  return { run, abort, isActive: () => !!current && !current.ended, toolbox: () => current?.toolbox || null };
+  return { run, abort, isActive: () => !!current && !current.ended, toolbox: () => (current || last)?.toolbox || null };
 }
 
 // -----------------------------------------------------------------------------------------------------

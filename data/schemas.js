@@ -38,6 +38,9 @@
     }
   };
   var DATE = { type: "string", format: "date" };
+  // The overall score's layer weights (brief §6.5): one per layer, from 0 to 3, as the method view offers them.
+  var WEIGHTS = { type: "object", additionalProperties: false, properties: {} };
+  LAYERS.forEach(function (l) { WEIGHTS.properties[l] = { type: "number", minimum: 0, maximum: 3 }; });
   var TIMESTAMP = { type: "string", pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}" };
   var URL = { type: "string", pattern: "^https?://[^\\s]+$" };
   var LANG = { type: "string", pattern: "^[a-z]{2}$" };
@@ -136,7 +139,7 @@
       required: ["method_version", "facts"],
       properties: {
         method_version: { type: "string", minLength: 1 },
-        weights: { type: "object", additionalProperties: { type: "number", minimum: 0 } },
+        weights: WEIGHTS,
         facts: { type: "object", additionalProperties: FACT_VALUE }
       }
     }),
@@ -171,7 +174,7 @@
       }
     }),
     Assessment: schema("Assessment", {
-      description: "A whole assessment as the app exports and replays it: the service, its as-of date, its source and the method version, the profile, the blocks, the layers' statuses and the person's corrections and decisions.",
+      description: "A whole assessment as the app exports and replays it: the service, its as-of date, its source and the method version, the profile (null while the agent has recorded none), the blocks as the agent recorded them with the reviewer's corrections apart, the layers' statuses, the layer weights in force and the person's decisions. Code adds each block's classes and level and the result's facts; an import computes them afresh.",
       type: "object", additionalProperties: false,
       required: ["service", "category", "as_of", "source", "method_version", "profile", "blocks", "layers"],
       properties: {
@@ -182,10 +185,10 @@
         as_of: DATE,
         source: { type: "string", enum: ["hand_authored", "recorded", "live"] },
         method_version: { type: "string", minLength: 1 },
-        profile: { $ref: "ServiceProfile.json" },
+        profile: { anyOf: [{ $ref: "ServiceProfile.json" }, { type: "null" }] },
         blocks: { type: "array", items: { $ref: "BuildingBlock.json" } },
         layers: { type: "array", items: { $ref: "LayerStatus.json" } },
-        weights: { type: "object", additionalProperties: { type: "number", minimum: 0 } },
+        weights: WEIGHTS,
         result: { $ref: "EngineResult.json" },
         decisions: { type: "array", items: { $ref: "Decision.json" } }
       }

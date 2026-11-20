@@ -4,7 +4,9 @@
 // portal's order, so the web is a hexagon. By building block: one axis per block at 25 × its level,
 // labelled with its id, its Made-in and Run-by codes and its name; an unscored block's axis is dashed.
 // The assessed service is teal (--vc-data-2) on its pastel fill: merlot means the person in charge
-// (DESIGN.md). Nothing round: markers and rings are polygons (tests/hexagon.mjs).
+// (DESIGN.md). Compare draws a second assessment over the first in apricot (--vc-data-3), with a dashed
+// line and hollow markers, so the two series also differ without colour. Nothing round: markers and
+// rings are polygons (tests/hexagon.mjs).
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -57,8 +59,10 @@ export function wrapWords(text, width, maxLines = 3) {
 }
 
 /**
- * The diagram. axes: [{ id, lines: [text…] (the label), value (0 to 100, or null), valueText, title }].
- * kind: "layer" or "block". ticks: [{ f, text }] ring labels. box: the host's size in pixels, when known.
+ * The diagram. axes: [{ id, lines: [text…] (the label), value (0 to 100, or null), valueText, title,
+ * dashed? }]. kind: "layer" or "block". ticks: [{ f, text }] ring labels. box: the host's size in pixels,
+ * when known. second (Compare): { values: [0 to 100 or null per axis], texts: [value text per axis] },
+ * drawn over the first series; an axis is dashed when `dashed` says so, else when it has no value.
  * Returns the <svg>.
  *
  * With a box, one unit of the drawing is one pixel: the web takes what room the labels leave, and the
@@ -97,7 +101,7 @@ export function spiderGeometry(kind, n, box = null, longest = 0) {
   return { W, H, cx: W / 2, cy: H / 2 + 4, r };
 }
 
-export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "", box = null }) {
+export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "", box = null, second = null, id = "spider" }) {
   const n = axes.length;
   // A short box: the block view's labels keep only the id and the codes, at the small size (each axis's
   // tooltip, the honeycomb and the table still name the block).
@@ -124,8 +128,8 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   // A small web (a short map): no ring labels, smaller values, so nothing crowds the markers.
   const tight = geo.r < 90;
   const ring = Math.max(n, 3) === n ? n : 6; // fewer than three axes: hexagon rings
-  const root = svg("svg", { class: "spider", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "spider-title spider-desc", "data-view": kind, "data-axes": n, preserveAspectRatio: "xMidYMid meet" });
-  root.append(svg("title", { id: "spider-title" }, title), svg("desc", { id: "spider-desc" }, desc));
+  const root = svg("svg", { class: "spider", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": `${id}-title ${id}-desc`, "data-view": kind, "data-axes": n, preserveAspectRatio: "xMidYMid meet" });
+  root.append(svg("title", { id: `${id}-title` }, title), svg("desc", { id: `${id}-desc` }, desc));
 
   // Rings for levels 1 to 4 (25, 50, 75, 100); level 0 is the centre.
   const rings = svg("g", { class: "sp-rings", "aria-hidden": "true" });
@@ -146,7 +150,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   const axesG = svg("g", { class: "sp-axes" });
   axes.forEach((ax, i) => {
     const [x2, y2] = axisPoint(i, n, 1, geo);
-    const dashed = ax.value === null || ax.value === undefined;
+    const dashed = ax.dashed !== undefined ? !!ax.dashed : ax.value === null || ax.value === undefined;
     const g = svg("g", { class: "sp-axis-g", "data-axis": ax.id, "data-value": dashed ? "" : String(ax.value), "data-dashed": dashed ? "true" : "false" });
     g.append(svg("title", {}, ax.title || ax.lines.join(" ")));
     g.append(svg("line", { class: dashed ? "sp-axis sp-axis--dashed" : "sp-axis", x1: geo.cx, y1: geo.cy, x2: r2(x2), y2: r2(y2) }));
@@ -189,5 +193,25 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     marks.append(svg("text", { class: big && !tight ? "sp-value" : "sp-value sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, ax.valueText));
   });
   root.append(marks);
+
+  // A second assessment (Compare): its area with a dashed line, hollow markers, the value on the other
+  // side of the axis.
+  if (second) {
+    const val = (i) => { const v = second.values?.[i]; return v === null || v === undefined ? null : Math.max(0, Math.min(100, v)); };
+    const pts2 = axes.map((ax, i) => (val(i) === null ? null : axisPoint(i, n, val(i) / 100, geo))).filter(Boolean);
+    if (pts2.length >= 2) root.append(svg("polygon", { class: "sp-area sp-area--b", points: pts2.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
+    const marks2 = svg("g", { class: "sp-markers sp-markers--b" });
+    axes.forEach((ax, i) => {
+      if (val(i) === null) return;
+      const [x, y] = axisPoint(i, n, val(i) / 100, geo);
+      marks2.append(svg("polygon", { class: "sp-marker sp-marker--b", points: hexPoints(x, y, big ? 7.5 : 6), "data-axis": ax.id, "data-value": String(second.values[i]) }));
+      const a = axisAngle(i, n);
+      const off = big ? 20 : 15;
+      const tx = x + Math.cos(a - Math.PI / 2) * off * 0.9 + Math.cos(a) * 4;
+      const ty = y + Math.sin(a - Math.PI / 2) * off * 0.9 + Math.sin(a) * 4 + 5;
+      marks2.append(svg("text", { class: big && !tight ? "sp-value sp-value--b" : "sp-value sp-value--b sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, second.texts?.[i] ?? ""));
+    });
+    root.append(marks2);
+  }
   return root;
 }

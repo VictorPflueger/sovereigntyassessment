@@ -6,7 +6,16 @@
 
 import { t } from "./i18n/index.js";
 import { renderFacts, formatFact } from "./facts.js";
-import { fmtDate } from "./format.js";
+import { fmtDate, fmtWeight } from "./format.js";
+import { LAYERS } from "./engine.js";
+
+/** The layer weights as a line of text when they are not all equal (the person's assumption), else null. */
+export function weightsLine(weights, lang) {
+  if (!weights) return null;
+  const values = LAYERS.map((l) => Number(weights[l] ?? 1));
+  if (values.every((v) => v === values[0])) return null;
+  return t("report.weights", { list: LAYERS.map((l, i) => t("report.weights.item", { layer: t(`layer.${l}.short`, null, lang), weight: fmtWeight(values[i], lang) }, lang)).join(", ") }, lang);
+}
 
 /** A party as text: "Governikus GmbH & Co. KG (DE)", with its parent; null is unknown. */
 export function partyText(p, lang) {
@@ -62,6 +71,7 @@ export function memoMarkdown(memo, lang = memo.lang) {
     "- " + overall,
     "- " + weakestLine(before, after, id, lang),
     "- " + exclusive,
+    ...(weightsLine(memo.weights, lang) ? ["- " + weightsLine(memo.weights, lang)] : []),
     "",
     "*" + t("memo.indicative", null, lang) + "*",
     "",
@@ -83,10 +93,22 @@ function weakestLine(before, after, id, lang) {
     : t("memo.fig.weakest.now", { before: now }, lang);
 }
 
-/** The report as Markdown, in its own language: the agent's findings, then the parts code writes. */
+/** The report as Markdown: the agent's findings, then the parts code writes (reportParts). */
 export function reportMarkdown(report, lang = report.lang) {
+  const p = reportParts(report, lang);
+  return [p.findings, "", p.closing].join("\n");
+}
+
+/**
+ * The report's two parts as Markdown: the agent's findings in the language they were written in, with
+ * their figures rendered in it, and the parts code writes in `lang` (the Outbox: the run's language; an
+ * export: the active language, brief §5): the reviewer's corrections, the decision, the layer weights
+ * when a person changed them, the sources, the method line and "Draft. Nothing is sent."
+ */
+export function reportParts(report, lang = report.lang) {
   const c = report.closing || {};
-  const out = [renderFacts(report.markdown, report.values, lang).trim(), ""];
+  const findings = renderFacts(report.markdown, report.values, report.lang || lang).trim();
+  const out = [];
   if (report.outcome === "assessed") {
     out.push("## " + t("report.corrections", null, lang), "");
     if (c.corrections?.length) {
@@ -106,6 +128,8 @@ export function reportMarkdown(report, lang = report.lang) {
     }
     out.push("");
   }
+  const weights = weightsLine(c.weights, lang);
+  if (weights) out.push("## " + t("report.assumptions", null, lang), "", weights, "");
   if (c.sources?.length) {
     out.push("## " + t("report.sources", null, lang), "");
     for (const s of c.sources) {
@@ -117,5 +141,5 @@ export function reportMarkdown(report, lang = report.lang) {
     out.push("");
   }
   out.push("*" + t("report.footer", { date: fmtDate(c.as_of, lang), method: c.method_version || "" }, lang) + "*", "", "**" + t("outbox.draftNote", null, lang) + "**");
-  return out.join("\n");
+  return { findings, closing: out.join("\n") };
 }

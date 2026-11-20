@@ -178,6 +178,12 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
     state.corrections.push(...fresh);
     render();
   });
+  // New layer weights: the summary's figures follow.
+  bus.on("weights_change", (ev) => {
+    if (!state.request || !ev.payload?.values) return;
+    state.request = { ...state.request, values: { ...(state.request.values || {}), ...ev.payload.values } };
+    render();
+  });
   bus.on("score_update", (ev) => {
     state.blocks = ev.payload?.result?.blocks || state.blocks;
     if (state.request && !state.resolved) render();

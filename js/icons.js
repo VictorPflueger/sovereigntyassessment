@@ -13,7 +13,7 @@ const VICI = {
   chevronDown: "chevron-down", chevronUp: "chevron-up", chevronRight: "chevron-right", eye: "eye",
   external: "external", spark: "sparkle", users: "users", clock: "clock", layers: "layers",
   honeycomb: "honeycomb", search: "search", link: "link", book: "book", flag: "flag", filter: "filter",
-  chart: "chart-bar", help: "help", lock: "lock", hexagon: "hexagon"
+  chart: "chart-bar", help: "help", lock: "lock", hexagon: "hexagon", upload: "upload"
 };
 
 /** The app's own drawings (static, trusted strings; never built from data). */

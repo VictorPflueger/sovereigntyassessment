@@ -22,6 +22,7 @@ import { createToolbox, pickLang } from "./tools.js";
 import { createEvidenceRegistry } from "./evidence.js";
 import { createDecisionQueue } from "./run_common.js";
 import { memoTemplate } from "./drafts.js";
+import { getWeights } from "./weights.js";
 
 const ABORT = Symbol("abort");
 
@@ -51,10 +52,12 @@ export function prepareEvidence(input, registry) {
 
 export function createSimulationPlayer({ getSpeed }) {
   let current = null;
+  let last = null; // the latest run, ended or not: its toolbox stays readable for the exports
 
   async function play(def, { lang = "en", service = "", mode = "simulation" } = {}) {
     const r = { ended: false, cancelled: false, waiters: new Set(), calls: 0 };
     current = r;
+    last = r;
     const registry = createEvidenceRegistry();
     const decisions = createDecisionQueue(() => r.ended, () => r.cancelled, ABORT);
     r.decisions = decisions;
@@ -66,7 +69,8 @@ export function createSimulationPlayer({ getSpeed }) {
       next: (type, pred) => decisions.next(type, pred),
       onPhase: (s) => { if (s && s !== phase && !r.ended) { phase = s; bus.emit("state_change", { state: s }); } },
       now: () => asOf,
-      service: { query: def.query, entry_id: def.entry_id, name: service }
+      service: { query: def.query, entry_id: def.entry_id, name: service },
+      weights: getWeights()
     });
     r.toolbox = toolbox;
 
@@ -163,5 +167,5 @@ export function createSimulationPlayer({ getSpeed }) {
     end(r, "aborted", "controls.aborted");
   }
 
-  return { play, abort, isActive: () => !!current && !current.ended, toolbox: () => current?.toolbox || null };
+  return { play, abort, isActive: () => !!current && !current.ended, toolbox: () => (current || last)?.toolbox || null };
 }

@@ -72,9 +72,9 @@ export const CLIENT_TOOLS = Object.freeze([
     input_schema: obj(["query"], { query: { type: "string" } }) },
   { name: "ref_facts", description: "Bundled structural facts verified at build time, each with URL, title, verbatim quote and the fields it supports, for example how iOS and Android apps are distributed and how they receive push messages.",
     input_schema: obj(["topic"], { topic: { type: "string", enum: ["app_distribution", "push_messaging", "mobile_os", "browsers", "federal_it"] } }) },
-  { name: "rec_profile", description: "Record the service profile: names, category, what it does, how it works, owner, operator, status, legal basis and sources. Write in the run's language; figures only as placeholders.",
+  { name: "rec_profile", description: "Record the service profile: names, category, what it does, how it works, owner, operator, status, legal basis and sources. Write in the run's language; figures only as placeholders. The category self_assessment is for this prototype itself only.",
     input_schema: obj(["names", "category", "what", "how", "owner", "operator", "status", "evidence"], {
-      names: { type: "array", minItems: 1, items: { type: "string" } }, category: { type: "string", enum: ["base_service", "platform_or_access"] },
+      names: { type: "array", minItems: 1, items: { type: "string" } }, category: { type: "string", enum: ["base_service", "platform_or_access", "self_assessment"] },
       what: { type: "string" }, how: { type: "string" }, owner: PARTY, operator: PARTY, status: { type: "string" },
       legal_basis: { type: "string" }, governance: { type: "string" }, evidence: EVIDENCE(PROFILE_FIELDS)
     }) },
@@ -171,6 +171,8 @@ const isoDay = (d) => (d instanceof Date ? d : new Date(d)).toISOString().slice(
  *   now()                      today, for the read_on date of evidence
  *   catalogue, refFacts        the bundled data (window.SA_CATALOGUE and window.SA_REF_FACTS by default)
  *   service                    { query, entry_id }
+ *   weights                    the overall score's layer weights when the run starts (js/weights.js;
+ *                              equal by default); setWeights() changes them during or after the run
  * }
  * execute(name, input) resolves { content (string for tool_result), isError, result (object), summary }.
  */
@@ -185,7 +187,7 @@ export function createToolbox(ctx) {
     blocks: new Map(),         // id → { recorded, checks, corrections, log, view }
     nextId: 1,
     layerStatus: {},           // layer → { status, reason, evidence }
-    weights: { ...EQUAL_LAYER_WEIGHTS },
+    weights: { ...EQUAL_LAYER_WEIGHTS, ...(ctx.weights || {}) },
     result: null,              // the engine's latest result on the current blocks
     whatifs: {},               // lever id → { changes, facts }
     known: new Set(),          // fact keys a tool returned to the model
@@ -193,6 +195,7 @@ export function createToolbox(ctx) {
     review: "none",
     reviewAction: null,
     corrections: [],           // the reviewer's corrections, in order
+    decisions: [],             // the person's steps with their times: the choice, the review, the lever
     levers: "none",
     leverSet: null,            // the levers payload on screen
     optionsSeq: 0,
@@ -531,6 +534,7 @@ export function createToolbox(ctx) {
       phase("awaiting_choice");
       emit("choice_request", { request_id, question: i.question, candidates: i.candidates, lang });
       const d = await ctx.next("choice_decision", (p) => p.request_id === request_id);
+      run.decisions.push({ kind: "choice", request_id, chosen: Number.isInteger(d.chosen) ? d.chosen : null, by: "user", ts: new Date().toISOString() });
       phase("understanding");
       const chosen = Number.isInteger(d.chosen) ? i.candidates[d.chosen] : null;
       return chosen
@@ -551,6 +555,7 @@ export function createToolbox(ctx) {
         if (d.action === "correct") { applyCorrection(d); continue; }
         run.review = "resolved";
         run.reviewAction = d.action === "skip" ? "skip" : "confirm";
+        run.decisions.push({ kind: "review", request_id, action: run.reviewAction, by: "user", ts: new Date().toISOString() });
         break;
       }
       run.scoredFresh = true;
@@ -593,6 +598,7 @@ export function createToolbox(ctx) {
       const d = await ctx.next("lever_decision", (p) => p.options_seq === options_seq && valid.has(p.lever_id));
       run.levers = "decided";
       run.decision = d.lever_id;
+      run.decisions.push({ kind: "lever", lever_id: d.lever_id, by: "user", ts: new Date().toISOString() });
       phase("drafting");
       const chosen = levers.find((l) => l.lever_id === d.lever_id);
       return {
@@ -614,6 +620,7 @@ export function createToolbox(ctx) {
         before: { ...run.result.facts },
         after: lever ? { ...lever.whatif.facts } : null,
         values: values(),
+        weights: { ...run.weights },
         status: "draft",
         audit: a.unchecked ? "unchecked" : "passed",
         ...(a.unchecked ? { unchecked: a.unchecked } : {})
@@ -636,6 +643,7 @@ export function createToolbox(ctx) {
         closing: {
           as_of: today(),
           method_version: METHOD_VERSION,
+          weights: { ...run.weights },
           review: run.reviewAction,
           corrections: run.corrections.map((c) => ({ ...c })),
           decision: run.decision ? { lever_id: run.decision, title: lever ? lever.title : null, facts: lever ? { ...lever.whatif.facts } : null } : null,
@@ -754,10 +762,73 @@ export function createToolbox(ctx) {
     return ctx.registry.addCitation(citation);
   }
 
+  /**
+   * New layer weights for the overall score (the method view; brief §6.5): the person's assumption,
+   * during or after the run. Recomputes the assessment, prices the proposed levers again with the same
+   * changes, and brings the drafts' figures up to date (their texts cite figures only as placeholders,
+   * so a draft stays true to the screen). Returns what the screen needs, or null when nothing changed.
+   */
+  function setWeights(next) {
+    const to = { ...EQUAL_LAYER_WEIGHTS, ...(next || {}) };
+    if (LAYERS.every((l) => to[l] === run.weights[l])) return null;
+    const from = { ...run.weights };
+    run.weights = to;
+    if (!run.blocks.size && !Object.keys(run.layerStatus).length) return { from, to, result: null, values: values() };
+    recompute();
+    const opts = { layerWeights: run.weights, layerStatus: layerStatusMap() };
+    for (const [id, w] of Object.entries(run.whatifs)) run.whatifs[id] = { changes: w.changes, facts: whatIf(effectiveBlocks(), id, w.changes, opts).facts };
+    // New objects throughout: the events already sent keep the figures they showed (the audit log
+    // holds them), and the change itself travels as its own event.
+    let levers = null;
+    if (run.leverSet) {
+      run.leverSet = {
+        ...run.leverSet,
+        levers: run.leverSet.levers.map((l) => ({ ...l, whatif: { facts: { ...run.whatifs[l.lever_id].facts } } })),
+        keep: { facts: { ...run.result.facts } },
+        values: values()
+      };
+      levers = { options_seq: run.leverSet.options_seq, levers: run.leverSet.levers.map((l) => ({ lever_id: l.lever_id, facts: { ...l.whatif.facts } })), keep: { ...run.result.facts }, values: values() };
+    }
+    let memo = null;
+    if (run.memo) {
+      const lever = run.leverSet?.levers.find((l) => l.lever_id === run.memo.lever_id) || null;
+      run.memo = { ...run.memo, before: { ...run.result.facts }, after: lever ? { ...lever.whatif.facts } : null, values: values(), weights: { ...run.weights } };
+      memo = { before: run.memo.before, after: run.memo.after, values: run.memo.values, weights: run.memo.weights };
+    }
+    let report = null;
+    if (run.reported) report = { values: values(), weights: { ...run.weights }, decision_facts: run.decision && run.decision !== "keep" ? { ...run.whatifs[run.decision]?.facts } : null };
+    return { from, to, result: publicResult(), values: values(), levers, memo, report };
+  }
+
+  /**
+   * The run as a record, for the assessment export (js/assessment.js): each block as the agent recorded
+   * it with its evidence checks and the reviewer's corrections, the layers' statuses with their reasons
+   * and evidence, the profile, the weights and the person's steps. Copies: changing them changes nothing.
+   */
+  function records() {
+    return structuredClone({
+      lang,
+      profile: run.profile,
+      blocks: [...run.blocks.values()].map((b) => ({ recorded: b.recorded, checks: b.checks, corrections: b.corrections, log: b.log })),
+      layerStatus: run.layerStatus,
+      weights: run.weights,
+      review: run.review,
+      reviewAction: run.reviewAction,
+      corrections: run.corrections,
+      decisions: run.decisions,
+      decision: run.decision,
+      reported: run.reported,
+      outcome: run.outcome
+    });
+  }
+
   return {
     execute,
     research,
     cite,
+    setWeights,
+    records,
+    weights: () => ({ ...run.weights }),
     /** A summary of the run for the agent loop, the player, the recorder and the tests. */
     state: () => ({
       reported: run.reported, outcome: run.outcome, blocks: run.blocks.size, review: run.review, reviewAction: run.reviewAction,

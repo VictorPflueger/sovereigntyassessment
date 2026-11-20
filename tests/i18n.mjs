@@ -39,7 +39,9 @@ const same = en.filter((k) => EN[k] === DE[k] && !/^(app\.title|app\.name)$/.tes
 const SAME_ALLOWED = new Set(["mode.simulation", "diag.col.status", "diag.col.details", "dialog.key.workspaces", "dialog.key.apiKeys",
   // Names and words that German uses as they are: a layer's short name, a country, the run's title line.
   "layer.devsecops.short", "class.CN", "field.hosting", "blocks.col.hosting", "map.col.status", "map.col.name", "review.partyName",
-  "console.run.sim", "outbox.kind.memo", "audit.tokens"]);
+  "console.run.sim", "outbox.kind.memo", "audit.tokens",
+  // Version 0.3.0: words German uses as they are.
+  "centre.portfolio", "portfolio.title", "export.title"]);
 const untranslated = same.filter((k) => !SAME_ALLOWED.has(k));
 check(!untranslated.length, "every text is translated (the same in both only for names and codes)", untranslated.map((k) => `${k}: "${EN[k]}"`).join("; "));
 
@@ -108,7 +110,14 @@ const FAMILIES = {
   "outbox.kind.": ["memo", "report"],
   "blocks.ev.verified.": ["fetched_text", "citation", "ref_facts", "recording", "catalogue"],
   "review.": ["tech", "operator", "tech.name", "tech.country", "operator.name", "operator.country"],
-  "badge.": ["live", "simulation"]
+  "badge.": ["live", "simulation"],
+  // Version 0.3.0: the centre's views, the Portfolio, the exports and the method view.
+  "centre.": ["assessment", "compare", "portfolio"].flatMap((v) => [v, `${v}.title`]),
+  "portfolio.cat.short.": ["base_service", "platform_or_access", "self_assessment"],
+  "export.": ["reportMd", "reportHtml", "assessment", "audit"],
+  "method.look.": LAYERS,
+  "method.source.": ["layers", "seal", "criteria"],
+  "method.seal.": ["0", "1", "2", "3", "4"]
 };
 const families = [];
 for (const [prefix, values] of Object.entries(FAMILIES)) {
