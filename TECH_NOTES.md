@@ -101,13 +101,13 @@ Victor approved the plan's defaults on 19 November 2026 ("Continue with the next
 ## 12. Deviations and open issues
 
 - **Hygiene without the private term list.** The brief has Victor add the list as the `HYGIENE_TERMS` secret; he cannot provide it. CI therefore runs `tests/hygiene.mjs` in its generic mode (e-mail addresses only), which says so ("HYGIENE GENERIC OK"). Before each push the build session runs the same test with its own list from a file outside the repository (`HYGIENE_TERMS_FILE`), which must print "HYGIENE OK". The list itself never enters the repository. The test's header is reworded neutrally; its code is the Timetable Translator's.
-- **Not yet run against the real API.** Version 0.2.0 runs the live agent against a stand-in that streams the real protocol (§13, `tests/live.mjs`); no key is part of the build. The first live run is Victor's (AC-21; the README's run book), and it is where the citations of fetched pages (I2, I3) are confirmed on the real API.
-- **The method view** (brief §9: the layers, the level rules and their source, the editable weights, the class and evidence rules, what the score is not) was announced here for version 0.2.0, but no milestone of PLAN.md h holds it, and version 0.2.0 does not have it. The engine already takes layer weights (§8). Proposed for version 0.3.0, with Compare and Portfolio; an open decision for Victor. The Commission's implementation guidance (PLAN.md, M3) needed an approval in Phase 0 that was not given and is still unread; the view will quote the framework's v1.2.1 and name the version (I10).
+- **Not yet run against the real API.** Versions 0.2.0 and 0.3.0 run the live agent against a stand-in that streams the real protocol (§13, `tests/live.mjs`); no key is part of the build. The first live run is Victor's (AC-21; the README's run book), and it is where the citations of fetched pages (I2, I3) are confirmed on the real API.
+- **The method view** (brief §9) was announced here for version 0.2.0, which did not have it; the pull request of 0.2.0 proposed it for 0.3.0, and Victor merged it without comment, which this build took as accepted. Version 0.3.0 has it (§21). The Commission's implementation guidance (PLAN.md, M3) needed an approval in Phase 0 that was not given and is still unread; the view will quote the framework's v1.2.1 and name the version (I10).
 - **Pages the fetch tool could not read** while the pre-runs were researched: the Federal Portal's own pages return only a JavaScript notice; one paywalled teaser, SAP's imprint and one press article refused the tool; one procurement notice came back empty. None of them is cited; §17 lists what was used instead. One redirect target needed an approval that went unanswered and was not used.
 - **Header at laptop widths.** Below 1,500 px the four tiles take a row of their own, so the prototype line and the tiles keep their full text (DESIGN.md §6).
 - **The open drawer on a 1280 × 720 screen** leaves the map and the console a strip: the review, the levers and the drafts stay fully usable in the drawer, and Hide gives the map its room back. The spider diagram keeps its labels legible at any size it gets (DESIGN.md §9); the layout of short screens is part of M4's hardening.
 
-| Issue | Topic | Status in 0.2.0 |
+| Issue | Topic | Status in 0.3.0 |
 |---|---|---|
 | I1 | No schema validator in the sister apps | Done: `js/schema.js` (§10) |
 | I2 | Fetched-document citations carry no URL | Done: the document registry maps a citation's index to the fetched document's URL (§14); confirmed live in AC-21 |
@@ -118,7 +118,7 @@ Victor approved the plan's defaults on 19 November 2026 ("Continue with the next
 | I7 | The shell's paid probe fails on Sonnet 5.5 | Not used (§3) |
 | I8 | Number words and years in the audit | Done: D9 and D10 (§9) |
 | I9 | Deutschland-App is a prototype in a pilot | Done: the catalogue's status and aliases (DATA_SOURCES.md §3) |
-| I10 | SEAL-3's name differs between sources | Open: the method view, proposed for version 0.3.0 (§12) |
+| I10 | SEAL-3's name differs between sources | Done: the method view names the levels as version 1.2.1 of the framework does, with its source and the date read (§21) |
 | I11 | The portfolio's share | Done: pooled over the blocks (§8) |
 
 ## 13. The live agent
@@ -158,3 +158,48 @@ A pre-run is a script `data/runs/<entry>.js` that sets `window.SA_RUNS["<entry>"
 ## 17. How the pre-runs were researched and verified
 
 The six pre-runs were written by hand on 19 November 2026 from public pages found with the build session's web search and read with its web fetch tool. That tool answers with a small model's reading of the page, so each check asked for the sentence verbatim, and only a quote the tool returned verbatim (or returned as consecutive verbatim parts) was used. The build session kept a log with one row per quote (URL, quote, result, date, the tool's answer); it is not part of the repository, and `research/` holds every quote the pre-runs cite, with its URL, title and read date. Where a page could not be read, nothing from it is cited (§12): the Federal Portal's pre-run rests on § 9a EGovG, the BMDS's Deutschland-Stack paper, a Bundestag news item on a parliamentary answer and the BundID's imprint; SAP's seat comes from SAP's corporate governance statement. Facts that only a press report gives (the Deutschland-App's cloud, platform and messenger) say so in the block's note and carry low confidence, and a block whose maker no source names (ePayBL's software, the Federal Portal's platform) is recorded as a gap rather than guessed.
+
+## 18. Decision D3: the pre-runs of version 0.3.0
+
+D3 asks for a pre-run for every remaining catalogue entry with enough public evidence. The criterion applied on 20 November 2026: a pre-run is bundled where public sources name, for the critical building blocks of most layers, who makes and who runs them, so that the assessment says something about the service rather than about the gaps in its sources. Where the sources describe a plan, a standard, a category or a component without naming makers or operators, the entry gets a research note in `research/` instead, which lists what was read and says why it is not enough. Live mode accepts every entry either way.
+
+| Entry | Outcome | Why |
+|---|---|---|
+| BundID, Online-Ausweis, FIT-Connect, ePayBL, Bundesportal, Deutschland-App | Pre-run (0.2.0) | The brief's six |
+| EUDI Wallet | Pre-run | The project's pages and news reports name the developer and the operator of the app, the issuer of the digital ID and the app stores; the wallet is not in operation yet, so the pre-run describes the plans the sources state |
+| Mein Unternehmenskonto | Pre-run | Bavarian rules, the data protection notice and a registration guide name the operator, the hosting in Germany and the developers of the mailbox and the authorisation control |
+| KIPITZ | Pre-run | A parliamentary answer, trade reports and a survey name who built and who runs it and what kind of models it uses; the models themselves are not named, which is a gap |
+| openCode | Pre-run | openCode's own pages name its operator and the software it rests on; the hosting provider is not named, which is a gap |
+| German Administration Cloud (DVC) | Pre-run | Its website and a conference talk name the operator and the two cloud providers; who runs each platform is not named |
+| NOOTS | Research note | Only the operator is named; no maker, hosting or software |
+| ZaPuK | Research note | A target architecture, not yet a service |
+| ZBDS | Research note | Named in the Deutschland-Stack papers without a description of its own |
+| Low-code and workflow automation | Research note | A category in a standards catalogue; no product is named |
+| Marktplatz Deutschland Digital | Research note | Only its technical basis, the Cloud Service Portal, is named, not who makes or runs it |
+| This prototype (self-assessment) | Pre-run | The seventeenth entry, in the category `self_assessment` (§19) |
+
+The five new pre-runs were researched like the first six (§17): every quote was read verbatim with the web fetch tool on 20 November 2026, each cited URL was found by a search, listed in the catalogue or read directly, and `tools/check-runs.mjs` sets each quote's verified flag from `research/`. Where the sources do not name a platform under a service that clearly has one (Mein Unternehmenskonto, the DVC), the pre-run records it as a block whose maker is unknown, as the Federal Portal's does; its level is then capped and the review can name the maker. In `tools/check-runs.mjs`, the reference facts are now loaded before the first flag is set, so a pre-run checked on its own keeps the verified flags of the bundled facts it cites.
+
+## 19. The self-assessment
+
+The seventeenth catalogue entry is this prototype, in the category `self_assessment`, shown in the catalogue in a group of its own and left out of the Portfolio, whose category shares would otherwise mix a prototype with public services. Its pre-run answers "a sovereignty tool on a US model?" in the method's own terms: GitHub Pages serves the site and GitHub keeps the code and runs the tests (GitHub, Inc., owned by Microsoft, both US); Live mode runs on Anthropic's Claude API, whose only workspace geo is the United States, and its web search and web fetch run as server tools on Anthropic's infrastructure; the visitor's browser comes from a US maker. The prototype's code and Vici are blocks whose maker's country no public source read states, so they are gaps, not German blocks by assumption; the review can correct that with a reason. The lever moves the model to an EU region of a cloud platform: only the hosting changes, the run-by class stays US, and the prototype would need another endpoint (the security policy allows api.anthropic.com only, §4).
+
+## 20. Exports, imports and the loaded set
+
+**File names.** Every file starts with `sovereignty-assessment-`, then the kind where there is one, a slug of the service (umlauts written out, so "Bürger" becomes "buerger"), the date and the language: `sovereignty-assessment-report-<service>-<date>-<lang>.md` and `sovereignty-assessment-report-<service>-<date>-<lang>.html` for the report, `sovereignty-assessment-<service>-<as_of>-<lang>.json` for the assessment, and `sovereignty-assessment-audit-<run>-<lang>.json` for the audit log.
+
+**Language.** What code writes follows the active language: headings, labels, the tables, the closing part of the report, the decision, the corrections and the assumptions. The findings are model text and keep the language of the run; in HTML they carry their own `lang` attribute, and in Markdown a line says so when the two differ.
+
+**The HTML report** is one self-contained page: its styles inline, the spider diagram as inline SVG, no script, nothing loaded from anywhere, and a security policy in a meta element (`default-src 'none'; style-src 'unsafe-inline'; img-src data:`). The colours are Vici's light theme written out, so the page prints as it shows.
+
+**The assessment JSON** validates against the `Assessment` schema (`data/schemas.js`), which since 0.3.0 also holds the layer weights the figures were computed with. Every export passes through the same redaction as the audit log, so no key-like string can leave in a file.
+
+**Import.** Portfolio loads assessment files: JSON, at most 5 MB each, several at once. A file is accepted only when it parses, validates against the schema and has unique block ids and one status per layer; its figures are then computed again by the engine, never taken from the file. A refused file is named with the first reason.
+
+**The loaded set** holds the bundled pre-runs (derived without the player: the recorded steps up to the review, scored by the engine), each assessment of this session once its review is confirmed or skipped, and the files loaded. Items are keyed `entry:<id>` for a pre-run, `query:<text>` for a session assessment and `file:<name>:<as_of>:<source>` for a file, so loading the same file twice keeps one copy. Compare chooses two items from the set; Portfolio pools them all except the self-assessment, with the engine's pooled shares (§8, I11).
+
+## 21. Layer weights and the method view
+
+The method view opens from the Method button in the header and from the overall tile. It names the six layers with the portal's labels, the level rules with the SEAL scale of the EU Cloud Sovereignty Framework, version 1.2.1 (SEAL-0 "No Sovereignty" to SEAL-4 "Full Digital Sovereignty", read on 20 November 2026; DATA_SOURCES.md), how block, layer and overall scores are formed, the origin classes, the evidence rules, and what the score is not.
+
+Its weights section sets one weight per layer, from 0 to 3 in steps the menu offers (0, 0.5, 1, 1.5, 2, 3); all six at 0 is refused. A change recomputes the overall score at once with the engine's weighted mean, is logged as `weights_change` in the audit log with the weights before and after and `by: "user"`, prints a line in the console, and is named in the report under "Assumptions" and in the memo's figures. Reset brings back equal weights. The weights live in memory only: a reload starts with equal weights, so a shared link never carries someone else's assumption.

@@ -84,6 +84,18 @@ export function createLeversPanel(panel) {
 
   bus.on("run_start", (ev) => { state.set = null; state.choice = null; state.decided = null; state.lang = ev.payload?.lang || "en"; render(); });
   bus.on("levers", (ev) => { state.set = ev.payload; state.choice = null; state.decided = null; render(); });
+  // New layer weights: the same levers, priced again with them (the choice stays).
+  bus.on("weights_change", (ev) => {
+    const L = ev.payload?.levers;
+    if (!state.set || !L || L.options_seq !== state.set.options_seq) return;
+    state.set = {
+      ...state.set,
+      levers: state.set.levers.map((l) => ({ ...l, whatif: { facts: { ...(L.levers.find((x) => x.lever_id === l.lever_id)?.facts || l.whatif.facts) } } })),
+      keep: { facts: { ...L.keep } },
+      values: { ...L.values }
+    };
+    render();
+  });
   onLang(render);
   render();
   return { pending: () => !!state.set && !state.decided };

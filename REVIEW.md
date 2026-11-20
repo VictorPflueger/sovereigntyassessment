@@ -8,8 +8,9 @@ This file keeps two things: the list of shared-shell files this app adapted, wit
 |---|---|---|
 | 0.1.0 | M1 Shell, method and languages | The shared shell with Vici; English and German, the shell's strings included; mode and key dialogs; Diagnostics with "Run all tests"; the intro; the catalogue's sixteen entries; the first reference facts; the engine and the fact audit with the golden cases S1 to S4 and F01 to F29; the JSON Schemas; CI |
 | 0.2.0 | M2 Agent, pre-runs and levers | The live agent with web search and web fetch, adapted from Rebate Hunter's; the evidence check and the guardrails in code; the sovereignty map; review, levers and the memo; the recorder; six pre-runs in both languages; the simulation player; the API stand-in with the server tools |
+| 0.3.0 | M3 Comparison, portfolio and exports | Compare and the Portfolio over the loaded set, with assessment files to load; the report as Markdown and self-contained HTML, the assessment and the audit log as JSON; the method view with layer weights; five more pre-runs (D3) and the self-assessment of this prototype as the seventeenth catalogue entry |
 
-Comparison, the portfolio and the exports follow in version 0.3.0 (`PLAN.md`, section h). Version 0.2.0 changed no shared file; of the adapted modules, `js/handover.js` changed (below).
+Hardening and the release follow in version 1.0.0 (`PLAN.md`, section h). Versions 0.2.0 and 0.3.0 changed no shared file; of the adapted modules, `js/handover.js` changed in 0.2.0 (below). Version 0.3.0's own styles are in `css/map.css` and `css/panels.css`, as before.
 
 ## Part 2. The shared shell
 

@@ -33,6 +33,11 @@ export function fmtDelta(value, lang = getLang()) {
   return has(value) ? nf(lang, { maximumFractionDigits: 0, signDisplay: "exceptZero" }).format(Number(value)) : noData(lang);
 }
 
+/** A layer weight, with at most one decimal: 1.5 or 1,5. */
+export function fmtWeight(value, lang = getLang()) {
+  return has(value) ? nf(lang, { maximumFractionDigits: 1 }).format(Number(value)) : noData(lang);
+}
+
 /** A whole number with the language's grouping: 1,122 or 1.122. */
 export function fmtInt(value, lang = getLang()) {
   return has(value) ? nf(lang, { maximumFractionDigits: 0 }).format(Math.round(Number(value))) : noData(lang);

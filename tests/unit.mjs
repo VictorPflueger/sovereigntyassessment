@@ -11,7 +11,7 @@ import path from "node:path";
 import vm from "node:vm";
 import { pathToFileURL } from "node:url";
 import { APP_ROOT, ONLY, wanted } from "./lib/harness.mjs";
-import { fixture, allFixtures, blockFromRow } from "./lib/fixtures.mjs";
+import { fixture, allFixtures, blockFromRow, fixtureAssessment } from "./lib/fixtures.mjs";
 
 const mod = (p) => import(pathToFileURL(path.join(APP_ROOT, p)).href);
 const read = (f) => fs.readFileSync(path.join(APP_ROOT, f), "utf8");
@@ -154,7 +154,9 @@ await group("schemas", "the eleven schemas: the brief's example block, the golde
   for (const row of fixture("s2-assessment.json").blocks) check.ok(ok({ ...blockFromRow(row), evidence: example.evidence }, "BuildingBlock"), `S2 ${row.id}`);
   check.equal(ok(blockFromRow(fixture("s2-assessment.json").blocks[0]), "BuildingBlock"), false, "a block without evidence");
   const cat = dataScript("data/catalogue.js").SA_CATALOGUE;
-  check.equal(cat.entries.length, 16);
+  // Sixteen services and, from version 0.3.0, this prototype's self-assessment in a category of its own.
+  check.equal(cat.entries.length, 17);
+  check.equal(cat.entries.filter((e) => e.category === "self_assessment").map((e) => e.id).join(), "sovereignty-assessment");
   for (const e of cat.entries) check.ok(ok(e, "CatalogueEntry"), `catalogue ${e.id}`);
   const rf = dataScript("data/ref_facts.js").SA_REF_FACTS;
   check.ok(rf.facts.length >= 6);
@@ -415,6 +417,92 @@ await group("guards", "sequence rules (brief §7): review after every layer, lev
   check.equal(guardTool("ui_final_report", ready, { outcome: "stopped" }), null, "stopped may end a run before a report");
   check.match(guardTool("rec_block", { ...decided, memo: true, reported: true })?.error || "", /run is over/, "nothing runs after the report");
   check.match(guardTool("ui_choose_service", ready)?.error || "", /new run/, "a service is chosen only before any block");
+});
+
+// ---- the exports (AC-17): the JSON against the schemas, the import, the names, the language -----------
+await group("exports", "the assessment JSON of every pre-run is valid in both languages and imports to the same figures; broken copies are refused; the audit rows are valid AuditEvents; names; the report's language rule", async () => {
+  // The bundled data as the page has it: window globals.
+  const win = {};
+  for (const f of ["data/catalogue.js", "data/ref_facts.js", "data/schemas.js", ...fs.readdirSync(path.join(APP_ROOT, "data/runs")).map((x) => `data/runs/${x}`)]) {
+    const ctx = { window: win };
+    vm.runInNewContext(read(f), ctx, { filename: f });
+  }
+  globalThis.window = Object.assign(globalThis.window || {}, win);
+  globalThis.SA_RUNS = win.SA_RUNS;
+  const S = win.SA_SCHEMAS;
+  const { validate } = await mod("js/schema.js");
+  const A = await mod("js/assessment.js");
+  const { exportFileName, slugOf, reportMarkdownExport, assessmentJson } = await mod("js/export.js");
+  const runs = Object.values(win.SA_RUNS);
+  check.ok(runs.length >= 6, `the pre-runs (${runs.length})`);
+  for (const def of runs) {
+    for (const lang of ["en", "de"]) {
+      const a = await A.assessmentFromPreRun(def, lang, { catalogue: win.SA_CATALOGUE, refFacts: win.SA_REF_FACTS });
+      check.deepEqual(validate(a, S.Assessment, S).errors.slice(0, 2), [], `${def.id} ${lang}: valid`);
+      check.equal(a.lang, lang);
+      check.equal(a.as_of, def.as_of);
+      const back = A.readAssessment(assessmentJson(a), S);
+      check.ok(back.ok, `${def.id} ${lang}: the export reads back`);
+      check.deepEqual(back.assessment.result.facts, a.result.facts, `${def.id} ${lang}: the same figures after the import`);
+    }
+  }
+  // A golden case as a file: S2 imports to its exact overall score, 865/12.
+  const s2 = fixtureAssessment({ service: "Musterdienst", category: "base_service", rows: fixture("s2-assessment.json").blocks });
+  const s2back = A.readAssessment(JSON.stringify(s2), S);
+  check.ok(s2back.ok);
+  check.ok(Math.abs(A.scoreAssessment(s2back.assessment).overall - 865 / 12) < 1e-9, "S2's overall from the file");
+  check.equal(A.scoreAssessment(s2back.assessment, { infrastructure: 0 }).overall === A.scoreAssessment(s2back.assessment).overall, false, "the weights count");
+  // Broken files are refused, each for its reason; nothing of them is loaded.
+  const one = structuredClone(s2);
+  const broken = [
+    [{ ...one, service: undefined }, "no service"],
+    [{ ...one, category: "standard" }, "a category outside the set"],
+    [{ ...one, lang: "fr" }, "a language the app does not have"],
+    [{ ...one, weights: { infrastructure: 4 } }, "a weight above 3"],
+    [{ ...one, weights: { politics: 1 } }, "a weight for no layer"],
+    [{ ...one, blocks: [{ ...one.blocks[0], tech: { name: "X", country: "Germany", parent: null } }] }, "a country that is no code"],
+    [{ ...one, blocks: [{ ...one.blocks[0], evidence: [{ ...one.blocks[0].evidence[0], quote: "x".repeat(151) }] }] }, "a quote longer than 150 characters"],
+    [{ ...one, blocks: [{ ...one.blocks[0], evidence: [{ ...one.blocks[0].evidence[0], url: "javascript:alert(1)" }] }] }, "a source that is no web address"],
+    [{ ...one, blocks: [one.blocks[0], one.blocks[0]] }, "the same block twice"],
+    [{ ...one, script: "<script>" }, "a field outside the contract"]
+  ];
+  for (const [value, what] of broken) check.equal(A.readAssessment(JSON.stringify(value), S).ok, false, what);
+  check.equal(A.readAssessment("{ not json", S).ok, false, "text that is no JSON");
+  // The audit log of a played pre-run: every row a valid AuditEvent.
+  const { bus } = await mod("js/events.js");
+  const { initAudit, auditSnapshot } = await mod("js/audit.js");
+  const { playProblems } = await mod("js/runs_check.js");
+  const { createSimulationPlayer } = await mod("js/simulation.js");
+  initAudit();
+  let report = null;
+  const off = bus.on("report", (ev) => { report = ev.payload; });
+  const def = win.SA_RUNS.bundid;
+  bus.beginRun({ run_id: "run-unit-exports", mode: "simulation" });
+  bus.emit("run_start", { run_id: "run-unit-exports", mode: "simulation", query: def.query, entry_id: def.entry_id, lang: "en", source: def.source, as_of: def.as_of, weights: { infrastructure: 1 } });
+  const played = await playProblems(def, { lang: "en", choice: "L1", createPlayer: createSimulationPlayer });
+  off();
+  bus.endRun();
+  check.deepEqual(played.problems, []);
+  const snap = auditSnapshot();
+  const rows = [...snap.events, ...snap.model_calls];
+  check.ok(rows.length > 20, `audit rows (${rows.length})`);
+  const bad = rows.filter((r) => !validate(r, S.AuditEvent, S).valid).map((r) => r.type);
+  check.deepEqual(bad, [], "every audit row is an AuditEvent");
+  check.equal(snap.kind, "audit");
+  // The names: the prefix, a slug of the service, the date, the language.
+  check.equal(exportFileName("report", { service: "Online ID (eID)", date: "2026-11-19", lang: "en", ext: "md" }), "sovereignty-assessment-report-online-id-eid-2026-11-19-en.md");
+  check.equal(exportFileName(null, { service: "Souveränität für Bürger", date: "2026-11-20", lang: "de", ext: "json" }), "sovereignty-assessment-souveraenitaet-fuer-buerger-2026-11-20-de.json");
+  check.equal(slugOf("  …  "), "service");
+  // The report's language rule: what code writes follows the active language; the findings keep theirs.
+  check.ok(report && report.lang === "en", "the run's report");
+  const de = reportMarkdownExport(report, "de");
+  const en = reportMarkdownExport(report, "en");
+  check.match(de, /## Korrekturen/);
+  check.match(de, /Die Befunde oben sind auf Englisch/);
+  check.match(de, /# BundID: findings/);
+  check.match(en, /## Corrections by the reviewer/);
+  check.doesNotMatch(en, /The findings above are in/);
+  check.doesNotMatch(en + de, /\{\{fact:/);
 });
 
 // ---- report -----------------------------------------------------------------------------------------------

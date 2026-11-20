@@ -63,7 +63,9 @@ async function main(argv) {
   const only = argv.filter((a) => !a.startsWith("--"));
   const ids = runIds().filter((id) => !only.length || only.includes(id));
   const { parseResearch, applyFlags } = await load("js/runs_check.js");
+  // Both before the first flag is set: a quote of the bundled reference facts counts as verified.
   await load("data/catalogue.js");
+  await load("data/ref_facts.js");
   let failed = 0;
   let plays = 0;
   for (const id of ids) {

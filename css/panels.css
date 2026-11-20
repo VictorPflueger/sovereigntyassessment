@@ -124,3 +124,43 @@
 /* A short workspace (a laptop screen with the drawer open): the console keeps to its own area and its
  * log scrolls inside it, instead of running over the drawer's bar. */
 .console-panel { overflow: hidden; }
+
+/* ---- Version 0.3.0: the exports at the top of the Outbox, the method view, the overall tile ---------- */
+.export-card.vc-card { padding: 12px 14px; margin-bottom: 12px; }
+.export-card[hidden] { display: none; }
+.export-title { margin: 0 0 2px; font-size: var(--vc-font-size-md); font-weight: var(--vc-weight-semibold); }
+.export-lead { margin: 0 0 8px; color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+.export-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.export-item { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.export-btn.vc-button { min-height: 40px; min-width: 13.5em; justify-content: flex-start; }
+.export-btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.export-name { font-family: var(--vc-font-mono); font-size: var(--fs-xs); color: var(--vc-text-muted); overflow-wrap: anywhere; }
+.export-name[data-ready="false"] { font-family: var(--vc-font-text); font-style: italic; }
+.export-status { margin: 8px 0 0; min-height: 1.3em; font-size: var(--vc-font-size-sm); }
+
+.method { display: grid; gap: 4px; }
+.method-lead { margin: 0 0 6px; max-width: 80ch; }
+.method-section { border-top: 1px solid var(--vc-border-subtle); padding-top: 10px; margin-top: 6px; }
+.method-section h3 { margin: 0 0 6px; font-size: var(--fs-lg); font-weight: var(--vc-weight-semibold); }
+.method-section h4 { margin: 12px 0 4px; font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); color: var(--vc-text-muted); }
+.method-section p { margin: 0 0 6px; max-width: 80ch; }
+.method-list { margin: 0 0 6px; padding-left: 1.2em; display: grid; gap: 4px; max-width: 84ch; }
+.method-seal { margin: 0 0 6px; padding-left: 1.2em; display: grid; gap: 2px; }
+.method-table { margin: 4px 0 8px; }
+.method-source { display: flex; align-items: baseline; gap: 6px; color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+.method-source .vc-icon { align-self: center; flex: none; }
+.method-weight-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px 16px; margin: 6px 0 10px; }
+.method-weight-row { display: grid; grid-template-columns: minmax(0, 1fr) 6.5em; align-items: center; gap: 10px; }
+.method-weight.vc-select { min-height: 40px; }
+.method-weight-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.method-weight-actions .vc-button { min-height: 40px; }
+.method-weight-state { color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+.method-status { margin: 6px 0 0; min-height: 1.3em; font-size: var(--vc-font-size-sm); }
+.method-log { margin: 0; padding-left: 1.4em; font-size: var(--vc-font-size-sm); font-variant-numeric: tabular-nums; }
+.method-note { color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+
+/* The overall tile opens the method: a button that keeps the stat card's look. */
+.kpi.kpi--button { text-align: left; cursor: pointer; font: inherit; color: inherit; align-items: stretch; }
+.kpi.kpi--button > span { display: block; }
+.kpi.kpi--button:hover { border-color: var(--vc-border-strong); }
+.kpi.kpi--button:focus-visible { outline: 2px solid var(--vc-accent); outline-offset: 2px; }

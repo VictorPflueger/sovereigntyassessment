@@ -30,6 +30,14 @@ import { createAuditPanel } from "./audit_panel.js";
 import { initAudit } from "./audit.js";
 import { createLiveAgent } from "./agent.js";
 import { createSimulationPlayer } from "./simulation.js";
+import { createCentre } from "./views.js";
+import { createCompare } from "./compare.js";
+import { createPortfolio } from "./portfolio.js";
+import { createExportPanel } from "./export_panel.js";
+import { openMethod } from "./method_panel.js";
+import { getWeights, onWeights, isEqualWeights } from "./weights.js";
+import { addPreRuns, addSessionAssessment } from "./loaded.js";
+import { assessmentFromRecords } from "./assessment.js";
 
 // The drawer's tabs (brief §9): building blocks, review, levers, outbox, audit.
 export const DRAWER_TABS = Object.freeze([
@@ -56,7 +64,7 @@ export function initUI() {
   const blocksPanel = createBlocksPanel(drawer.panel("blocks"), { onCount: (n) => drawer.setCount("blocks", n) });
   const reviewPanel = createReviewPanel(drawer.panel("review"), { getBlocks: () => sovmap.result()?.blocks || [] });
   createLeversPanel(drawer.panel("levers"));
-  createOutbox(drawer.panel("outbox"), { onCount: (n) => drawer.setCount("outbox", n) });
+  const outbox = createOutbox(drawer.panel("outbox"), { onCount: (n) => drawer.setCount("outbox", n) });
   createAuditPanel(drawer.panel("audit"), { onCount: (n) => drawer.setCount("audit", n) });
 
   const mapRoot = document.getElementById("map");
@@ -65,11 +73,52 @@ export function initUI() {
   });
   const catalogueEl = mapRoot.querySelector(".catalogue");
   const sovmap = createSovMap(mapRoot, catalogueEl, {
-    onPickBlock: (id) => { drawer.show("blocks"); blocksPanel.openBlock(id); }
+    onPickBlock: (id) => { drawer.show("blocks"); blocksPanel.openBlock(id); },
+    onShow: (on) => centre.setPart(on ? "map" : "catalogue")
+  });
+  // Compare and the Portfolio: views of the same area, over the loaded assessments (brief §9).
+  addPreRuns();
+  const compare = createCompare(mapRoot);
+  const portfolio = createPortfolio(mapRoot);
+  const centre = createCentre(mapRoot, { catalogue: catalogueEl, map: sovmap.el, compare: compare.el, portfolio: portfolio.el }, {
+    onShow: (view) => { if (view === "compare") compare.render(); else if (view === "portfolio") portfolio.render(); }
   });
 
   const agent = createLiveAgent({ onKeyRejected: () => setState({ keyPresent: false }) });
   const player = createSimulationPlayer({ getSpeed: () => getState().speed });
+
+  // ---- the run on screen as a record: the exports, the loaded set, the weights ----------------------
+  let runMeta = null; // { run_id, mode, query, entry_id, lang, as_of, source }
+  const runToolbox = () => (runMeta ? (runMeta.mode === "live" ? agent.toolbox() : player.toolbox()) : null);
+  function runAssessment() {
+    const tb = runToolbox();
+    if (!tb) return null;
+    return assessmentFromRecords(tb.records(), {
+      query: runMeta.query, entryId: runMeta.entry_id, name: runMeta.query,
+      asOf: runMeta.as_of, source: runMeta.mode === "live" ? "live" : runMeta.source || "hand_authored"
+    });
+  }
+  /** Once the person has confirmed or skipped the review, the findings are frozen: the assessment joins the loaded set. */
+  function refreshSession() {
+    const tb = runToolbox();
+    if (!tb || tb.records().review !== "resolved") return;
+    addSessionAssessment(runAssessment());
+  }
+  const exportPanel = createExportPanel(drawer.panel("outbox"), {
+    source: () => ({ run: runMeta, report: outbox.report(), result: runToolbox()?.result() || null, assessment: runAssessment })
+  });
+  // A change of the layer weights (the method view): the run on screen is scored again with them, the
+  // levers priced again and the drafts' figures brought up to date; the change is logged as an
+  // assumption on the bus (the audit log, the console), and Compare and the Portfolio follow.
+  onWeights((change) => {
+    const tb = runToolbox();
+    const p = tb ? tb.setWeights(change.to) : null;
+    bus.emit("weights_change", { from: change.from, to: change.to, by: "user", ...(p ? { result: p.result, values: p.values, levers: p.levers, memo: p.memo, report: p.report } : {}) });
+    if (p?.result) bus.emit("score_update", { facts: { ...p.result.facts }, partial: false, result: p.result });
+    bus.emit("notice", { level: "info", key: isEqualWeights(change.to) ? "notice.weightsEqual" : "notice.weights" });
+    refreshSession();
+    exportPanel.render();
+  });
 
   const controls = createControls(document.getElementById("controls"), {
     // Typing a catalogue entry's exact name picks the entry; anything else is a free-text service.
@@ -93,7 +142,16 @@ export function initUI() {
     icon("info", 18), tx("header.about", null, { cls: "btn-text" }));
   attrs(aboutBtn, { title: "header.about.title" });
   aboutBtn.addEventListener("click", () => showIntro());
-  badge.after(withTooltip(aboutBtn, tx("header.about"), { below: true }));
+  const aboutAnchor = withTooltip(aboutBtn, tx("header.about"), { below: true });
+  badge.after(aboutAnchor);
+  // "Method": how the scores come about, the weights to change, what the score is not (brief §9).
+  const methodBtn = h("button", { class: "vc-button vc-button--secondary about-btn method-btn", type: "button", id: "btn-method" },
+    icon("book", 18), tx("header.method", null, { cls: "btn-text" }));
+  attrs(methodBtn, { title: "header.method.title" });
+  methodBtn.addEventListener("click", () => openMethod());
+  // Beside the AI disclosure, on the badges' second row, so the first row keeps its width.
+  (document.querySelector(".header-badges .ai-disclosure") || aboutAnchor).after(withTooltip(methodBtn, tx("header.method"), { below: true }));
+  kpis.onOverall(() => openMethod());
 
   function showIntro() {
     const s = getState();
@@ -134,7 +192,16 @@ export function initUI() {
     const st = ev.payload.status;
     setState({ runState: st === "done" || st === "not_a_service" ? "done" : st });
   });
-  bus.on("score_update", (ev) => kpis.show(ev.payload?.result || null));
+  bus.on("score_update", (ev) => { kpis.show(ev.payload?.result || null); exportPanel.render(); });
+  bus.on("run_start", (ev) => {
+    const p = ev.payload || {};
+    runMeta = { run_id: p.run_id, mode: p.mode, query: p.query, entry_id: p.entry_id ?? null, lang: p.lang, as_of: p.as_of || new Date().toISOString().slice(0, 10), source: p.source || null };
+    centre.show("assessment");
+    exportPanel.render();
+  });
+  bus.on("review_decision", (ev) => { if (ev.payload?.action !== "correct") setTimeout(refreshSession, 0); });
+  bus.on("report", () => setTimeout(() => exportPanel.render(), 0));
+  bus.on("run_end", () => setTimeout(() => { refreshSession(); exportPanel.render(); }, 0));
   // The person's turn opens the tab where it is taken, with a merlot count on the tab.
   bus.on("review_request", () => { drawer.setCount("review", 1, true); drawer.show("review"); });
   bus.on("review_decision", (ev) => { if (ev.payload?.action !== "correct") drawer.setCount("review", 0); });
@@ -185,12 +252,12 @@ export function initUI() {
     bus.beginRun({ run_id, mode });
     setState({ mode, runId: run_id, runState: "understanding" });
     if (mode === "simulation") {
-      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry.id, lang, source: def.source, as_of: def.as_of });
+      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry.id, lang, source: def.source, as_of: def.as_of, weights: getWeights() });
       bus.emit("state_change", { state: "understanding" });
       player.play(def, { lang, service });
     } else {
       const model = getState().model;
-      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry?.id ?? null, lang, model });
+      bus.emit("run_start", { run_id, mode, query: service, entry_id: entry?.id ?? null, lang, model, weights: getWeights() });
       agent.run({ query: service, entryId: entry?.id ?? null, lang, modelId: model });
     }
   }
@@ -213,6 +280,8 @@ export function initUI() {
     sovmap.reset();
     blocksPanel.reset();
     drawer.setOpen(false);
+    runMeta = null;
+    exportPanel.render();
     setState({ runState: "idle", runId: null, mode: null });
   }
 
@@ -221,7 +290,7 @@ export function initUI() {
     if (!introSeen() && !document.querySelector("dialog[open]")) showIntro();
   }
 
-  return { start, resetWorkspace, showIntro, introOnFirstVisit, kpis, consoleUI, reviewPending: () => reviewPanel.pending() };
+  return { start, resetWorkspace, showIntro, introOnFirstVisit, kpis, consoleUI, reviewPending: () => reviewPanel.pending(), centre, compare, portfolio, openMethod };
 }
 
 /**

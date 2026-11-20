@@ -1,7 +1,9 @@
 /* The bundled catalogue (brief §8): sixteen German digital base services, platforms and access channels,
  * each with names in both languages, category, a one-line description, status and verified starting
- * URLs. Every URL was opened with the web fetch tool on 19 November 2026, and every description and
- * status line rests on what those pages say (DATA_SOURCES.md lists them). The live agent's cat_lookup
+ * URLs, and as the seventeenth entry this prototype itself, in a category of its own (self_assessment,
+ * from version 0.3.0). Every URL was opened with the web fetch tool on 19 November 2026 (the
+ * self-assessment's on 20 November 2026), and every description and status line rests on what those
+ * pages say (DATA_SOURCES.md lists them). The live agent's cat_lookup
  * returns an entry with its URLs, which makes them fetchable; the fact audit counts an entry's texts
  * as part of the run's evidence. Live mode accepts any service; Simulation offers the entries that have
  * a pre-run (from version 0.2.0).
@@ -286,6 +288,24 @@
         urls: [
           url("https://www.bundestag.de/1223070", "Deutschland-App: Prototyp wird in sechs Kommunen erprobt", "de"),
           url("https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app", "Wiesbaden becomes pilot municipality for Germany app", "en")
+        ]
+      },
+      {
+        // This prototype, assessed with its own method. The Portfolio leaves the category out.
+        id: "sovereignty-assessment", category: "self_assessment",
+        names: { en: "Sovereignty Assessment (this prototype)", de: "Souveränitätsbewertung (dieser Prototyp)" },
+        aliases: ["Sovereignty Assessment", "Souveränitätsbewertung", "this prototype", "dieser Prototyp", "self-assessment", "Selbstbewertung", "sovereigntyassessment"],
+        description: {
+          en: "This prototype: a static site on GitHub Pages whose Live mode runs on Anthropic's Claude API with web search and web fetch on Anthropic's servers.",
+          de: "Dieser Prototyp: eine statische Website auf GitHub Pages, deren Live-Modus auf der Claude-API von Anthropic läuft, mit Websuche und Web-Abruf auf den Servern von Anthropic."
+        },
+        status: {
+          en: "A prototype built by Victor Pflüger and published on GitHub Pages; not an official service.",
+          de: "Ein Prototyp, gebaut von Victor Pflüger und auf GitHub Pages veröffentlicht; kein offizieller Dienst."
+        },
+        urls: [
+          { url: "https://github.com/VictorPflueger/sovereigntyassessment", title: "GitHub - VictorPflueger/sovereigntyassessment", lang: "en", read_on: "2026-11-20" },
+          { url: "https://docs.github.com/en/articles/about-github-pages", title: "About GitHub Pages", lang: "en", read_on: "2026-11-20" }
         ]
       }
     ]

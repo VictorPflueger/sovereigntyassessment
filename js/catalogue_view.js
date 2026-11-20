@@ -11,7 +11,8 @@ import { getLang, onLang } from "./i18n/index.js";
 import { byCategory, catalogueEntries, entryById } from "./catalogue.js";
 import { fmtDate } from "./format.js";
 
-const CATEGORIES = ["base_service", "platform_or_access"];
+// The public services in two groups, then this prototype in a group of its own (brief §8).
+const CATEGORIES = ["base_service", "platform_or_access", "self_assessment"];
 
 /** The entry's text in a language ({ en, de } or a plain string). */
 export function inLang(value, lang = getLang()) {
@@ -34,10 +35,12 @@ export function createCatalogueView(root, { onPick } = {}) {
 
   root.append(
     h("section", { class: "catalogue", "aria-labelledby": "catalogue-title" },
-      h("header", { class: "catalogue-head" },
-        tx("catalogue.title", null, { tag: "h2", attrs: { id: "catalogue-title" } }),
-        tx("catalogue.lead", null, { tag: "p", cls: "catalogue-lead", n: catalogueEntries().length }),
-        asOf),
+      h("header", { class: "catalogue-head view-head" },
+        h("div", { class: "view-heading" },
+          tx("catalogue.title", null, { tag: "h2", attrs: { id: "catalogue-title" } }),
+          tx("catalogue.lead", null, { tag: "p", cls: "catalogue-lead", n: catalogueEntries().filter((e) => e.category !== "self_assessment").length }),
+          asOf),
+        h("div", { class: "view-slot" })),
       groupsEl,
       detail));
 

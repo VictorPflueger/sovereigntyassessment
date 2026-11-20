@@ -48,6 +48,18 @@ export function createOutbox(panel, { onCount } = {}) {
   bus.on("run_start", () => { state.memo = null; state.report = null; render(); });
   bus.on("action_draft", (ev) => { state.memo = ev.payload; render(); });
   bus.on("report", (ev) => { state.report = ev.payload; render(); });
+  // New layer weights (the method view): the drafts' figures follow, as new objects, so the events the
+  // audit log holds keep what they showed.
+  bus.on("weights_change", (ev) => {
+    const p = ev.payload || {};
+    if (state.memo && p.memo) state.memo = { ...state.memo, ...p.memo };
+    if (state.report && p.report) {
+      const c = state.report.closing || {};
+      const decision = c.decision && p.report.decision_facts ? { ...c.decision, facts: { ...p.report.decision_facts } } : c.decision;
+      state.report = { ...state.report, values: { ...p.report.values }, closing: { ...c, weights: { ...p.report.weights }, decision } };
+    }
+    if (p.memo || p.report) render();
+  });
   onLang(render);
   render();
   return { memo: () => state.memo, report: () => state.report };

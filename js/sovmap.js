@@ -23,8 +23,11 @@ export function isStale(asOf, today = appToday()) {
   return !Number.isNaN(d.getTime()) && (today.getTime() - d.getTime()) / 86400000 > UI.staleDays;
 }
 
-/** host: the map's element; catalogue: the catalogue's element, hidden while a run shows. */
-export function createSovMap(host, catalogue, { onPickBlock } = {}) {
+/**
+ * host: the map's element; catalogue: the catalogue's element, hidden while a run shows. onShow(on): the
+ * centre's switch (js/views.js) decides what shows; without it the map and the catalogue swap places.
+ */
+export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
   const state = { view: "layer", table: false, result: null, layerStatus: {}, run: null };
   const title = h("h2", { class: "sov-title", id: "sov-title" });
   const meta = h("p", { class: "sov-meta" });
@@ -38,7 +41,7 @@ export function createSovMap(host, catalogue, { onPickBlock } = {}) {
   const hcHost = h("div", { class: "sov-honeycomb", "aria-labelledby": "sov-hc-title" });
   const hcTitle = h("h3", { class: "sov-hc-title", id: "sov-hc-title" });
   const map = h("section", { class: "sov-map", "aria-labelledby": "sov-title", hidden: true, dataset: { view: "layer", table: "false" } },
-    h("header", { class: "sov-head" }, h("div", { class: "sov-heading" }, title, meta), h("div", { class: "sov-tools" }, views, tableBtn)),
+    h("header", { class: "sov-head" }, h("div", { class: "sov-heading" }, title, meta), h("div", { class: "sov-tools" }, views, tableBtn), h("div", { class: "view-slot" })),
     h("div", { class: "sov-top" }, spiderHost, mixHost),
     tableHost,
     h("div", { class: "sov-bottom" }, hcTitle, hcHost));
@@ -184,6 +187,7 @@ export function createSovMap(host, catalogue, { onPickBlock } = {}) {
   onLang(() => render());
 
   function show(on) {
+    if (onShow) { onShow(on); return; }
     map.hidden = !on;
     catalogue.hidden = on;
     host.dataset.view = on ? "map" : "catalogue";

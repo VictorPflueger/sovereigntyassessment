@@ -211,8 +211,8 @@ if (wanted("mode-dialog")) {
     checks.simBundidButton = await text(page, '.mode-card[data-mode="simulation"] .mode-cta button');
     await page.keyboard.press("Escape");
     await page.waitForSelector(".mode-card", { state: "detached" });
-    // An entry without one: Simulation unavailable, with its reason.
-    await page.click('.catalogue-chip[data-entry="eudi-wallet"]');
+    // An entry without one (NOOTS has a research note instead, D3): Simulation unavailable, with its reason.
+    await page.click('.catalogue-chip[data-entry="noots"]');
     await page.click("#btn-start");
     await page.waitForSelector(".mode-card");
     checks.title = await text(page, ".vc-dialog__title");
@@ -251,7 +251,7 @@ if (wanted("mode-dialog")) {
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("mode-dialog: the service, Simulation with its reason, Live, Escape cancels", t, checks, [
     [checks.simBundid !== "true" && !checks.simBundidReason && !!checks.simBundidButton, `an entry with a pre-run offers Simulation (${checks.simBundid}; ${checks.simBundidButton})`],
-    [checks.title === "How should the agent run?" && checks.service === "Will assess: EUDI Wallet “d-you”", `title and service (${checks.service})`],
+    [checks.title === "How should the agent run?" && checks.service === "Will assess: NOOTS (National Once-Only Technical System)", `title and service (${checks.service})`],
     [checks.simDisabled === "true" && checks.simButton === "true" && checks.simReason === "No pre-run assessment exists for this service yet.", "Simulation unavailable, with its reason"],
     [checks.stillOpen === true, "Simulation's button does nothing"],
     [checks.live === "Continue with my API key" && checks.focus === "Continue with my API key", "Live asks for the key, focused"],
