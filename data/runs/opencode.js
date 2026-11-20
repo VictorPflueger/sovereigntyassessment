@@ -824,12 +824,12 @@
      {
       "lever_id": "L1",
       "title": {
-       "en": "Run the GitLab system as open source and say so",
-       "de": "Das GitLab-System als Open Source betreiben und das ausweisen"
+       "en": "Run the code platform under an open-source licence and say so",
+       "de": "Die Code-Plattform unter einer quelloffenen Lizenz betreiben und das ausweisen"
       },
       "rationale": {
-       "en": "The sources do not say which edition and licence of GitLab openCode runs. The Deutschland-Stack asks that solutions be bought mainly on the European market or developed as open source. If the GitLab system ran under an open-source licence, the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Die Quellen sagen nicht, welche Edition und Lizenz von GitLab openCode einsetzt. Der Deutschland-Stack sieht vor, Lösungen vorrangig am europäischen Markt einzukaufen oder als Open Source zu entwickeln. Liefe das GitLab-System unter einer quelloffenen Lizenz, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "The sources do not say which edition and licence of its code platform openCode runs. The Deutschland-Stack asks that solutions be bought mainly on the European market or developed as open source. If the code platform ran under an open-source licence, the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Die Quellen sagen nicht, welche Edition und Lizenz seiner Code-Plattform openCode einsetzt. Der Deutschland-Stack sieht vor, Lösungen vorrangig am europäischen Markt einzukaufen oder als Open Source zu entwickeln. Liefe die Code-Plattform unter einer quelloffenen Lizenz, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {

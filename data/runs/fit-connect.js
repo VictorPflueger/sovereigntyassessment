@@ -1,4 +1,4 @@
-/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/fit-connect.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "fit-connect",
  "entry_id": "fit-connect",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "FIT-Connect",
  "steps": [
@@ -143,6 +143,35 @@
   },
   {
    "search": {
+    "query": "Dataport AöR Twin Data Center Hamburg Norderstedt Rechenzentren der Verwaltung",
+    "results": [
+     {
+      "url": "https://www.dataport.de/pressemitteilung/buergermeister-peter-tschentscher-besucht-rechenzentrum-von-dataport/",
+      "title": "Bürgermeister Peter Tschentscher besucht Rechenzentrum von Dataport"
+     },
+     {
+      "url": "https://www.datacenter-insider.de/das-dataport-rechenzentrum-zieht-um-und-der-betrieb-laeuft-a-522395/",
+      "title": "Das Dataport-Rechenzentrum zieht um und der Betrieb läuft"
+     },
+     {
+      "url": "https://www.stadt-und-werk.de/k21-meldungen/rechenzentren-auf-hoechstem-niveau/",
+      "title": "Rechenzentren auf höchstem Niveau - stadt+werk online"
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+    "title": "Dataport – Hamburgs zentraler IT-Dienstleister"
+   }
+  },
+  {
+   "search": {
     "query": "Global Access Internet Services GmbH Rechenzentrum München Impressum",
     "results": [
      {
@@ -179,8 +208,8 @@
      "de": "Beherbergt den Zustelldienst, über den jeder Antrag läuft."
     },
     "note": {
-     "en": "Dataport is a public-law IT provider of several Länder; its data centres are in Hamburg and Norderstedt, according to a trade report.",
-     "de": "Dataport ist ein IT-Dienstleister mehrerer Länder in öffentlich-rechtlicher Form; seine Rechenzentren liegen laut einem Fachbericht in Hamburg und Norderstedt."
+     "en": "Dataport is a public-law IT provider of several Länder. Its data centre, the Twin Data Center, has a site in Hamburg, according to a newer page of the City of Hamburg; a trade report from long before FIT-Connect names Hamburg and Norderstedt as its sites.",
+     "de": "Dataport ist ein IT-Dienstleister mehrerer Länder in öffentlich-rechtlicher Form. Sein Rechenzentrum, das Twin Data Center, hat einen Standort in Hamburg, laut einer neueren Seite der Stadt Hamburg; ein Fachbericht, der lange vor FIT-Connect erschien, nennt Hamburg und Norderstedt als Standorte."
     },
     "criticality": "critical",
     "tech": {
@@ -195,7 +224,7 @@
     },
     "hosting": "EU",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -223,6 +252,26 @@
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
       "title": "Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren | CIO DE",
       "quote": "Die Standorte liegen in Hamburg und im schleswig-holsteinischen Norderstedt direkt an der Hamburger Stadtgrenze.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Basis dafür ist ein leistungsfähiges, flexibles und sicheres Rechenzentrum – das Twin Data Center.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Der Hamburger Rechenzentrumsstandort hat dafür den Blauen Engel erhalten.",
       "lang": "de",
       "supports": [
        "hosting"
@@ -262,7 +311,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -321,7 +370,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -379,7 +428,7 @@
     },
     "hosting": "EU",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -405,6 +454,26 @@
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
       "title": "Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren | CIO DE",
       "quote": "Die Standorte liegen in Hamburg und im schleswig-holsteinischen Norderstedt direkt an der Hamburger Stadtgrenze.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Basis dafür ist ein leistungsfähiges, flexibles und sicheres Rechenzentrum – das Twin Data Center.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Der Hamburger Rechenzentrumsstandort hat dafür den Blauen Engel erhalten.",
       "lang": "de",
       "supports": [
        "hosting"
@@ -616,13 +685,13 @@
      "de": "Liefert Entwicklern das Java-SDK, mit dem Systeme an FIT-Connect angebunden werden."
     },
     "note": {
-     "en": "Maven Central is maintained by Sonatype, which moved its headquarters to Maryland; where the registry is hosted is not stated in the sources read.",
-     "de": "Maven Central wird von Sonatype betreut, das seinen Hauptsitz nach Maryland verlegt hat; wo das Verzeichnis gehostet wird, steht nicht in den gelesenen Quellen."
+     "en": "Maven Central is maintained by Sonatype, which moved its headquarters to Maryland, so the registry counts as made and run by Sonatype (the rule for a block built from a named product). Where it is hosted and under which licence it runs are not stated in the sources read.",
+     "de": "Maven Central wird von Sonatype betreut, das seinen Hauptsitz nach Maryland verlegt hat; das Verzeichnis gilt daher als von Sonatype hergestellt und betrieben (die Regel für einen Baustein aus einem benannten Produkt). Wo es gehostet wird und unter welcher Lizenz es läuft, steht nicht in den gelesenen Quellen."
     },
     "criticality": "important",
     "tech": {
-     "name": "Föderale IT-Kooperation (FITKO)",
-     "country": "DE",
+     "name": "Sonatype, Inc.",
+     "country": "US",
      "parent": null
     },
     "operator": {
@@ -631,35 +700,16 @@
      "parent": null
     },
     "hosting": "UNKNOWN",
-    "licence": "open_source",
+    "licence": "unknown",
     "exit": "easy",
     "evidence": [
-     {
-      "url": "https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf",
-      "title": "FIT-Connect Onepager (FITKO)",
-      "quote": "Es wird von der Föderalen IT-Kooperation (FITKO) entwickelt und betrieben.",
-      "lang": "de",
-      "supports": [
-       "tech"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
-      "title": "Maven Central: dev.fitko.fitconnect:sdk-client",
-      "quote": "EUPL-1.2",
-      "lang": "en",
-      "supports": [
-       "licence"
-      ],
-      "verified": true
-     },
      {
       "url": "https://sonatype.com/about",
       "title": "About Sonatype | Our Company & Mission | Sonatype",
       "quote": "As the maintainers of Maven Central and creators of Nexus Repository",
       "lang": "en",
       "supports": [
+       "tech",
        "operator"
       ],
       "verified": true
@@ -670,6 +720,7 @@
       "quote": "With Jackson coming on board, Sonatype moves its headquarters from Silicon Valley to Maryland.",
       "lang": "en",
       "supports": [
+       "tech",
        "operator"
       ],
       "verified": true
@@ -735,8 +786,8 @@
        "de": "Die SDKs aus einem Verzeichnis in der EU verteilen"
       },
       "rationale": {
-       "en": "The SDK's source code already lives on the FITKO's own GitLab, so a package registry run in Germany is a known path. With it the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Der Quellcode des SDK liegt bereits im eigenen GitLab der FITKO; ein Paketverzeichnis mit Betrieb in Deutschland ist daher ein bekannter Weg. Damit läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "The SDK's source code already lives on a code platform its operator runs itself, so a package registry run in Germany is a known path. With it the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Der Quellcode des SDK liegt bereits auf einer Code-Plattform, die sein Betreiber selbst betreibt; ein Paketverzeichnis mit Betrieb in Deutschland ist daher ein bekannter Weg. Damit läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {
@@ -768,7 +819,7 @@
    "report": {
     "findings": {
      "en": "# FIT-Connect: findings\n\nFIT-Connect, the base infrastructure for submitting applications for administrative services, is developed and operated by the FITKO on behalf of the IT-Planungsrat. Its overall score is {{fact:score.overall}}, indicative.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): according to the FIT-Connect FAQ, the Zustelldienst runs in Dataport's data centre and the authentication server in the data centre of Global Access, both German providers.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the FITKO develops FIT-Connect and runs its technical infrastructure.\n- **Platform** ({{fact:score.layer.platform}}): the Zustelldienst is operated by IT.Niedersachsen; the software of the authentication server is not named in the sources read, so that block is partly unknown.\n- **Base services**: planning documents name re-used base services, but no source read says who runs them for FIT-Connect.\n- **Applications** ({{fact:score.layer.applications}}): the Java SDK lists the EUPL among its licences.\n- **Interface and access** ({{fact:score.layer.access}}): the Java SDK reaches developers through Maven Central, which Sonatype maintains.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. Evidence coverage is {{fact:coverage}}; exclusive non-EU control of critical blocks is {{fact:share.exclusive_non_eu}}.",
-     "de": "# FIT-Connect: Befunde\n\nFIT-Connect, die Basisinfrastruktur für das Einreichen von Anträgen auf Verwaltungsleistungen, wird im Auftrag des IT-Planungsrats von der FITKO entwickelt und betrieben. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Laut der FAQ von FIT-Connect läuft der Zustelldienst im Rechenzentrum von Dataport und der Authentifizierungsserver im Rechenzentrum von Global Access, beides Anbieter aus Deutschland.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO entwickelt FIT-Connect und betreibt die technische Infrastruktur.\n- **Plattform** ({{fact:score.layer.platform}}): Den Zustelldienst betreibt IT.Niedersachsen; die Software des Authentifizierungsservers nennen die gelesenen Quellen nicht, daher ist dieser Baustein teilweise unbekannt.\n- **Basisdienste**: Planungsunterlagen nennen nachgenutzte Basisdienste, doch keine gelesene Quelle sagt, wer sie für FIT-Connect betreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Das Java-SDK nennt die EUPL unter seinen Lizenzen.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Das Java-SDK erreicht Entwickler über Maven Central, das Sonatype betreut.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die ausschließliche Kontrolle kritischer Bausteine außerhalb der EU beträgt {{fact:share.exclusive_non_eu}}."
+     "de": "# FIT-Connect: Befunde\n\nFIT-Connect, die Basisinfrastruktur für das Einreichen von Anträgen auf Verwaltungsleistungen, wird im Auftrag des IT-Planungsrats von der FITKO entwickelt und betrieben. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Laut der FAQ von FIT-Connect läuft der Zustelldienst im Rechenzentrum von Dataport und der Authentifizierungsserver im Rechenzentrum von Global Access, beides Anbieter aus Deutschland.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO entwickelt FIT-Connect und betreibt die technische Infrastruktur.\n- **Plattform** ({{fact:score.layer.platform}}): Den Zustelldienst betreibt IT.Niedersachsen; die Software des Authentifizierungsservers nennen die gelesenen Quellen nicht, daher ist dieser Baustein teilweise unbekannt.\n- **Basisdienste**: Planungsunterlagen nennen nachgenutzte Basisdienste, doch keine gelesene Quelle sagt, wer sie für FIT-Connect betreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Das Java-SDK nennt die EUPL unter seinen Lizenzen.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Das Java-SDK erreicht Entwickler über Maven Central, das Sonatype betreut.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die exklusive Nicht-EU-Kontrolle der kritischen Bausteine beträgt {{fact:share.exclusive_non_eu}}."
     }
    }
   }

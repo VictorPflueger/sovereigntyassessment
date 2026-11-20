@@ -19,6 +19,10 @@
 //   exports           after a pre-run, the four exports with their names, in the active language, the HTML
 //                     self-contained, the JSON valid against the schemas (AC-17)
 //   method            the method view and its sources; a weight change recomputes, is logged and reported
+//   names             accessible names (AC-20): each of the spider's axes is an image named with its layer or
+//                     block and its value, each honeycomb cell is named with its block, level and codes, in
+//                     English and after a switch in German; every quote carries the language it was read
+//                     in, in the evidence of the Building blocks tab and in the report's sources
 //   missing-data      a data file is missing: the boot screen names it
 // Every case fails on a page error, a console error, a policy violation, or a request to another host
 // than this test server (api.anthropic.com is answered by a stand-in where a case needs it).
@@ -166,6 +170,10 @@ if (wanted("lang-switch")) {
     // A notice in the console, written by code: it follows the language too.
     await page.click("#btn-start");
     await page.waitForSelector('.entry[data-type="notice"]');
+    // The warning folded the drawer away from the console (it opens over the console's column); open it
+    // again, so its words are read open.
+    checks.foldedForNotice = await page.evaluate(() => document.querySelector("#drawer")?.dataset.open === "false");
+    await page.click("#tab-blocks");
     // A chosen entry: its name in the field follows the language.
     await page.click('.catalogue-chip[data-entry="online-ausweis"]');
     checks.en = await snapshot();
@@ -217,7 +225,8 @@ if (wanted("lang-switch")) {
     [de.start === "Agent starten" && de.placeholder === "Basisdienst oder Plattform eingeben" && de.pill === "Bereit", "the controls"],
     [en.field === "Online ID (eID)" && de.field === "Online-Ausweis (eID)", `the chosen entry's name in the field follows (${en.field} → ${de.field})`],
     [en.chip === "Online ID (eID)" && de.chip === "Online-Ausweis (eID)" && de.catalogueTitle === "Dienst auswählen", "the catalogue's names come from its German texts"],
-    [en.preRun === "pre-run assessment available" && de.preRun === "vorab erstellte Bewertung verfügbar", "the pre-run mark's hidden label follows"],
+    [en.preRun === "pre-run available" && de.preRun === "vorab erstellter Lauf verfügbar", "the pre-run mark's hidden label follows"],
+    [checks.foldedForNotice === true, "a warning in the console folds the drawer away from it"],
     [en.tab === "Building blocks" && de.tab === "Bausteine" && /Ausblenden/.test(de.drawerToggle || "") && de.drawerNote === "Nur Entwürfe. Nichts wird versendet." && de.builtBy === "Gebaut von" && de.empty === "Noch keine Bausteine", `the drawer: tabs, toggle, note, byline, empty state (${JSON.stringify({ tab: de.tab, toggle: de.drawerToggle })})`],
     [JSON.stringify(en.rail) === JSON.stringify(["Understand", "Research", "Score", "Your review", "Recommend"]) && JSON.stringify(de.rail) === JSON.stringify(["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"]), `the rail (${JSON.stringify(de.rail)})`],
     [de.console === "Agentenkonsole" && /^Geben Sie zuerst/.test(de.notice || "") && /^Enter a base service/.test(en.notice || ""), "the console and a notice written by code"],
@@ -295,6 +304,9 @@ if (wanted("diagnostics")) {
     await page.click("#btn-diagnostics");
     await page.waitForSelector(".diag-table");
     await page.waitForFunction(() => document.querySelectorAll('.diag-checks li').length >= 10);
+    // The local checks start on opening; the method check imports the golden cases first, which can take a
+    // moment on a loaded machine. Wait until each has an outcome, without pressing Run all.
+    await page.waitForFunction(() => ["method", "languages", "privacy", "data"].every((id) => !["idle", "running"].includes(document.querySelector(`.diag-table tr[data-test="${id}"] .diag-status`)?.dataset.s)), null, { timeout: 15000 }).catch(() => {});
     checks.local = await statuses();
     await runAll();
     checks.en = await statuses();
@@ -384,8 +396,12 @@ if (wanted("kpi")) {
       window.__kpis.show(score(golden["s2-assessment.json"].blocks.map(blockFromRow)));
     });
     checks.en = await read();
+    // The weakest-link tile's tooltip says it weighs only the critical blocks (the review's finding R-22).
+    const tip = () => page.$eval('#test-kpis .kpi[data-tile="weakest"]', (el) => el.getAttribute("title") || "");
+    checks.tipEn = await tip();
     await page.click('#lang-switch button[data-lang="de"]');
     checks.de = (await read()).map((s) => s.replace(/[  ]/g, " "));
+    checks.tipDe = await tip();
     await page.evaluate(() => window.__kpis.reset());
     checks.reset = await read();
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
@@ -393,7 +409,8 @@ if (wanted("kpi")) {
     [JSON.stringify(checks.empty) === JSON.stringify(["no data", "no data", "no data", "no data"]), `no data before a run (${JSON.stringify(checks.empty)})`],
     [JSON.stringify(checks.en) === JSON.stringify(["72|indicative", "level 0|B-10 B-10", "92%|weighted share of blocks scored", "40%|of scored critical blocks"]), `S2 in English (${JSON.stringify(checks.en)})`],
     [JSON.stringify(checks.de) === JSON.stringify(["72|indikativ", "Stufe 0|B-10 B-10", "92 %|gewichteter Anteil bewerteter Bausteine", "40 %|der bewerteten kritischen Bausteine"]), `S2 in German (${JSON.stringify(checks.de)})`],
-    [JSON.stringify(checks.reset) === JSON.stringify(["keine Daten|indikativ", "keine Daten|kein bewerteter kritischer Baustein", "keine Daten|gewichteter Anteil bewerteter Bausteine", "keine Daten|der bewerteten kritischen Bausteine"]), `reset to no data (${JSON.stringify(checks.reset)})`]
+    [JSON.stringify(checks.reset) === JSON.stringify(["keine Daten|indikativ", "keine Daten|kein bewerteter kritischer Baustein", "keine Daten|gewichteter Anteil bewerteter Bausteine", "keine Daten|der bewerteten kritischen Bausteine"]), `reset to no data (${JSON.stringify(checks.reset)})`],
+    [/The lowest level among the critical blocks; important and supporting blocks count in the layer scores, not here\.$/.test(checks.tipEn || "") && /Die niedrigste Stufe unter den kritischen Bausteinen; wichtige und unterstützende Bausteine zählen in den Ebenenwerten, nicht hier\.$/.test(checks.tipDe || ""), `the weakest-link tile's tooltip in both languages (${checks.tipEn}; ${checks.tipDe})`]
   ]);
 }
 
@@ -458,6 +475,7 @@ if (wanted("compare")) {
         axes, bMarks, areas: [svg.querySelectorAll(".sp-area").length, svg.querySelectorAll(".sp-area--b").length],
         tableA: order.map((l) => cell(`score.layer.${l}`, "a")?.dataset.value), tableB: order.map((l) => cell(`score.layer.${l}`, "b")?.dataset.value),
         overall: [cell("score.overall", "a")?.textContent, cell("score.overall", "b")?.textContent, ra.overall, rb.overall],
+        layersRow: [cell("layers", "a")?.textContent, cell("layers", "b")?.textContent, order.filter((l) => ra.layers[l].score !== null).length, order.filter((l) => rb.layers[l].score !== null).length],
         caption: document.querySelector("#cmp-table caption")?.textContent, head: document.querySelector("#cmp-title")?.textContent,
         pressed: document.querySelector('#centre-views button[data-centre="compare"]')?.getAttribute("aria-pressed")
       };
@@ -482,7 +500,9 @@ if (wanted("compare")) {
     [JSON.stringify(checks.en?.areas) === "[2,1]", `two areas, the second dashed (${JSON.stringify(checks.en?.areas)})`],
     [checks.en?.overall?.[0] === String(Math.round(checks.en?.overall?.[2])) && checks.en?.overall?.[1] === String(Math.round(checks.en?.overall?.[3])), `the overall scores (${JSON.stringify(checks.en?.overall)})`],
     [checks.en?.head === "Compare" && /BundID and ePayBL side by side/.test(checks.en?.caption || "") && checks.de?.head === "Vergleich" && /BundID und ePayBL nebeneinander/.test(checks.de?.caption || ""), `the view's words in each language (${checks.en?.caption} / ${checks.de?.caption})`],
-    [checks.en?.pressed === "true", "the switch says Compare"]
+    [checks.en?.pressed === "true", "the switch says Compare"],
+    // How many layers each score rests on (the review's finding R-11).
+    [checks.en?.layersRow?.[0] === `${checks.en.layersRow[2]} of 6` && checks.en.layersRow[1] === `${checks.en.layersRow[3]} of 6` && checks.de?.layersRow?.[0] === `${checks.de.layersRow[2]} von 6`, `the layers scored (${JSON.stringify(checks.en?.layersRow)} / ${JSON.stringify(checks.de?.layersRow)})`]
   ]);
 }
 
@@ -501,6 +521,8 @@ if (wanted("portfolio")) {
     await centre(page, "portfolio");
     await page.waitForSelector("#pf-clear");
     checks.before = await page.$$eval(".pf-row", (els) => els.length);
+    checks.mddNote = await page.$eval('.pf-row[data-key="entry:marktplatz-deutschland-digital"] .pf-layers', (e) => e.textContent).catch(() => null);
+    checks.bundidNote = await page.$eval('.pf-row[data-key="entry:bundid"] .pf-layers', (e) => e.textContent).catch(() => null);
     await page.click("#pf-clear");
     await page.waitForFunction(() => !document.querySelectorAll(".pf-row").length);
     await page.setInputFiles("#pf-file", files);
@@ -511,8 +533,9 @@ if (wanted("portfolio")) {
       const { portfolio } = await import("/js/engine.js");
       const list = await loadedAssessments("en");
       const p = portfolio(list.map(({ item, assessment }) => ({ service: item.key, category: assessment.category, blocks: effectiveBlocks(assessment) })));
-      const rows = [...document.querySelectorAll(".pf-row")].map((r) => ({ key: r.dataset.key, overall: r.dataset.overall, value: r.querySelector(".pf-value").textContent }));
-      const expected = list.filter((x) => x.assessment.category !== "self_assessment").map(({ item, assessment }) => ({ key: item.key, overall: scoreAssessment(assessment).overall })).sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1));
+      const rows = [...document.querySelectorAll(".pf-row")].map((r) => ({ key: r.dataset.key, overall: r.dataset.overall, value: r.querySelector(".pf-value").textContent, layersNote: r.querySelector(".pf-layers")?.textContent || null }));
+      const layersOf = (s) => Object.values(s.layers).filter((L) => L.score !== null).length;
+      const expected = list.filter((x) => x.assessment.category !== "self_assessment").map(({ item, assessment }) => { const s = scoreAssessment(assessment); return { key: item.key, overall: s.overall, layers: layersOf(s) }; }).sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1));
       const share = (cat) => document.querySelector(`.pf-cat[data-category="${cat}"] .pf-share-value`)?.textContent;
       const waffle = (cat) => Object.fromEntries([...document.querySelectorAll(`.pf-cat[data-category="${cat}"] .waffle-group`)].map((g) => [g.dataset.cls, Number(g.dataset.n)]));
       const drawn = (cat) => [...document.querySelectorAll(`.pf-cat[data-category="${cat}"] .waffle-group`)].reduce((n, g) => n + g.querySelectorAll(".waffle-hex").length, 0);
@@ -538,6 +561,10 @@ if (wanted("portfolio")) {
   const sorted = (r) => !!r && r.rows.length === r.expected.length && r.rows.every((row, i) => row.key === r.expected[i].key && row.overall === String(r.expected[i].overall));
   await finish("portfolio: S4 for the loaded set, 33% and 67% (33 % and 67 %), sorted scores and the waffle from the engine, the self-assessment left out", t, checks, [
     [checks.before >= 6, `the pre-runs were loaded first (${checks.before})`],
+    // A score on fewer than six layers says on how many (the review's finding R-11): the Marktplatz's three of
+    // six among the pre-runs, BundID's five; and so does each bar of the loaded files.
+    [checks.mddNote === "3 of 6 layers" && checks.bundidNote === "5 of 6 layers", `the pre-runs' notes (${checks.mddNote}; ${checks.bundidNote})`],
+    [checks.en?.rows?.length === checks.en?.expected?.length && checks.en.rows.every((r) => { const e = checks.en.expected.find((x) => x.key === r.key); return e && (e.overall === null || e.layers === 6 ? r.layersNote === null : r.layersNote === `${e.layers} of 6 layers`); }), `each bar's layers note (${JSON.stringify(checks.en?.rows?.map((r) => r.layersNote))} for ${JSON.stringify(checks.en?.expected?.map((e) => e.layers))})`],
     [checks.en?.rows?.[0]?.key === "file:query:musterdienst:2026-11-20:hand_authored" && checks.en?.rows?.[0]?.value === "72", `Musterdienst is S2: overall 72, the highest (${JSON.stringify(checks.en?.rows?.[0])})`],
     [checks.en?.share?.base === "33%" && checks.en?.share?.platform === "67%", `English shares (${JSON.stringify(checks.en?.share)})`],
     [nbsp(checks.de?.share?.base) === "33 %" && nbsp(checks.de?.share?.platform) === "67 %", `German shares (${JSON.stringify(checks.de?.share)})`],
@@ -591,7 +618,7 @@ if (wanted("exports")) {
   const leftover = (f) => !f ? ["no files"] : [f.md.text, f.html.text].flatMap((x) => [...x.matchAll(/\{\{[^}]*\}\}|\bundefined\b|\bNaN\b/g)].map((m) => m[0]));
   const keyLike = (f) => !!f && Object.values(f).some((x) => /sk-ant-/.test(x.text));
   await finish("exports: the report as Markdown and HTML, the assessment and the audit as JSON, with the stated names, in the active language, valid against the schemas", t, checks, [
-    [names(checks.en, "bundid", "2026-11-19", "en") && names(checks.switched, "bundid", "2026-11-19", "de") && names(checks.de, "epaybl", "2026-11-19", "de"), `the names (${JSON.stringify([checks.en?.md?.name, checks.en?.json?.name, checks.en?.audit?.name, checks.de?.html?.name])})`],
+    [names(checks.en, "bundid", "2026-11-20", "en") && names(checks.switched, "bundid", "2026-11-20", "de") && names(checks.de, "epaybl", "2026-11-20", "de"), `the names (${JSON.stringify([checks.en?.md?.name, checks.en?.json?.name, checks.en?.audit?.name, checks.de?.html?.name])})`],
     [/## Corrections by the reviewer/.test(checks.en?.md?.text || "") && /Lever L1 was approved/.test(checks.en?.md?.text || "") && /Draft\. Nothing is sent\./.test(checks.en?.md?.text || "") && !/The findings above are in/.test(checks.en?.md?.text || ""), "the English report in Markdown"],
     [/<html lang="en">/.test(checks.en?.html?.text || "") && /<h1>Sovereignty assessment: BundID<\/h1>/.test(checks.en?.html?.text || "") && selfContained(checks.en?.html?.text), "the English HTML report, self-contained"],
     [/## Korrekturen/.test(checks.switched?.md?.text || "") && /Entwurf\. Nichts wird versendet\./.test(checks.switched?.md?.text || "") && /# BundID: findings/.test(checks.switched?.md?.text || "") && /Die Befunde oben sind auf Englisch/.test(checks.switched?.md?.text || ""), "after a switch: code's parts in German, the English findings marked as such"],
@@ -602,6 +629,73 @@ if (wanted("exports")) {
     [checks.deValid && !checks.deValid.assessment.length && checks.deValid.lang === "de" && checks.deValid.entry === "epaybl", `the German assessment JSON is valid (${JSON.stringify(checks.deValid?.assessment)})`],
     [checks.enValid?.auditKind === "audit" && checks.enValid.auditRows > 20 && !checks.enValid.auditBad.length && !checks.deValid?.auditBad?.length, `every audit row is a valid AuditEvent (${JSON.stringify(checks.enValid?.auditBad)})`],
     [!keyLike(checks.en) && !keyLike(checks.switched) && !keyLike(checks.de), "no key-like string in any file"]
+  ]);
+}
+
+// ---- names (AC-20) -------------------------------------------------------------------------------------------------
+if (wanted("names")) {
+  const t = await newPage();
+  const { page } = t;
+  const checks = {};
+  /** The accessibility tree's view of the map: the spider's named images and the honeycomb's cells. */
+  const names = () => page.evaluate(() => ({
+    axes: [...document.querySelectorAll(".sov-spider svg.spider .sp-axis-g")].map((g) => ({ role: g.getAttribute("role"), name: g.getAttribute("aria-label") || "" })),
+    svgRole: document.querySelector(".sov-spider svg.spider")?.getAttribute("role"),
+    hidden: [...document.querySelectorAll(".sov-spider svg.spider > g.sp-markers, .sov-spider svg.spider > polygon.sp-area")].every((e) => e.getAttribute("aria-hidden") === "true"),
+    cells: [...document.querySelectorAll(".hc-cell")].map((c) => ({ block: c.dataset.block || null, name: c.getAttribute("aria-label") || "", tag: c.tagName, role: c.getAttribute("role") }))
+  }));
+  try {
+    await fast(page);
+    await page.click('.catalogue-chip[data-entry="bundid"]');
+    await page.click("#btn-start");
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await waitRun(page, ["awaiting_review"]);
+    checks.en = await names();
+    // The same names as the accessibility tree reports them (Playwright's ARIA snapshot).
+    checks.snapshot = await page.locator(".sov-spider svg.spider").ariaSnapshot();
+    await page.click('.sov-views button[data-view="block"]');
+    await page.waitForSelector('.spider[data-view="block"]');
+    checks.enBlocks = await names();
+    await page.click('.sov-views button[data-view="layer"]');
+    await page.click('#lang-switch button[data-lang="de"]');
+    await page.waitForFunction(() => document.documentElement.lang === "de");
+    await page.waitForTimeout(300);
+    checks.de = await names();
+    // The evidence of a block in the Building blocks tab: each quote with its language.
+    await openTab(page, "blocks");
+    await page.waitForSelector(".blocks-table .row-toggle");
+    await page.click(".blocks-table .row-toggle");
+    await page.waitForSelector("blockquote.evidence-quote");
+    checks.evidence = await page.$$eval("blockquote.evidence-quote", (qs) => qs.map((q) => ({ lang: q.getAttribute("lang"), text: q.textContent.trim().slice(0, 40) })));
+    await page.click('#lang-switch button[data-lang="en"]');
+    await openTab(page, "review");
+    await page.click("#btn-review-confirm");
+    await waitRun(page, ["awaiting_decision"]);
+    await page.click('.lever-card[data-lever="L1"] .lever-id');
+    await page.click("#btn-approve-lever");
+    await waitRun(page, ["done", "stopped", "aborted", "error"]);
+    await openTab(page, "outbox");
+    await page.waitForSelector('.outbox-card[data-draft="report"]');
+    checks.report = await page.evaluate(async () => {
+      const card = document.querySelector('.outbox-card[data-draft="report"] .md');
+      const spans = [...card.querySelectorAll(".quote-text")].map((s) => ({ lang: s.getAttribute("lang"), text: s.textContent }));
+      // The sources the report lists, as the run published them.
+      const items = [...card.querySelectorAll("li")].filter((li) => /“/.test(li.textContent));
+      return { spans, quoted: items.length, cardLang: card.getAttribute("lang") };
+    });
+  } catch (err) { checks.FAILED = String(err.message).split("\n").slice(0, 6).join(" / "); }
+  const layerNames = (n, re) => !!n && n.svgRole === "group" && n.hidden && n.axes.length === 6 && n.axes.every((a) => a.role === "img" && re.test(a.name));
+  const cellNames = (n, re) => !!n && n.cells.filter((c) => c.block).length >= 5 && n.cells.every((c) => (c.block ? c.tag === "BUTTON" && c.name.startsWith(c.block) && re.test(c.name) : c.role === "img" && c.name.length > 5));
+  const evidence = checks.evidence || [];
+  const spans = checks.report?.spans || [];
+  await finish("names: the spider's axes and the honeycomb's cells are named in both languages, and every quote carries its language", t, checks, [
+    [layerNames(checks.en, /^(Infrastructure|Development, security and operations|Platform|Base services|Applications and services|Interface and access) \(German: [^)]+\): (\d+|no evidence found|not researched yet)$/), `English: six named axes, the web a group (${JSON.stringify(checks.en?.axes?.map((a) => a.name))})`],
+    [/img "Infrastructure \(German: Infrastruktur\): 100"/.test(checks.snapshot || "") && (checks.snapshot.match(/img "/g) || []).length === 6, `the accessibility tree has the six axes (${(checks.snapshot || "").split("\n").slice(0, 3).join(" | ")})`],
+    [!!checks.enBlocks && checks.enBlocks.axes.length >= 5 && checks.enBlocks.axes.every((a) => a.role === "img" && /^B-\d\d .+: (level \d|gap)/.test(a.name)), `the block view: an axis per block, named (${JSON.stringify(checks.enBlocks?.axes?.slice(0, 2))})`],
+    [cellNames(checks.en, /level \d|gap|unknown/), `English: every cell named with its block (${JSON.stringify(checks.en?.cells?.slice(0, 2))})`],
+    [layerNames(checks.de, /^(Infrastruktur|Entwicklung, Sicherheit und Betrieb|Plattform|Basisdienst|Anwendungen und Dienstleistungen|Oberfläche und Zugang)/) && cellNames(checks.de, /Stufe \d|Lücke|unbekannt/), `German: the axes and cells named in German (${JSON.stringify(checks.de?.axes?.[0])}; ${JSON.stringify(checks.de?.cells?.[0])})`],
+    [evidence.length >= 1 && evidence.every((q) => /^(de|en)$/.test(q.lang || "")), `every quote in the evidence carries its language (${JSON.stringify(evidence)})`],
+    [spans.length >= 1 && spans.length >= (checks.report?.quoted || 0) && spans.every((q) => /^(de|en)$/.test(q.lang || "")) && spans.some((q) => q.lang === "de"), `every quote in the report's sources carries its language (${spans.length} quotes in ${checks.report?.quoted} sources; ${JSON.stringify(spans.slice(0, 2))})`]
   ]);
 }
 

@@ -89,6 +89,8 @@ export function createEvidenceRegistry() {
    */
   function addDocument({ url, title = "", text = null, kind = text === null ? "pdf" : "text" }) {
     const key = allowUrl(url, { via: "fetch", title });
+    // The fetched page's own title names the source, over a search result's (the review's finding R-14).
+    if (key && title) urls.get(key).title = normaliseText(title);
     docs.push({ url: key, title: normaliseText(title), kind });
     if (typeof text === "string" && text.trim()) push(pages, key, normaliseText(text));
     return docs.length - 1;
@@ -199,7 +201,9 @@ export function checkEvidence(registry, items = [], { readOn = null } = {}) {
     const v = quote ? registry.verifyQuote(item.url, quote) : { verified: false, via: "none" };
     checks.push({
       url: item.url,
-      title: item.title || registry.titleOf(item.url),
+      // The title the run read for the page, not one the model wrote (R-14); the model's only where the
+      // run read none.
+      title: registry.titleOf(item.url) || item.title,
       quote,
       lang: item.lang,
       supports: [...(item.supports || [])],

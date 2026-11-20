@@ -2,7 +2,7 @@
 
 ePayBL, researched on 19 November 2026: the developer community's page, two slide decks of Saxony-Anhalt's OZG office hours (2023 and 2026), a press release of the Saxon government, slides of the SID, a paper of North Rhine-Westphalia on e-payment, PayPal's terms of use, a list of PayPal Holdings' subsidiaries filed with the SEC, a PayPal press release, a Reuters report and a press release of the European Payments Initiative.
 
-Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/epaybl.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/epaybl.js cites it, except the quotes that follow a paragraph beginning "Not cited", which says why. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
 ### [Online bezahlen in der öffentlichen Verwaltung - ePayBL](https://www.epaybl.de/)
 Read on 2026-11-19 (German).
@@ -31,7 +31,10 @@ Read on 2026-11-19 (German).
 ### [Wie schaffte es ePayBL zur Auszeichnung? Hinter den Kulissen eines Preisträgers (SID-Kundenforum)](https://www.sid.sachsen.de/download/SID_Kundenforum_2025_ORANGE_ePayBL.pdf)
 Read on 2026-11-19 (German).
 
+Not cited since the re-check of the review's fixes: it states the SID's responsibility for Saxony's payment component, not who runs the joint development.
+
 > SID: Verfahrensverantwortung für Basiskomponente Zahlungsverkehr
+
 
 ### [Belgian banks join European Payments Initiative to expand Wero wallet across Europe (Reuters, via The Star)](https://www.thestar.com.my/tech/tech-news/2025/07/07/belgian-banks-join-european-payments-initiative-to-expand-wero-wallet-across-europe)
 Read on 2026-11-19 (English).

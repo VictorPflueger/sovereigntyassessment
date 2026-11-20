@@ -8,7 +8,7 @@ import { bus } from "./events.js";
 import { h } from "./dom.js";
 import { icon } from "./icons.js";
 import { t, onLang, getLang } from "./i18n/index.js";
-import { fmtDate, fmtInt, fmtScore } from "./format.js";
+import { fmtDate, fmtInt, fmtScore, layerStatusKey } from "./format.js";
 import { LAYERS } from "./engine.js";
 import { UI } from "./config.js";
 import { appToday } from "./clock.js";
@@ -19,8 +19,12 @@ import { renderTables } from "./datatable.js";
 
 /** True when an as-of date is older than the staleness limit (brief §6.6: "Check for updates"). */
 export function isStale(asOf, today = appToday()) {
-  const d = new Date(`${asOf}T12:00:00`);
-  return !Number.isNaN(d.getTime()) && (today.getTime() - d.getTime()) / 86400000 > UI.staleDays;
+  // Whole calendar days, so a change to or from summer time moves nothing.
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(asOf || ""));
+  if (!m) return false;
+  const then = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const now = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  return (now - then) / 86400000 > UI.staleDays;
 }
 
 /**
@@ -61,14 +65,16 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
     if (state.view === "layer") {
       return LAYERS.map((l) => {
         const L = r?.layers?.[l] || { score: null, status: "open" };
-        const status = L.score !== null ? "scored" : state.layerStatus[l]?.status || L.status;
+        const status = L.score !== null ? "scored" : statuses()[l]?.status || L.status;
         const value = L.score;
         return {
           id: l,
           lines: wrapWords(t(`layer.${l}`), 22, 3),
+          // A short map uses the layer's short name; the axis's tooltip and the table keep the full one.
+          short: [t(`layer.${l}.short`)],
           value,
-          valueText: value === null ? t(`map.status.${status}`) : fmtScore(value),
-          title: `${t(`layer.${l}.full`)}: ${value === null ? t(`map.status.${status}`) : fmtScore(value)}`
+          valueText: value === null ? t(layerStatusKey(status, L.blocks)) : fmtScore(value),
+          title: `${t(`layer.${l}.full`)}: ${value === null ? t(layerStatusKey(status, L.blocks)) : fmtScore(value)}`
         };
       });
     }
@@ -85,6 +91,15 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
     });
   }
 
+  /**
+   * The layers' statuses as the agent recorded them; once a run has ended without an assessment, every
+   * other layer reads "not assessed" rather than "not researched yet" (the review's finding R-07).
+   */
+  function statuses() {
+    if (!state.run?.notAssessed) return state.layerStatus;
+    return Object.fromEntries(LAYERS.map((l) => [l, state.layerStatus[l] || { status: "not_assessed" }]));
+  }
+
   function render() {
     const lang = getLang();
     const r = state.result;
@@ -97,7 +112,7 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
     meta.replaceChildren(...[
       h("span", {}, run.mode === "simulation" ? t("map.asOf", { date: fmtDate(run.as_of) }) : t("map.liveAsOf", { date: fmtDate(new Date().toISOString()) })),
       " · ",
-      h("span", {}, t("map.indicative")),
+      h("span", {}, t(run.notAssessed ? "map.notAssessed" : "map.indicative")),
       stale ? h("span", { class: "vc-tag vc-tag--warning stale-tag" }, icon("alert", 14), t("map.stale")) : null].filter(Boolean));
     byLayer.textContent = t("map.view.layer");
     byBlock.textContent = t("map.view.block");
@@ -113,8 +128,8 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
     tableHost.hidden = !state.table;
     spiderHost.hidden = state.table;
     mixHost.hidden = state.table;
-    if (state.table) renderTables(tableHost, r, { layerStatus: state.layerStatus, lang: run.lang });
-    renderHoneycomb(hcHost, r, { layerStatus: state.layerStatus, lang: run.lang, onPick: (id) => onPickBlock?.(id) });
+    if (state.table) renderTables(tableHost, r, { layerStatus: statuses(), lang: run.lang });
+    renderHoneycomb(hcHost, r, { layerStatus: statuses(), lang: run.lang, onPick: (id) => onPickBlock?.(id) });
   }
 
   /** The spider diagram, or a note while there is nothing to draw in the block view. */
@@ -177,6 +192,11 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
   bus.on("score_update", (ev) => {
     if (!state.run) return;
     state.result = ev.payload?.result || state.result;
+    render();
+  });
+  bus.on("report", (ev) => {
+    if (!state.run || ev.payload?.outcome !== "not_a_service") return;
+    state.run.notAssessed = true;
     render();
   });
   bus.on("layer_status", (ev) => {

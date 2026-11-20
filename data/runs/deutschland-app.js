@@ -1,4 +1,4 @@
-/* Pre-run assessment of Deutschland-App (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of Deutschland-App (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/deutschland-app.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,14 +12,14 @@
  "id": "deutschland-app",
  "entry_id": "deutschland-app",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "Deutschland-App",
  "steps": [
   {
    "say": {
-    "en": "I look the Deutschland-App up in the catalogue and read the Bundestag's report on the Federal Government's answer and a pilot municipality's announcement.",
-    "de": "Ich schlage die Deutschland-App im Katalog nach und lese die Meldung des Bundestages zur Antwort der Bundesregierung und die Mitteilung einer Pilotkommune."
+    "en": "I look the Deutschland-App up in the catalogue and read the Bundestag's report on the Federal Government's answer, a pilot municipality's announcement and the press reports on who builds and runs the app.",
+    "de": "Ich schlage die Deutschland-App im Katalog nach und lese die Meldung des Bundestages zur Antwort der Bundesregierung, die Mitteilung einer Pilotkommune und die Presseberichte dazu, wer die App baut und betreibt."
    }
   },
   {
@@ -38,6 +38,41 @@
    "fetch": {
     "url": "https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app",
     "title": "Wiesbaden becomes pilot municipality for Germany app"
+   }
+  },
+  {
+   "search": {
+    "query": "Deutschland-App SAP Telekom Schwarz Digits Wire Bürger-App",
+    "results": [
+     {
+      "url": "https://www.techbook.de/mobile-lifestyle/apps/deutschland-app-amt-services",
+      "title": "Zum Inhalt springen"
+     },
+     {
+      "url": "https://stock3.com/news/sap-und-telekom-sollen-die-buerger-app-bauen-17008647",
+      "title": "sap und telekom sollen die buerger app bauen 17008647"
+     },
+     {
+      "url": "https://heise.de/-11247830",
+      "title": "SAP and Telekom develop central citizen app for Germany"
+     },
+     {
+      "url": "https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/",
+      "title": "2026-10-16 964 82"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://heise.de/-11247830",
+    "title": "SAP and Telekom develop central citizen app for Germany (heise online)"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/",
+    "title": "Verwaltungsdigitalisierung: Vieles unklar bei der Deutschland-App (netzpolitik.org)"
    }
   },
   {
@@ -62,12 +97,9 @@
      "parent": null
     },
     "operator": {
-     "name": "T-Systems International GmbH",
+     "name": "Deutsche Telekom AG",
      "country": "DE",
-     "parent": {
-      "name": "Deutsche Telekom AG",
-      "country": "DE"
-     }
+     "parent": null
     },
     "status": {
      "en": "Prototype in a pilot, not in the app stores.",
@@ -110,8 +142,7 @@
       "quote": "Für die Entwicklung des Prototyps sei die T-Systems International GmbH als Generalunternehmerin beauftragt worden",
       "lang": "de",
       "supports": [
-       "owner",
-       "operator"
+       "owner"
       ],
       "verified": true
      },
@@ -124,49 +155,24 @@
        "status"
       ],
       "verified": true
+     },
+     {
+      "url": "https://heise.de/-11247830",
+      "title": "SAP and Telekom develop central citizen app for Germany (heise online)",
+      "quote": "Telekom will be responsible for the operational management",
+      "lang": "en",
+      "supports": [
+       "operator"
+      ],
+      "verified": true
      }
     ]
    }
   },
   {
    "say": {
-    "en": "Infrastructure: the Federal Government's answer names no hosting. I check the press reports on who builds the app.",
-    "de": "Infrastruktur: Die Antwort der Bundesregierung nennt kein Hosting. Ich prüfe die Presseberichte dazu, wer die App baut."
-   }
-  },
-  {
-   "search": {
-    "query": "Deutschland-App SAP Telekom Schwarz Digits Wire Bürger-App",
-    "results": [
-     {
-      "url": "https://www.techbook.de/mobile-lifestyle/apps/deutschland-app-amt-services",
-      "title": "Zum Inhalt springen"
-     },
-     {
-      "url": "https://stock3.com/news/sap-und-telekom-sollen-die-buerger-app-bauen-17008647",
-      "title": "sap und telekom sollen die buerger app bauen 17008647"
-     },
-     {
-      "url": "https://heise.de/-11247830",
-      "title": "SAP and Telekom develop central citizen app for Germany"
-     },
-     {
-      "url": "https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/",
-      "title": "2026-10-16 964 82"
-     }
-    ]
-   }
-  },
-  {
-   "fetch": {
-    "url": "https://heise.de/-11247830",
-    "title": "SAP and Telekom develop central citizen app for Germany (heise online)"
-   }
-  },
-  {
-   "fetch": {
-    "url": "https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/",
-    "title": "Verwaltungsdigitalisierung: Vieles unklar bei der Deutschland-App (netzpolitik.org)"
+    "en": "Infrastructure: the Federal Government's answer names no hosting; the press reports name T-Systems for the cloud and data storage.",
+    "de": "Infrastruktur: Die Antwort der Bundesregierung nennt kein Hosting; die Presseberichte nennen T-Systems für Cloud und Datenspeicherung."
    }
   },
   {
@@ -434,8 +440,8 @@
      "de": "Weist die Identität einer Person in der App nach."
     },
     "note": {
-     "en": "The Federal Government names the eID function of the identity card among the ways to sign in; the AusweisApp, which reads the card, is developed by Governikus on behalf of the BSI.",
-     "de": "Die Bundesregierung nennt die eID-Funktion des Personalausweises unter den Wegen der Anmeldung; die AusweisApp, die die Karte ausliest, entwickelt Governikus im Auftrag des BSI."
+     "en": "The Federal Government names the eID function of the identity card among the ways to sign in; the AusweisApp, which reads the card, is developed by Governikus on behalf of the BSI. No source read says who runs the online ID for this app.",
+     "de": "Die Bundesregierung nennt die Online-Ausweisfunktion des Personalausweises unter den Wegen der Anmeldung; die AusweisApp, die den Ausweis liest, entwickelt Governikus im Auftrag des BSI. Keine gelesene Quelle sagt, wer den Online-Ausweis für diese App betreibt."
     },
     "criticality": "critical",
     "tech": {
@@ -444,8 +450,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -455,11 +461,10 @@
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      }
@@ -651,8 +656,8 @@
   },
   {
    "say": {
-    "en": "Every layer has blocks or a status. The blocks named so far are made and run in Germany, but much rests on press reports, and who runs the messenger is open.",
-    "de": "Jede Ebene hat Bausteine oder einen Status. Die bisher genannten Bausteine werden in Deutschland hergestellt und betrieben, doch vieles beruht auf Presseberichten, und wer den Messenger betreibt, ist offen."
+    "en": "Every layer has blocks or a status. Every block is made in Germany and most are run there, though much rests on press reports; who runs the sign-in with the online ID and the messenger is open.",
+    "de": "Jede Ebene hat Bausteine oder einen Status. Alle Bausteine werden in Deutschland hergestellt und die meisten dort betrieben, vieles stützt sich aber auf Presseberichte; wer die Anmeldung mit dem Online-Ausweis und den Messenger betreibt, ist offen."
    }
   },
   {

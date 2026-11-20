@@ -1,8 +1,8 @@
 # Sovereignty Assessment: data sources
 
-What the app reads, where each bundled fact comes from, and when it was read. Every source below was opened with this build's web tools on the date given; nothing is from memory. Version 0.3.0, 20 November 2026.
+What the app reads, where each bundled fact comes from, and when it was read. Every source below was opened with this build's web tools on the date given; nothing is from memory. Version 1.0.0, 20 November 2026.
 
-**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services and this prototype with verified starting URLs, a first set of reference facts with verbatim quotes, and twelve pre-run assessments for Simulation with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
+**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services and this prototype with verified starting URLs, a first set of reference facts with verbatim quotes, and seventeen pre-runs for Simulation, one for every entry, with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
 
 ---
 
@@ -86,109 +86,114 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Twelve catalogue entries ship with a pre-run assessment for Simulation. The first six were written by hand on 19 November 2026, the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), all in both languages (`source: "hand_authored"`, `as_of: "2026-11-19"`). Each cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built. The five catalogue entries without a pre-run (NOOTS, ZaPuK, ZBDS, low-code and the Marktplatz Deutschland Digital) have a research note in `research/` that lists the catalogue sources read and says why they are not enough.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
 
 ### BundID (`data/runs/bundid.js`)
 
-8 sources with 15 quotes; the reference facts on the Federation's IT and app distribution.
+11 sources read, 10 of them with the 19 quotes cited; the reference facts on the Federation's IT and app distribution. The AusweisApp's page in the App Store is read for the app's distribution but, since the review (R-01), no longer cited: it does not say who runs the store.
 
-| Source | Language |
-|---|---|
-| [BundID](https://id.bund.de/en/) | German |
-| [Die BundID: sicherer Zugang zu allen eServices \| Bundesagentur für Arbeit](https://www.arbeitsagentur.de/bundid) | German |
-| [ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)](https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf) | German |
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English |
-| [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English |
-| [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English |
-| [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English |
-| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English |
+| Source | Language | Read |
+|---|---|---|
+| [BundID](https://id.bund.de/en/) | German | 2026-11-20 |
+| [Die BundID: sicherer Zugang zu allen eServices \| Bundesagentur für Arbeit](https://www.arbeitsagentur.de/bundid) | German | 2026-11-19 |
+| [ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)](https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf) | German | 2026-11-19 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
+| [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English | 2026-11-19 |
+| [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
+| [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
+| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
+| [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes) | English | 2026-11-20 |
+| [Who we are](https://cncf.io/about/who-we-are/) | English | 2026-11-20 |
+| [Privacy Policy \| Linux Foundation](https://linuxfoundation.org/legal/privacy-policy) | English | 2026-11-20 |
 
 ### Deutschland-App (`data/runs/deutschland-app.js`)
 
 8 sources with 16 quotes.
 
-| Source | Language |
-|---|---|
-| [Deutschland-App: Prototyp wird in sechs Kommunen erprobt](https://www.bundestag.de/1223070) | German |
-| [Wiesbaden becomes pilot municipality for Germany app](https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app) | English |
-| [SAP and Telekom develop central citizen app for Germany (heise online)](https://heise.de/-11247830) | English |
-| [Verwaltungsdigitalisierung: Vieles unklar bei der Deutschland-App (netzpolitik.org)](https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/) | German |
-| [SAP: Erklärung zur Unternehmensführung 2025](https://ir-api.eqs.com//media/document/456cd775-917f-4e55-947e-2af8368267db/assets/sap-2025-ezu.pdf) | German |
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English |
-| [About Wire](https://wire.com/en/about) | English |
-| [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German |
+| Source | Language | Read |
+|---|---|---|
+| [Deutschland-App: Prototyp wird in sechs Kommunen erprobt](https://www.bundestag.de/1223070) | German | 2026-11-19 |
+| [Wiesbaden becomes pilot municipality for Germany app](https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app) | English | 2026-11-19 |
+| [SAP and Telekom develop central citizen app for Germany (heise online)](https://heise.de/-11247830) | English | 2026-11-19 |
+| [Verwaltungsdigitalisierung: Vieles unklar bei der Deutschland-App (netzpolitik.org)](https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/) | German | 2026-11-19 |
+| [SAP: Erklärung zur Unternehmensführung 2025](https://ir-api.eqs.com//media/document/456cd775-917f-4e55-947e-2af8368267db/assets/sap-2025-ezu.pdf) | German | 2026-11-19 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
+| [About Wire](https://wire.com/en/about) | English | 2026-11-19 |
+| [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-19 |
 
 ### Online-Ausweis (`data/runs/online-ausweis.js`)
 
-11 sources with 16 quotes; the reference facts on app distribution.
+11 sources read, 9 of them with the 16 quotes cited; the reference facts on app distribution. Since the review (R-01), two pages read are no longer cited, as their quotes did not state what they were cited for: the BVA's page on the authorisation certificates and the AusweisApp's page in the App Store.
 
-| Source | Language |
-|---|---|
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English |
-| [eID Server](https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html) | English |
-| [BT-Drucksache 20/13075: Evolutionslösung für den elektronischen Personalausweis – eID](https://dserver.bundestag.de/btd/20/130/2013075.pdf) | German |
-| [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English |
-| [Online-Ausweis: Der ePerso ist tot, lange lebe der ePerso (netzpolitik.org)](https://netzpolitik.org/2026/online-ausweis-der-eperso-ist-tot-lange-lebe-der-eperso/) | German |
-| [D-Trust-BerCA für Diensteanbieter und eID-Service-Provider (Produktblatt)](https://www.d-trust.net/files/dokumente/pdf/produktblatt_berechtigungszertifikate.pdf) | German |
-| [BVA - Vergabestelle für Berechtigungszertifikate](https://www.bva.bund.de/DE/Services/Behoerden/Produkt/PA-VfB/pa-vfb_node.html) | German |
-| [Der neue Personalausweis – die Fakten auf einen Blick (BSI, via Stadt Düren)](https://onlinedienste.dueren.de/suche/-/vr-bis-detail/dokument/12224/download) | German |
-| [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English |
-| [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English |
-| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English |
+| Source | Language | Read |
+|---|---|---|
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
+| [eID Server](https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html) | English | 2026-11-19 |
+| [BT-Drucksache 20/13075: Evolutionslösung für den elektronischen Personalausweis – eID](https://dserver.bundestag.de/btd/20/130/2013075.pdf) | German | 2026-11-19 |
+| [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English | 2026-11-19 |
+| [Online-Ausweis: Der ePerso ist tot, lange lebe der ePerso (netzpolitik.org)](https://netzpolitik.org/2026/online-ausweis-der-eperso-ist-tot-lange-lebe-der-eperso/) | German | 2026-11-19 |
+| [D-Trust-BerCA für Diensteanbieter und eID-Service-Provider (Produktblatt)](https://www.d-trust.net/files/dokumente/pdf/produktblatt_berechtigungszertifikate.pdf) | German | 2026-11-19 |
+| [BVA - Vergabestelle für Berechtigungszertifikate](https://www.bva.bund.de/DE/Services/Behoerden/Produkt/PA-VfB/pa-vfb_node.html) | German | 2026-11-19 |
+| [Der neue Personalausweis – die Fakten auf einen Blick (BSI, via Stadt Düren)](https://onlinedienste.dueren.de/suche/-/vr-bis-detail/dokument/12224/download) | German | 2026-11-19 |
+| [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
+| [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
+| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
 
 ### FIT-Connect (`data/runs/fit-connect.js`)
 
-8 sources with 13 quotes.
+9 sources read, 8 of them with the 14 quotes cited. The FITKO's one-pager is read for the SDKs but, since the verification of the review's fixes noted the registry's maker, no longer cited: it says who develops FIT-Connect, not who makes the registry that distributes its SDK.
 
-| Source | Language |
-|---|---|
-| [Einführung in FIT-Connect \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/intro/) | German |
-| [FAQ \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/faq/) | German |
-| [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German |
-| [Global Access Internet Services GmbH (connect professional, Anbieterkompass)](https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html) | German |
-| [Maven Central: dev.fitko.fitconnect:sdk-client](https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client) | English |
-| [FIT-Connect Onepager (FITKO)](https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf) | German |
-| [About Sonatype \| Our Company & Mission \| Sonatype](https://sonatype.com/about) | English |
-| [Sonatype Relocates Headquarters to Maryland](https://www.sonatype.com/blog/2010/09/sonatype-headquarters-moves-to-maryland?hs_amp=true) | English |
+| Source | Language | Read |
+|---|---|---|
+| [Einführung in FIT-Connect \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/intro/) | German | 2026-11-19 |
+| [FAQ \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/faq/) | German | 2026-11-19 |
+| [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German | 2026-11-19 |
+| [Dataport – Hamburgs zentraler IT-Dienstleister](https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538) | German | 2026-11-20 |
+| [Global Access Internet Services GmbH (connect professional, Anbieterkompass)](https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html) | German | 2026-11-19 |
+| [Maven Central: dev.fitko.fitconnect:sdk-client](https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client) | English | 2026-11-19 |
+| [FIT-Connect Onepager (FITKO)](https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf) | German | 2026-11-19 |
+| [About Sonatype \| Our Company & Mission \| Sonatype](https://sonatype.com/about) | English | 2026-11-19 |
+| [Sonatype Relocates Headquarters to Maryland](https://www.sonatype.com/blog/2010/09/sonatype-headquarters-moves-to-maryland?hs_amp=true) | English | 2026-11-19 |
 
 ### ePayBL (`data/runs/epaybl.js`)
 
-11 sources with 18 quotes.
+11 sources read, 10 of them with the 17 quotes cited. The SID's slides on the award are read for the development block but, since the re-check of the review's fixes, no longer cited: they state the SID's responsibility for Saxony's payment component, not who runs the joint development.
 
-| Source | Language |
-|---|---|
-| [Online bezahlen in der öffentlichen Verwaltung - ePayBL](https://www.epaybl.de/) | German |
-| [38. OZG-Sprechstunde: Beantragungsprozess eines ePayBL-Mandanten, Basisdienst ePayLSA (Sachsen-Anhalt)](https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/38_OZG-Sprechstunde_Basisdienste_ePayLSA_130923.pdf) | German |
-| [73. Kommunen-digital-Sprechstunde: Neues aus den Basisdiensten, Migration auf ePayBL 4 und MODUL-F (Sachsen-Anhalt)](https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf) | German |
-| [Entwicklergemeinschaft ePay-Bund-Länder gewinnt den eGovernment Readers Choice Award 2024 in Gold](https://medienservice.sachsen.de/medien/news/1079912/download_pdf) | German |
-| [Wie schaffte es ePayBL zur Auszeichnung? Hinter den Kulissen eines Preisträgers (SID-Kundenforum)](https://www.sid.sachsen.de/download/SID_Kundenforum_2025_ORANGE_ePayBL.pdf) | German |
-| [Belgian banks join European Payments Initiative to expand Wero wallet across Europe (Reuters, via The Star)](https://www.thestar.com.my/tech/tech-news/2025/07/07/belgian-banks-join-european-payments-initiative-to-expand-wero-wallet-across-europe) | English |
-| [PayPal-Nutzungsbedingungen](https://www.paypal.com/de/webapps/mpp/ua/useragreement-emea-full) | German |
-| [Exhibit 21.01: Subsidiaries of PayPal Holdings, Inc. (SEC EDGAR)](https://www.sec.gov/Archives/edgar/data/1633917/000163391721000018/exhibit2101subsidiarylistf.htm) | English |
-| [PayPal Announces Strategic Reorganization to Accelerate Growth](https://newsroom.paypal-corp.com/2026-04-29-PayPal-Announces-Strategic-Reorganization-to-Accelerate-Growth) | English |
-| [Standardisierung ePayment-Lösung (Nordrhein-Westfalen)](https://www.mhkbd.nrw/system/files/media/document/file/standardisierung_epayment_v1_0.pdf) | German |
-| [Five Belgian Banks Join EPI to Bring Wero to Even More European Customers](https://epicompany.eu/media-insights/five-belgian-banks-join-epi-to-bring-wero-to-even-more-european-customers) | English |
+| Source | Language | Read |
+|---|---|---|
+| [Online bezahlen in der öffentlichen Verwaltung - ePayBL](https://www.epaybl.de/) | German | 2026-11-19 |
+| [38. OZG-Sprechstunde: Beantragungsprozess eines ePayBL-Mandanten, Basisdienst ePayLSA (Sachsen-Anhalt)](https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/38_OZG-Sprechstunde_Basisdienste_ePayLSA_130923.pdf) | German | 2026-11-19 |
+| [73. Kommunen-digital-Sprechstunde: Neues aus den Basisdiensten, Migration auf ePayBL 4 und MODUL-F (Sachsen-Anhalt)](https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf) | German | 2026-11-19 |
+| [Entwicklergemeinschaft ePay-Bund-Länder gewinnt den eGovernment Readers Choice Award 2024 in Gold](https://medienservice.sachsen.de/medien/news/1079912/download_pdf) | German | 2026-11-19 |
+| [Wie schaffte es ePayBL zur Auszeichnung? Hinter den Kulissen eines Preisträgers (SID-Kundenforum)](https://www.sid.sachsen.de/download/SID_Kundenforum_2025_ORANGE_ePayBL.pdf) | German | 2026-11-19 |
+| [Belgian banks join European Payments Initiative to expand Wero wallet across Europe (Reuters, via The Star)](https://www.thestar.com.my/tech/tech-news/2025/07/07/belgian-banks-join-european-payments-initiative-to-expand-wero-wallet-across-europe) | English | 2026-11-19 |
+| [PayPal-Nutzungsbedingungen](https://www.paypal.com/de/webapps/mpp/ua/useragreement-emea-full) | German | 2026-11-19 |
+| [Exhibit 21.01: Subsidiaries of PayPal Holdings, Inc. (SEC EDGAR)](https://www.sec.gov/Archives/edgar/data/1633917/000163391721000018/exhibit2101subsidiarylistf.htm) | English | 2026-11-19 |
+| [PayPal Announces Strategic Reorganization to Accelerate Growth](https://newsroom.paypal-corp.com/2026-04-29-PayPal-Announces-Strategic-Reorganization-to-Accelerate-Growth) | English | 2026-11-19 |
+| [Standardisierung ePayment-Lösung (Nordrhein-Westfalen)](https://www.mhkbd.nrw/system/files/media/document/file/standardisierung_epayment_v1_0.pdf) | German | 2026-11-19 |
+| [Five Belgian Banks Join EPI to Bring Wero to Even More European Customers](https://epicompany.eu/media-insights/five-belgian-banks-join-epi-to-bring-wero-to-even-more-european-customers) | English | 2026-11-19 |
 
 ### Bundesportal (`data/runs/bundesportal.js`)
 
 5 sources with 9 quotes; the reference facts on the Federation's IT.
 
-| Source | Language |
-|---|---|
-| [§ 9a EGovG - Einzelnorm](https://www.gesetze-im-internet.de/egovg/__9a.html) | German |
-| [Umsetzung des Onlinezugangsgesetzes (hib 1402/2020)](https://www.bundestag.de/presse/hib/814130-814130) | German |
-| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German |
-| [BundID](https://id.bund.de/en/) | German |
-| [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German |
+| Source | Language | Read |
+|---|---|---|
+| [§ 9a EGovG - Einzelnorm](https://www.gesetze-im-internet.de/egovg/__9a.html) | German | 2026-11-19 |
+| [Umsetzung des Onlinezugangsgesetzes (hib 1402/2020)](https://www.bundestag.de/presse/hib/814130-814130) | German | 2026-11-19 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-19 |
+| [BundID](https://id.bund.de/en/) | German | 2026-11-20 |
+| [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-19 |
 
 ### EUDI Wallet (`data/runs/eudi-wallet.js`)
 
-7 sources with 10 quotes; the reference facts on app distribution.
+8 sources read, 7 of them with the 10 quotes cited; the reference facts on app distribution. The second heise report was read for the infrastructure layer, which the pre-run records as "no evidence found" without a quote.
 
 | Source | Language | Read |
 |---|---|---|
 | [The national EUDI Wallet Project \| EUDI-Wallet](https://eudi-wallet.gov.de/en/about) | English | 2026-11-20 |
 | [Demo of the EUDI wallet app: what the digital wallet can already do](https://heise.de/-10418753) | English | 2026-11-20 |
+| [eID: German version of the EUDI wallet with cloud-based key storage](https://heise.de/-10417676) | English | 2026-11-20 |
 | [d-you startet am 2. Januar 2027: Deutschlands digitale Identität](https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/) | German | 2026-11-20 |
 | [The digital ID in the EUDI Wallet \| EUDI-Wallet](https://eudi-wallet.gov.de/en/news/digitaler-ausweis) | English | 2026-11-20 |
 | [FAQ zur EUDI-Wallet: Die wichtigsten Fragen und Antworten zur digitalen Brieftasche](https://netzpolitik.org/?p=512498) | German | 2026-11-20 |
@@ -251,11 +256,12 @@ Twelve catalogue entries ship with a pre-run assessment for Simulation. The firs
 
 ### This prototype, the self-assessment (`data/runs/sovereignty-assessment.js`)
 
-11 sources with 23 quotes.
+12 sources with 23 quotes; the README is cited both on the repository's front page and at the commit that added the maker's sentence.
 
 | Source | Language | Read |
 |---|---|---|
 | [GitHub - VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment) | English | 2026-11-20 |
+| [sovereigntyassessment/README.md at 67d20c3 · VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment/blob/67d20c38a6e57c565cf4c45180788d2bb059caf6/README.md) | English | 2026-11-20 |
 | [About GitHub Pages](https://docs.github.com/en/articles/about-github-pages) | English | 2026-11-20 |
 | [GitHub General Privacy Statement - GitHub Docs](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement) | English | 2026-11-20 |
 | [Microsoft to acquire GitHub for $7.5 billion](https://news.microsoft.com/2018/06/04/microsoft-to-acquire-github-for-7-5-billion/) | English | 2026-11-20 |
@@ -266,3 +272,57 @@ Twelve catalogue entries ship with a pre-run assessment for Simulation. The firs
 | [Google Terms of Service – Privacy & Terms – Google](https://policies.google.com/terms) | English | 2026-11-20 |
 | [Google Chrome and ChromeOS Additional Terms of Service](https://www.google.com/intl/en/chrome/terms/) | English | 2026-11-20 |
 | [Regional compliance \| Claude by Anthropic](https://claude.com/regional-compliance) | English | 2026-11-20 |
+
+### NOOTS (National Once-Only Technical System) (`data/runs/noots.js`)
+
+5 sources with 16 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Vertrag über die Errichtung, den Betrieb und die Weiterentwicklung des Nationalen Once-Only-Technical-Systems (NOOTS) – NOOTS-Staatsvertrag](https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf) | German | 2026-11-20 |
+| [NOOTS MVP v1.4.0](https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+| [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German | 2026-11-20 |
+| [IMPRESSUM - SEITENBAU](https://www.seitenbau.com/impressum) | German | 2026-11-20 |
+
+### Marktplatz Deutschland Digital (MDD) (`data/runs/marktplatz-deutschland-digital.js`)
+
+8 sources with 14 quotes. For the independent review, the IT-Planungsrat's news of the start replaces a FITKO handout of 2024 and the German Administration Cloud's homepage as the source on the marketplace's operator.
+
+| Source | Language | Read |
+|---|---|---|
+| [Crew gesucht: Community-Funktionen für den Marktplatz Deutschland Digital](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Crew_Gesucht_Community-Funtktionen_Marktplatz_Deutschland_Fell.pdf) | German | 2026-11-20 |
+| [Marktplatz Deutschland Digital (MDD) startet Produktivbetrieb - Vergabeblog](https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/) | German | 2026-11-20 |
+| [Marktplatz Deutschland Digital startet Produktivbetrieb](https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb) | German | 2026-11-20 |
+| [dbb magazin 10/2026 – Page 27](https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/) | German | 2026-11-20 |
+| [Sechs Bundesländer starten Open-Source-Bildungsplattform \| ChannelPartner](https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html) | German | 2026-11-20 |
+| [Shopware 6: Vom klassischen Shopsystem zur E-Commerce-Plattform](https://t3n.de/news/shopware-6-version-1165877/) | German | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+| [Privacy \| Shopware](https://www.shopware.com/en/privacy/website/) | English | 2026-11-20 |
+
+### ZBDS (central payment component) (`data/runs/zbds.js`)
+
+2 sources with 4 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+
+### ZaPuK (target architecture for mailbox and communication solutions) (`data/runs/zapuk.js`)
+
+3 sources with 7 quotes cited; the research note holds an eighth from the same Drucksache, which the ZBDS pre-run cites.
+
+| Source | Language | Read |
+|---|---|---|
+| [Föderale Zielarchitektur für Postfach- und Kommunikationslösungen: Überblick und Handlungsempfehlung, Version 1.0](https://www.it-planungsrat.de/fileadmin/beschluesse/2025/Beschluss_2025_28_ZaPuK_%C3%9Cberblick.pdf) | German | 2026-11-20 |
+| [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+
+### Low-code and workflow automation (`data/runs/low-code.js`)
+
+1 source with 4 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat](https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf) | German | 2026-11-20 |

@@ -553,7 +553,7 @@
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
        "tech"

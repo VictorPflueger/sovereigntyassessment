@@ -37,9 +37,9 @@ Read on 2026-11-19 (German).
 > Als SE mit Sitz in Walldorf, Deutschland, unterliegt SAP den europäischen und deutschen SE-Regelungen
 
 ### [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us)
-Read on 2026-11-19 (English).
+Read on 2026-11-20 (English); first read on 2026-11-19, when the quote was cut at 125 characters by the fetch tool, and read again in full for the review of version 1.0.0.
 
-> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office
+> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).
 
 ### [About Wire](https://wire.com/en/about)
 Read on 2026-11-19 (English).

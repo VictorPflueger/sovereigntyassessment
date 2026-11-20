@@ -44,6 +44,14 @@ const TEXT_PATHS = {
 };
 
 const KNOWN_STEPS = ["say", "search", "fetch", "tool", "memo", "report"];
+// Legal forms after a company's name ("Apple Inc.", "Dataport AöR"): a party whose name carries one is a
+// company, and its name before the form may not appear in a lever.
+const LEGAL_FORM = /\s+(GmbH & Co\. KG|GmbH|AG|SE|Inc\.|Ltd\.|LLC|PBC|Corp\.|eG|AöR|KG|S\.à r\.l\. et Cie, S\.C\.A\.|Holdings, Inc\.)$/;
+// Products and companies the sources name as alternatives or platforms, which no lever may name either.
+const LEVER_NAMES = ["Apple", "App Store", "Anthropic", "Claude", "AWS", "Amazon", "Bedrock", "GCP", "Google", "Vertex", "Microsoft", "Foundry", "Azure",
+  "Mistral", "STACKIT", "StackIT", "Stackit", "Wero", "European Payments Initiative", "EPI", "PayPal", "Mastercard", "Visa", "GitLab", "GitHub",
+  "Keycloak", "Kubernetes", "Shopware", "SAP", "IONOS", "T-Systems", "Telekom", "Dataport", "Governikus", "Bundesdruckerei", "D-Trust", "SEITENBAU",
+  "Sonatype", "SVA", "ARWINET", "AKDB", "govdigital", "Linux Foundation", "CNCF", "Wire"];
 const KEY_LIKE = /sk-ant-[A-Za-z0-9_-]{6,}/;
 const isBoth = (v) => v && typeof v === "object" && !Array.isArray(v) && Object.keys(v).length === 2 && "en" in v && "de" in v;
 
@@ -162,6 +170,47 @@ export function staticProblems(def, ctx = {}) {
     if (kind === "tool" && step.tool === "rec_block" && !(Array.isArray(step.input?.evidence) && step.input.evidence.length)) add("block_without_evidence", where, "a block needs evidence");
   });
 
+  // Every field a block records stands on a quote that supports it (brief §6.6): an unsupported field counts
+  // as unknown for scoring, and the exit path, which is not scored, would otherwise be shown and exported
+  // as a judgement without a source (the review's findings R-01 and R-10).
+  (def.steps || []).forEach((step, n) => {
+    if (step.tool !== "rec_block" || !step.input) return;
+    const b = step.input;
+    const sup = new Set((b.evidence || []).flatMap((e) => e.supports || []));
+    const need = [
+      [b.exit && b.exit !== "unknown", "exit", `the exit path "${b.exit}"`],
+      [b.hosting && b.hosting !== "UNKNOWN", "hosting", `the hosting "${b.hosting}"`],
+      [b.licence && b.licence !== "unknown", "licence", `the licence "${b.licence}"`],
+      [b.tech?.country && b.tech.country !== "UNKNOWN", "tech", `the maker ${b.tech?.name}`],
+      [b.operator?.country && b.operator.country !== "UNKNOWN", "operator", `the operator ${b.operator?.name}`],
+      [!!b.tech?.parent, "tech.parent", `the maker's parent ${b.tech?.parent?.name}`],
+      [!!b.operator?.parent, "operator.parent", `the operator's parent ${b.operator?.parent?.name}`]
+    ];
+    for (const [recorded, field, what] of need) if (recorded && !sup.has(field)) add("unsupported_field", `steps[${n}] rec_block`, `${what} has no evidence that supports "${field}"`);
+  });
+
+  // A lever names categories, never a company or a product (brief §6.5 and §6.6); the names stay in its
+  // evidence. Checked against the companies the run's blocks record and the products its sources name.
+  const companies = new Set(LEVER_NAMES);
+  for (const step of def.steps || []) {
+    if (step.tool !== "rec_block" || !step.input) continue;
+    for (const p of [step.input.tech, step.input.operator, step.input.tech?.parent, step.input.operator?.parent]) {
+      const name = String(p?.name || "").replace(/\s*\(.*?\)\s*/g, " ").trim();
+      const form = name.match(LEGAL_FORM);
+      if (form) companies.add(name.slice(0, form.index).replace(/,$/, "").trim());
+    }
+  }
+  (def.steps || []).forEach((step, n) => {
+    if (step.tool !== "ui_propose_levers") return;
+    (step.input?.levers || []).forEach((l, k) => {
+      for (const field of ["title", "rationale"]) for (const lang of ["en", "de"]) {
+        const text = String(l[field]?.[lang] || "");
+        const hit = [...companies].filter((c) => new RegExp(`(^|[^\\p{L}\\p{N}])${c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^\\p{L}\\p{N}])`, "u").test(text));
+        if (hit.length) add("lever_names_company", `steps[${n}] levers[${k}].${field}.${lang}`, `names ${hit.join(", ")}`);
+      }
+    });
+  });
+
   for (const { item, where } of evidenceItems(def)) {
     if (!allowed.has(normaliseUrl(item.url))) add("unknown_url", where, `${item.url} is in neither the run's research steps, the catalogue nor the reference facts`);
     if (typeof item.quote === "string" && [...item.quote].length > MAX_QUOTE) add("long_quote", where, `the quote has ${[...item.quote].length} characters, more than ${MAX_QUOTE}`);
@@ -192,12 +241,14 @@ export function leverChoices(def) {
  */
 export async function playProblems(def, { lang, choice = "keep", createPlayer }) {
   const problems = [];
+  // A pre-run whose report says "not_a_service" ends that way: no blocks, no review, no levers.
+  const expected = (def?.steps || []).some((s) => s.report?.outcome === "not_a_service") ? "not_a_service" : "done";
   const offs = [
     bus.on("review_request", (ev) => bus.emit("review_decision", { request_id: ev.payload.request_id, action: "confirm", by: "user" })),
     bus.on("levers", (ev) => bus.emit("lever_decision", { options_seq: ev.payload.options_seq, lever_id: choice, by: "user" })),
     bus.on("choice_request", (ev) => bus.emit("choice_decision", { request_id: ev.payload.request_id, chosen: 0, by: "user" })),
     bus.on("notice", (ev) => { if (ev.payload.level === "error") problems.push({ code: "play", where: `${lang} ${choice}`, message: `${ev.payload.key}: ${ev.payload.vars?.message || ""}` }); }),
-    bus.on("run_end", (ev) => { if (ev.payload.status !== "done") problems.push({ code: "play", where: `${lang} ${choice}`, message: `the run ended with ${ev.payload.status}` }); })
+    bus.on("run_end", (ev) => { if (ev.payload.status !== expected) problems.push({ code: "play", where: `${lang} ${choice}`, message: `the run ended with ${ev.payload.status}, not ${expected}` }); })
   ];
   const player = createPlayer({ getSpeed: () => 1e7 });
   let toolbox = null;

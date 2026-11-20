@@ -6,20 +6,23 @@
 
 import { h, clear } from "./dom.js";
 import { t, onLang, getLang } from "./i18n/index.js";
-import { fmtDate, fmtDelta, fmtInt, fmtScore, fmtShare } from "./format.js";
+import { fmtDate, fmtDelta, fmtInt, fmtScore, fmtShare, layerStatusKey } from "./format.js";
 import { LAYERS } from "./engine.js";
 import { spiderSvg, wrapWords } from "./spider.js";
 import { loadedAssessments, onLoaded } from "./loaded.js";
 import { scoreAssessment, serviceName } from "./assessment.js";
 import { getWeights, onWeights } from "./weights.js";
 import { formatFact } from "./facts.js";
+import { isStale } from "./sovmap.js";
 
 /** How a loaded assessment is named in a list: its service, then where it comes from. */
 export function itemLabel(item, a, lang = getLang()) {
   const name = serviceName(a, lang);
-  if (item.origin === "prerun") return t("loaded.label.prerun", { name, date: fmtDate(a.as_of, lang) }, lang);
+  // An assessment older than ninety days says so here as on the map (the review's finding R-24).
+  const stale = item.origin !== "session" && a.as_of && isStale(a.as_of) ? ` · ${t("map.stale", null, lang)}` : "";
+  if (item.origin === "prerun") return t("loaded.label.prerun", { name, date: fmtDate(a.as_of, lang) }, lang) + stale;
   if (item.origin === "session") return t(a.source === "live" ? "loaded.label.sessionLive" : "loaded.label.session", { name }, lang);
-  return t("loaded.label.file", { name, date: fmtDate(a.as_of, lang) }, lang);
+  return t("loaded.label.file", { name, date: fmtDate(a.as_of, lang) }, lang) + stale;
 }
 
 /** The weakest critical link as text: "level 0 · B-06 App distribution on iOS", or no data. */
@@ -100,7 +103,7 @@ export function createCompare(host) {
 
   function layerValue(r, l) {
     const L = r.layers[l];
-    return L.score === null ? t(`map.status.${L.status}`) : fmtScore(L.score);
+    return L.score === null ? t(layerStatusKey(L.status, L.blocks)) : fmtScore(L.score);
   }
 
   function drawSpider(ra, rb, nameA, nameB) {
@@ -139,6 +142,10 @@ export function createCompare(host) {
     }
     rows.push(h("tr", { class: "cmp-total", dataset: { row: "overall" } }, h("th", { scope: "row" }, t("compare.row.overall")),
       cell("score.overall", ra.overall, fmtScore(ra.overall), "a"), cell("score.overall", rb.overall, fmtScore(rb.overall), "b"), delta("score.overall", ra.overall, rb.overall)));
+    const layersScored = (r) => LAYERS.filter((l) => r.layers[l].score !== null).length;
+    rows.push(h("tr", { dataset: { row: "layers" } }, h("th", { scope: "row" }, t("compare.row.layers")),
+      cell("layers", layersScored(ra), t("map.layersScored", { scored: fmtInt(layersScored(ra)), all: fmtInt(LAYERS.length) }), "a"),
+      cell("layers", layersScored(rb), t("map.layersScored", { scored: fmtInt(layersScored(rb)), all: fmtInt(LAYERS.length) }), "b"), h("td", { class: "num" }, "–")));
     rows.push(h("tr", { dataset: { row: "weakest" } }, h("th", { scope: "row" }, t("kpi.weakest.label")),
       cell("weakest.level", ra.weakest?.level ?? null, weakestText(ra, lang), "a"), cell("weakest.level", rb.weakest?.level ?? null, weakestText(rb, lang), "b"), h("td", { class: "num" }, "–")));
     rows.push(h("tr", { dataset: { row: "coverage" } }, h("th", { scope: "row" }, t("kpi.coverage.label")),

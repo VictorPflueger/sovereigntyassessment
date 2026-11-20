@@ -1,4 +1,4 @@
-/* Pre-run assessment of Online ID (eID) (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of Online ID (eID) (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/online-ausweis.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "online-ausweis",
  "entry_id": "online-ausweis",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "Online-Ausweis",
  "steps": [
@@ -81,8 +81,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "status": {
@@ -93,11 +93,10 @@
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "owner",
-       "operator"
+       "owner"
       ],
       "verified": true
      },
@@ -160,18 +159,18 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
+     "name": "Governikus GmbH & Co. KG",
      "country": "DE",
      "parent": null
     },
     "hosting": "UNKNOWN",
     "licence": "open_source",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
        "tech",
@@ -190,7 +189,11 @@
       "verified": true
      }
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "note": {
+     "en": "Governikus develops the AusweisApp on behalf of the BSI, so the developer runs its development.",
+     "de": "Governikus entwickelt die AusweisApp im Auftrag des BSI; die Entwicklung betreibt also der Entwickler."
+    }
    }
   },
   {
@@ -318,7 +321,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://www.d-trust.net/files/dokumente/pdf/produktblatt_berechtigungszertifikate.pdf",
@@ -337,16 +340,6 @@
       "lang": "de",
       "supports": [
        "tech"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://www.bva.bund.de/DE/Services/Behoerden/Produkt/PA-VfB/pa-vfb_node.html",
-      "title": "BVA - Vergabestelle für Berechtigungszertifikate",
-      "quote": "Unternehmen und Behörden erhalten nur dann Zugang zu den elektronischen Ausweisdaten von Bürgerinnen und Bürgern",
-      "lang": "de",
-      "supports": [
-       "operator"
       ],
       "verified": true
      },
@@ -383,8 +376,8 @@
      "de": "Liest den Personalausweis aus und gibt die Daten an den eID-Server des Dienstes weiter."
     },
     "note": {
-     "en": "The source code is published on GitHub under the EUPL.",
-     "de": "Der Quellcode ist auf GitHub unter der EUPL veröffentlicht."
+     "en": "The source code is published on GitHub under the EUPL. The app runs on each user's own device; no source read says who runs it for the service.",
+     "de": "Der Quellcode ist auf GitHub unter der EUPL veröffentlicht. Die App läuft auf dem eigenen Gerät jeder Nutzerin und jedes Nutzers; keine gelesene Quelle sagt, wer sie für den Dienst betreibt."
     },
     "criticality": "critical",
     "tech": {
@@ -393,8 +386,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -404,11 +397,10 @@
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      },
@@ -461,8 +453,8 @@
      "de": "Die Chipkarte, die Menschen an das Lesegerät oder das Smartphone halten."
     },
     "note": {
-     "en": "The BSI says the card is produced by the Bundesdruckerei in Berlin.",
-     "de": "Laut BSI wird die Karte von der Bundesdruckerei in Berlin hergestellt."
+     "en": "The BSI says the card is produced by the Bundesdruckerei in Berlin; no source read says who runs it for a service.",
+     "de": "Laut BSI wird die Karte von der Bundesdruckerei in Berlin hergestellt; keine gelesene Quelle sagt, wer sie für einen Dienst betreibt."
     },
     "criticality": "critical",
     "tech": {
@@ -471,13 +463,13 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesdruckerei GmbH",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://onlinedienste.dueren.de/suche/-/vr-bis-detail/dokument/12224/download",
@@ -485,8 +477,7 @@
       "quote": "von der Bundesdruckerei in Berlin hergestellt",
       "lang": "de",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      }
@@ -568,7 +559,7 @@
      }
     },
     "hosting": "UNKNOWN",
-    "licence": "proprietary",
+    "licence": "unknown",
     "exit": "possible",
     "evidence": [
      {
@@ -577,15 +568,24 @@
       "quote": "App Store, iCloud, and iCloud+ are service marks of Apple Inc., registered in the U.S. and other countries and regions.",
       "lang": "en",
       "supports": [
-       "tech",
-       "licence"
+       "tech"
       ],
       "verified": true
      },
      {
-      "url": "https://apps.apple.com/us/app/id948660805",
-      "title": "AusweisApp Bund App - App Store",
-      "quote": "on the App Store",
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Depending on your location, the Apple entity providing the services is:",
+      "lang": "en",
+      "supports": [
+       "operator"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Apple Media Services include, where available, the App Store",
       "lang": "en",
       "supports": [
        "operator"
@@ -656,9 +656,7 @@
     "changes": [
      {
       "block_id": "B-06",
-      "made_in": "EU",
-      "run_by": "EU",
-      "hosting": "EU"
+      "run_by": "EU"
      }
     ]
    }
@@ -670,19 +668,17 @@
      {
       "lever_id": "L1",
       "title": {
-       "en": "Also offer the AusweisApp through an app marketplace run in the EU",
-       "de": "Die AusweisApp auch über einen App-Marktplatz mit Betrieb in der EU anbieten"
+       "en": "Distribute the AusweisApp on iPhones through an app marketplace run in the EU",
+       "de": "Die AusweisApp für iPhones über einen in der EU betriebenen App-Marktplatz vertreiben"
       },
       "rationale": {
-       "en": "In the EU, iPhone users can install alternative app marketplaces, so the app need not depend on one store. The overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren; die App muss also nicht von einem Store abhängen. Der Gesamtwert läge bei {{fact:whatif.L1.overall}}."
+       "en": "In the EU, iPhone users can install alternative app marketplaces. If the AusweisApp reached iPhones through a marketplace run in the EU rather than the phone maker's store, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on the phone maker's platform.",
+       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
       },
       "changes": [
        {
         "block_id": "B-06",
-        "made_in": "EU",
-        "run_by": "EU",
-        "hosting": "EU"
+        "run_by": "EU"
        }
       ],
       "evidence": [
@@ -707,8 +703,8 @@
   {
    "report": {
     "findings": {
-     "en": "# Online ID: findings\n\nThe online ID function of the German identity card proves a person's identity to online services. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says where the central background systems are hosted.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): Governikus develops the AusweisApp on behalf of the BSI.\n- **Platform**: each service runs its own eID server or commissions an eID service; who makes and runs them differs, and according to netzpolitik.org none of the server implementations is open source. The block is a gap.\n- **Base services** ({{fact:score.layer.base_service}}): the Bundesverwaltungsamt grants the authorisation to read the card; the certificates come from a PKI with revocation management described by D-Trust.\n- **Applications** ({{fact:score.layer.applications}}): the AusweisApp is open source under the EUPL.\n- **Interface and access** ({{fact:score.layer.access}}): the card is produced by the Bundesdruckerei in Berlin, according to the BSI; on iPhones the AusweisApp comes from the App Store, which Apple Distribution International operates for European users as part of the Apple group.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. A phone-only credential, the Smart-eID, was stopped at the end of 2023, according to a parliamentary paper.",
-     "de": "# Online-Ausweis: Befunde\n\nDie Online-Ausweisfunktion des deutschen Personalausweises weist die Identität gegenüber Onlinediensten nach. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, wo die zentralen Hintergrundsysteme betrieben werden.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Governikus entwickelt die AusweisApp im Auftrag des BSI.\n- **Plattform**: Jeder Dienst betreibt einen eigenen eID-Server oder beauftragt einen eID-Service; wer sie herstellt und betreibt, ist verschieden, und laut netzpolitik.org ist keine Server-Implementierung Open Source. Der Baustein ist eine Lücke.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Das Bundesverwaltungsamt erteilt die Berechtigung zum Auslesen; die Zertifikate stammen aus einer PKI mit Sperrmanagement, die D-Trust beschreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die AusweisApp ist Open Source unter der EUPL.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Karte stellt laut BSI die Bundesdruckerei in Berlin her; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Ein reines Smartphone-Verfahren, die Smart-eID, wurde laut einer Bundestagsdrucksache Ende 2023 gestoppt."
+     "en": "# Online ID: findings\n\nThe online ID function of the German identity card proves a person's identity to online services. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says where the central background systems are hosted.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): Governikus develops the AusweisApp on behalf of the BSI.\n- **Platform**: each service runs its own eID server or commissions an eID service; who makes and runs them differs, and according to netzpolitik.org none of the server implementations is open source. The block is a gap.\n- **Base services** ({{fact:score.layer.base_service}}): the Bundesverwaltungsamt grants the authorisation to read the card; the certificates come from a PKI with revocation management described by D-Trust.\n- **Applications** ({{fact:score.layer.applications}}): the AusweisApp is open source under the EUPL.\n- **Interface and access** ({{fact:score.layer.access}}): the card is produced by the Bundesdruckerei in Berlin, according to the BSI, but no source read says who runs it for a service, so its level counts as partly unknown; on iPhones the AusweisApp comes from the App Store, which Apple Distribution International operates for European users as part of the Apple group.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. A phone-only credential, the Smart-eID, was stopped at the end of 2023, according to a parliamentary paper.",
+     "de": "# Online-Ausweis: Befunde\n\nDie Online-Ausweisfunktion des deutschen Personalausweises weist die Identität gegenüber Onlinediensten nach. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, wo die zentralen Hintergrundsysteme betrieben werden.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Governikus entwickelt die AusweisApp im Auftrag des BSI.\n- **Plattform**: Jeder Dienst betreibt einen eigenen eID-Server oder beauftragt einen eID-Service; wer sie herstellt und betreibt, ist verschieden, und laut netzpolitik.org ist keine Server-Implementierung Open Source. Der Baustein ist eine Lücke.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Das Bundesverwaltungsamt erteilt die Berechtigung zum Auslesen; die Zertifikate stammen aus einer PKI mit Sperrmanagement, die D-Trust beschreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die AusweisApp ist Open Source unter der EUPL.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Karte stellt laut BSI die Bundesdruckerei in Berlin her, doch keine gelesene Quelle sagt, wer sie für einen Dienst betreibt, daher gilt ihre Stufe als teilweise unbekannt; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Ein reines Smartphone-Verfahren, die Smart-eID, wurde laut einer Bundestagsdrucksache Ende 2023 gestoppt."
     }
    }
   }

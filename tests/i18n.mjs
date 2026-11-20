@@ -1,7 +1,8 @@
 // Both languages, statically (brief §5; AC-04): en.js and de.js have the same keys, no empty value and
 // the same placeholders; every key the app asks for exists, and every key is used; index.html's static
-// English defaults are exactly the English texts of the keys they name; and no user-visible sentence is
-// typed into the app's code instead of the dictionaries. The end-to-end half (first visit, ?lang=, the
+// English defaults are exactly the English texts of the keys they name; no user-visible sentence is
+// typed into the app's code instead of the dictionaries; and exclusive non-EU control has one name, its
+// tile's, in the levers, the memo and every pre-run's texts. The end-to-end half (first visit, ?lang=, the
 // switch without a reload) is in tests/smoke.mjs.
 // Usage: node tests/i18n.mjs
 import fs from "node:fs";
@@ -44,6 +45,37 @@ const SAME_ALLOWED = new Set(["mode.simulation", "diag.col.status", "diag.col.de
   "centre.portfolio", "portfolio.title", "export.title"]);
 const untranslated = same.filter((k) => !SAME_ALLOWED.has(k));
 check(!untranslated.length, "every text is translated (the same in both only for names and codes)", untranslated.map((k) => `${k}: "${EN[k]}"`).join("; "));
+
+// One term per figure (the review's finding R-20): the levers and the memo name exclusive non-EU control as
+// its tile does, in both languages.
+const termWrong = [EN, DE].flatMap((D, i) => {
+  const term = D["kpi.exclusive.label"];
+  const lang = i ? "de" : "en";
+  return [D["levers.exclusive"] === term ? null : `${lang} levers.exclusive`,
+    ...["memo.fig.exclusive.now", "memo.fig.exclusive.after"].map((k) => (String(D[k]).startsWith(`${term}:`) ? null : `${lang} ${k}`))].filter(Boolean);
+});
+check(!termWrong.length, "the levers and the memo name exclusive non-EU control as its tile does, in both languages", termWrong.join(", "));
+// The pre-runs too (the re-check of R-20): a clause that cites the figure names it with the tile's term.
+const { readRunFile, runIds } = await mod("tools/check-runs.mjs");
+const preRunWrong = [];
+for (const id of runIds()) {
+  const def = readRunFile(path.join(APP_ROOT, "data/runs", `${id}.js`));
+  const walk = (v) => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (!v || typeof v !== "object") return;
+    const keys = Object.keys(v);
+    if (keys.length === 2 && typeof v.en === "string" && typeof v.de === "string") {
+      for (const [lang, D] of [["en", EN], ["de", DE]]) {
+        const term = D["kpi.exclusive.label"].toLowerCase();
+        for (const clause of v[lang].split(/[.;!?](?:\s|$)/)) if (/exclusive_non_eu\}\}/.test(clause) && !clause.toLowerCase().includes(term)) preRunWrong.push(`${id} (${lang}): "${clause.trim().slice(0, 90)}"`);
+      }
+      return;
+    }
+    Object.values(v).forEach(walk);
+  };
+  walk(def.steps);
+}
+check(!preRunWrong.length, "every pre-run text that cites exclusive non-EU control names it as the tile does", preRunWrong.join("; "));
 
 // ---- the files the app's words come from --------------------------------------------------------------
 // The shared shell's files that stay unchanged (tests/parity.mjs, IDENTICAL) are the sister apps' and
@@ -104,7 +136,7 @@ const FAMILIES = {
   "lang.name.": ["en", "de"],
   "ai.kind.": ["narration", "profile", "block", "review", "levers", "memo", "report"].flatMap((k) => [k, `${k}.text`]),
   "console.end.": ["done", "not_a_service", "stopped", "aborted", "error"],
-  "map.status.": ["scored", "open", "no_evidence", "not_applicable"],
+  "map.status.": ["scored", "open", "no_evidence", "not_applicable", "not_assessed", "no_origin"],
   "tool.rec_layer.": ["no_evidence", "not_applicable"],
   "tool.ui_request_review.": ["confirm", "skip"],
   "outbox.kind.": ["memo", "report"],
