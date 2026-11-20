@@ -1,6 +1,6 @@
 # Sovereignty Assessment: technical notes
 
-Version 0.2.0 (milestone M2: agent, pre-runs and levers), 19 November 2026. What the code relies on, where each fact comes from and when it was checked, the decisions in force and the deviations from the brief. The build plan with the full probe log is [PLAN.md](PLAN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md); the shared shell and the adapted modules are in [REVIEW.md](REVIEW.md).
+Version 1.0.0 (milestone M4: hardening and release), 20 November 2026. What the code relies on, where each fact comes from and when it was checked, the decisions in force and the deviations from the brief. The build plan with the full probe log is [PLAN.md](PLAN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md); the shared shell and the adapted modules are in [REVIEW.md](REVIEW.md).
 
 ## 1. Models, prices and the cost meter
 
@@ -101,13 +101,14 @@ Victor approved the plan's defaults on 19 November 2026 ("Continue with the next
 ## 12. Deviations and open issues
 
 - **Hygiene without the private term list.** The brief has Victor add the list as the `HYGIENE_TERMS` secret; he cannot provide it. CI therefore runs `tests/hygiene.mjs` in its generic mode (e-mail addresses only), which says so ("HYGIENE GENERIC OK"). Before each push the build session runs the same test with its own list from a file outside the repository (`HYGIENE_TERMS_FILE`), which must print "HYGIENE OK". The list itself never enters the repository. The test's header is reworded neutrally; its code is the Timetable Translator's.
-- **Not yet run against the real API.** Versions 0.2.0 and 0.3.0 run the live agent against a stand-in that streams the real protocol (§13, `tests/live.mjs`); no key is part of the build. The first live run is Victor's (AC-21; the README's run book), and it is where the citations of fetched pages (I2, I3) are confirmed on the real API.
+- **Not yet run against the real API.** Versions 0.2.0 to 1.0.0 run the live agent against a stand-in that streams the real protocol (§13, `tests/live.mjs`); no key is part of the build. The first live run is Victor's (AC-21; the README's run book), and it is where the citations of fetched pages (I2, I3) are confirmed on the real API.
 - **The method view** (brief §9) was announced here for version 0.2.0, which did not have it; the pull request of 0.2.0 proposed it for 0.3.0, and Victor merged it without comment, which this build took as accepted. Version 0.3.0 has it (§21). The Commission's implementation guidance (PLAN.md, M3) needed an approval in Phase 0 that was not given and is still unread; the view will quote the framework's v1.2.1 and name the version (I10).
 - **Pages the fetch tool could not read** while the pre-runs were researched: the Federal Portal's own pages return only a JavaScript notice; one paywalled teaser, SAP's imprint and one press article refused the tool; one procurement notice came back empty. None of them is cited; §17 lists what was used instead. One redirect target needed an approval that went unanswered and was not used.
-- **Header at laptop widths.** Below 1,500 px the four tiles take a row of their own, so the prototype line and the tiles keep their full text (DESIGN.md §6).
-- **The open drawer on a 1280 × 720 screen** leaves the map and the console a strip: the review, the levers and the drafts stay fully usable in the drawer, and Hide gives the map its room back. The spider diagram keeps its labels legible at any size it gets (DESIGN.md §9); the layout of short screens is part of M4's hardening.
+- **Header at laptop widths.** Up to 1,700 px the four tiles take a row of their own, so the prototype line, the badges and the tiles keep their full text (DESIGN.md §6; 1,500 px until version 1.0.0).
+- **The open drawer on a short screen** left the map and the console a strip until version 1.0.0; the drawer now opens beside the map (§22).
+- **The drawer beside the map needs CSS anchor positioning,** which current Chrome and Edge have and the README asks for. A browser without it opens the drawer at the bottom, as before 1.0.0: still usable, with the short-screen strip.
 
-| Issue | Topic | Status in 0.3.0 |
+| Issue | Topic | Status in 1.0.0 |
 |---|---|---|
 | I1 | No schema validator in the sister apps | Done: `js/schema.js` (§10) |
 | I2 | Fetched-document citations carry no URL | Done: the document registry maps a citation's index to the fetched document's URL (§14); confirmed live in AC-21 |
@@ -148,7 +149,7 @@ Victor approved the plan's defaults on 19 November 2026 ("Continue with the next
 
 ## 16. The simulation format and the recorder
 
-A pre-run is a script `data/runs/<entry>.js` that sets `window.SA_RUNS["<entry>"]` (a script, because the security policy allows no fetch from the page's own origin): `{ id, entry_id, source: "hand_authored" | "recorded", as_of, method_version, query, steps }`. A step has one key: `say` (one sentence, `{ en, de }`), `search` (`{ query, results: [{ url, title }] }`), `fetch` (`{ url, title, pdf? }`; a page's text is never stored), `tool` with its `input` (texts as `{ en, de }`, evidence items with their `verified` flag), `memo: true` (the memo for the person's choice, from the template) or `report` (`{ findings: { en, de } }`, followed by code's closing part). Figures appear only as placeholders.
+A pre-run is a script `data/runs/<entry>.js` that sets `window.SA_RUNS["<entry>"]` (a script, because the security policy allows no fetch from the page's own origin): `{ id, entry_id, source: "hand_authored" | "recorded", as_of, method_version, query, steps }`. A step has one key: `say` (one sentence, `{ en, de }`), `search` (`{ query, results: [{ url, title }] }`), `fetch` (`{ url, title, pdf? }`; a page's text is never stored), `tool` with its `input` (texts as `{ en, de }`, evidence items with their `verified` flag), `memo: true` (the memo for the person's choice, from the template) or `report` (`{ findings: { en, de } }`, followed by code's closing part; with `outcome: "not_a_service"` for a pre-run that ends without an assessment, §18). Figures appear only as placeholders.
 
 - **Playback** (`js/simulation.js`) runs the steps through the same tool executors as Live, so the engine recomputes every figure, the guardrails apply, and a review correction or another lever yields consistent tiles, memo and report (AC-11). The run's language is the one active at its start; the pauses (`STEP_MS`) divide by the speed ×1, ×2 or ×4. Nothing leaves the page.
 - **`tools/check-runs.mjs`** checks each pre-run under the rules of section 8 of the brief: both languages in every model-written text, the same placeholders in both, the fact audit, known fact keys, evidence on every block, URLs the run's research steps or the catalogue or the reference facts returned, quotes of at most 150 characters, every quote listed under its URL in `research/<entry>.md` with a "Read on" date, no key-like string, no thinking block. It then plays each pre-run in both languages along every lever choice. With `--write` it sets each quote's `verified` flag from `research/`; without it, flags that differ from `research/` are a failure. `tests/runs.mjs` plants a defect for each rule.
@@ -205,3 +206,64 @@ The seventeenth catalogue entry is this prototype, in the category `self_assessm
 The method view opens from the Method button in the header and from the overall tile. It names the six layers with the portal's labels, the level rules with the SEAL scale of the EU Cloud Sovereignty Framework, version 1.2.1 (SEAL-0 "No Sovereignty" to SEAL-4 "Full Digital Sovereignty", read on 20 November 2026; DATA_SOURCES.md), how block, layer and overall scores are formed, the origin classes, the evidence rules, and what the score is not.
 
 Its weights section sets one weight per layer, from 0 to 3 in steps the menu offers (0, 0.5, 1, 1.5, 2, 3); all six at 0 is refused. A change recomputes the overall score at once with the engine's weighted mean, is logged as `weights_change` in the audit log with the weights before and after and `by: "user"`, prints a line in the console, and is named in the report under "Assumptions" and in the memo's figures. Reset brings back equal weights. The weights live in memory only: a reload starts with equal weights, so a shared link never carries someone else's assumption.
+
+## 22. Version 1.0.0: the layout on projectors, the keyboard and screen readers
+
+What M4 changed to meet AC-18 and AC-20, with the reason for each; DESIGN.md §11 describes the result.
+
+- **The drawer beside the map.** `css/drawer.css` opens the drawer at the bottom with a panel `min(44vh, 460px)` high: at 1920×1080 that left the map about 370 px, at 1280×720 about 130 px, too little for the spider and the honeycomb (the M3 report's open point). From 1,101 px wide, where the workspace has two columns, `css/panels.css` positions the open panel over the console's column with CSS anchor positioning (`anchor-name` on the console, `position-anchor` and `anchor()` on the panel), so it is exactly as high and wide as the console; the workspace's columns move to 54 and 46 per cent while it is open, and the console's contents are hidden behind it (their panel stays the anchor: a hidden element cannot anchor). `@supports (anchor-name: …)` keeps the bottom drawer in browsers without it. `js/ui.js` folds the drawer when a run starts and when the console writes a warning or an error, so the console never speaks unseen. The shared `css/drawer.css` and `js/drawer.js` are unchanged (parity).
+- **The Building blocks table** has ten columns, about 1,200 px at their narrowest; in a panel under 980 px wide (a container query on the drawer's body) each block's row stacks, with the column's name before each value as CSS generated text with empty alternative text, and explicit table roles keep the headers for screen readers.
+- **The tiles.** From 1,501 to 1,700 px the badges wrapped to three rows and the German coverage note was cut by its two-line clamp: the tiles' own row now reaches 1,700 px, and above it a tile is at least 176 px wide. The weakest-link note shows the block's id and name where they fit its two lines and the id alone otherwise, with the name in the tile's tooltip (`js/kpi.js`, checked again when the tile changes width).
+- **The spider's labels.** `spiderGeometry` works out each label's box from its lines (the stylesheet's sizes: 15 px, 17 px lines, about 8.2 px per character in the layer view) and takes the largest radius at which every box stays inside the drawing, trying centres up to 60 px above or below the middle. Below a radius of 96 px the layer view tries the layers' short names (`layer.<id>.short`) and keeps them when they buy a larger web. `blockLabels` lays the block view's labels out in two columns, pushing them apart top-down and bottom-up within the drawing, keeping each outside the web's circle at its height and drawing a leader line where a label moved more than about half a line; when a column cannot hold the full labels, each keeps its first line. Above twelve blocks the marker values are left out.
+- **The honeycomb** keeps 40 px targets (46×40 px cells where the map is short; 30×26 px before); a narrow group's score wraps under its name; a crowded map scrolls (`overflow-y: auto` on the map) instead of cutting cells off. On a map under 640 px high the block view hides the honeycomb.
+- **Accessible names.** The spider is `role="group"` named by its title and description, each axis `role="img"` with its title as its name, the rings, area and markers hidden. The honeycomb's cells were already buttons with names.
+- **Quotes' language.** The report's sources list renders through the shared Markdown renderer, which knows no language; `markQuoteLangs` (`js/drafts.js`) wraps each listed quote, as rendered, in a span with its language, in the Outbox and in the HTML export.
+- **Found on the way.** The Audit tab showed "No events yet" during a run: its empty state's `hidden` was inverted (`js/audit_panel.js`). A replay's tape said "Pre-run assessment" also for the three pre-runs that end without one: it says "Pre-run as of …" now, and the assessment export of such a run says why it has nothing to save.
+
+## 23. Verification log
+
+What was checked, how and when, for version 1.0.0; the probes of Phase 0 are in PLAN.md, the quotes in `research/`.
+
+| Date | What | How | Result |
+|---|---|---|---|
+| 19 November 2026 | Models, prices, the server tools, the browser-access header and CORS (P1 to P12) | Anthropic's documentation read with web fetch; keyless requests from curl and from Chrome | §1 and §2 |
+| 19 November 2026 | The catalogue's starting URLs | Each opened with the web fetch tool | DATA_SOURCES.md §3 |
+| 19 November 2026 | The quotes of the six pre-runs of 0.2.0 and of the reference facts | Each read verbatim on its page with web fetch, one log row per quote | `research/`, DATA_SOURCES.md §4 and §7 |
+| 20 November 2026 | The quotes of the five pre-runs of D3 and of the self-assessment; the SEAL levels re-read for the method view | The same | `research/`, DATA_SOURCES.md §2 and §7 |
+| 20 November 2026 | The quotes of the five pre-runs of 1.0.0 (NOOTS, the Marktplatz Deutschland Digital, ZBDS, ZaPuK, low-code): 42 distinct quotes from 16 pages, among them the NOOTS state treaty, the federal office's description of the NOOTS minimal version, Drucksache 21/9020 and the IT-Planungsrat's standards; four of them, on four pages, were read the same day for the pre-runs of D3 and are cited again | Each read verbatim on its page with web fetch, long sentences in consecutive parts; one sentence of a magazine page was found to describe another service and is not used | `research/`, §18, DATA_SOURCES.md §7 |
+| 20 November 2026 | The README's sentence "Built by Victor Pflüger in Germany.", which the self-assessment cites for the maker's country | Read in README.md at the head of the branch through GitHub's API | §19 |
+| 20 November 2026 | Every pre-run under section 8 of the brief | `tools/check-runs.mjs`: 17 pre-runs, 62 plays | Passed |
+| 20 November 2026 | The whole test set in this checkout, the parity check against Rebate Hunter's `main` included | `node tests/run-all.mjs` | ALL SUITES PASSED (18 of 18) |
+| 20 November 2026 | No client, prospect, contact or meeting named in any published file | `tests/hygiene.mjs` with the build session's private term list, before every push | HYGIENE OK |
+| 20 November 2026 | The page icon against the website's card | `tests/page-icon.mjs` with VictorPflueger/VIP checked out next to the repository, on the branch of its pull request | The card's icon and kind match |
+
+## 24. Acceptance checklist
+
+The brief's acceptance criteria (§12) and how version 1.0.0 meets each. "Met" means the named test passes in this checkout and in CI; AC-21 and AC-22 are Victor's and stay open until he has done them.
+
+| AC | Criterion | Verified by | Status |
+|---|---|---|---|
+| AC-01 | The engine reproduces S1 to S4 within 1e-9, every display string in both languages | `tests/engine.mjs`; Diagnostics in the browser | Met |
+| AC-02 | The fact audit on F01 to F29 | `tests/audit.mjs` | Met |
+| AC-03 | The origin classes: the 26 other EU states, CN with HK and MO, OTHER, UNKNOWN, the ultimate parent, open source without a steward | `tests/engine.mjs` ("classes"), `tests/unit.mjs` | Met |
+| AC-04 | Both languages: the same keys, nothing hard-coded, a German browser's first visit in English, `?lang=de` stored, the switch without a reload across the shell | `tests/i18n.mjs`; `tests/smoke.mjs` ("lang-first-visit", "lang-url", "lang-switch") | Met |
+| AC-05 | Parity with Rebate Hunter's `main`, the four shared tests with this app's values, the adapted modules listed | `tests/parity.mjs`; REVIEW.md part 2 | Met |
+| AC-06 | The security policy exactly the brief's; nothing from another site; storage keys `sa.` and `vc-theme` | `tests/unit.mjs` ("policy", "storage"); `tests/accept.mjs` ("policy", "storage") | Met |
+| AC-07 | The key only for Live, checked with `GET /v1/models`, never stored or shown elsewhere; Forget key; no key dialog in a frame | `tests/accept.mjs` ("key-dialog", "storage", "frame"); `tests/live.mjs` ("key") | Met |
+| AC-08 | The protocol against the stand-in with server-tool blocks: echoes, `pause_turn`, mixed turns, switched-off tools, in-result errors, counts, nudges, unchanged tools | `tests/live.mjs` ("protocol", "nudges", "disabled-search", "disabled-fetch"); `tests/unit.mjs` | Met against the stand-in; the real API with AC-21 |
+| AC-09 | An unverified quote leaves its fields unknown and marks the block; an unreturned URL is refused | `tests/live.mjs` ("evidence"); `tests/unit.mjs` ("evidence") | Met |
+| AC-10 | No 41st call and none past €3; the cost meter to within 1e-9 | `tests/live.mjs` ("caps", "cost") | Met |
+| AC-11 | The pre-runs play offline without a key, with the tape, recomputed figures and complete texts in both languages; another correction or lever stays consistent | `tests/sims.mjs` ("play": 34 plays of 17 pre-runs, "alternate") | Met |
+| AC-12 | `tools/check-runs.mjs` passes every pre-run | `tests/runs.mjs` | Met |
+| AC-13 | The spider by layer and by block, the mix and the table with the engine's numbers | `tests/sims.mjs` ("map"); `tests/smoke.mjs` ("names") | Met |
+| AC-14 | Review: confirm, correct with a reason and recompute, skip; the report lists every correction | `tests/sims.mjs` ("review", "alternate") | Met |
+| AC-15 | Levers: at most three plus Keep as is, what-ifs on a copy, Approve needs a choice, the memo a draft, no request but to api.anthropic.com | `tests/sims.mjs` ("levers"); every browser suite refuses other hosts | Met |
+| AC-16 | Compare overlays two assessments; the Portfolio reproduces S4 | `tests/smoke.mjs` ("compare", "portfolio") | Met |
+| AC-17 | The exports' names and contents in the active language; the JSON valid against the schemas | `tests/smoke.mjs` ("exports"); `tests/unit.mjs` ("exports") | Met |
+| AC-18 | 1920×1080 to 1280×720, both themes and languages: no overflow, nothing cut on the spider, honeycomb or tiles, 40 px targets | `tests/layout.mjs` (five sizes, six states, thirty blocks, the dialogs) | Met |
+| AC-19 | Contrast in both themes, nothing round, the page icon as on the website's card, `vici/` as released | `tests/tokens.mjs`, `tests/hexagon.mjs`, `tests/page-icon.mjs` (against the card), `tests/vici-files.mjs`; `tests/design.mjs` for the grammar in the running app | Met |
+| AC-20 | A run by keyboard alone with visible focus; reduced motion stops the diagram's animation; axes and cells named; quotes with their `lang` | `tests/accept.mjs` ("keyboard"); `tests/design.mjs` ("motion"); `tests/smoke.mjs` ("names") | Met |
+| AC-21 | Victor runs one catalogue service live with his key within the caps; the audit export shows model, usage, searches and cost | Victor, with the README's run book | Open: Victor's |
+| AC-22 | Victor gives the five-minute demo in English and German at ×1 without help | Victor, with DEMO_SCRIPT.md | Open: Victor's |
+| AC-23 | An agent that did not build the prototype reviews figures, sources, honesty rules and the UI; no high or medium finding open | REVIEW.md part 3 | Met: see REVIEW.md part 3 |
+| AC-24 | README, DESIGN, TECH_NOTES, DATA_SOURCES and DEMO_SCRIPT complete | `tests/docs.mjs`; the build session's document check for 1.0.0 | Met |

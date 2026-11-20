@@ -8,18 +8,18 @@ Live site: https://victorpflueger.github.io/sovereigntyassessment/
 
 Prototype – not an official service of the German Federal Government. The scores are indicative and are not an official assessment under the EU Cloud Sovereignty Framework.
 
-## Status: version 0.3.0
+## Status: version 1.0.0
 
 | Version | Milestone | What it holds |
 |---|---|---|
 | 0.1.0 | M1 Shell, method and languages | The shared shell with Vici; English and German throughout; the catalogue of sixteen services with verified sources; Start agent with the mode and key dialogs; Diagnostics with "Run all tests"; the intro; the engine and the fact audit, proven on the brief's golden cases; the data contracts as JSON Schemas; CI |
 | 0.2.0 | M2 Agent, pre-runs and levers | The live agent with web search and web fetch, its fifteen tools and the guardrails in code; evidence verification; the sovereignty map; review, levers with what-ifs and the memo; the recorder; six pre-run assessments for Simulation, in both languages |
-| **0.3.0** | **M3 Comparison, portfolio and exports** | **Compare and Portfolio over the loaded assessments; the report as Markdown and HTML, the assessment and the audit log as JSON; the method view with adjustable layer weights; five more pre-runs and the self-assessment of this prototype, twelve in all** |
-| 1.0.0 | M4 Hardening and release | Layout, design and accessibility suites; the documents complete; an independent review |
+| 0.3.0 | M3 Comparison, portfolio and exports | Compare and Portfolio over the loaded assessments; the report as Markdown and HTML, the assessment and the audit log as JSON; the method view with adjustable layer weights; five more pre-runs and the self-assessment of this prototype, twelve in all |
+| **1.0.0** | **M4 Hardening and release** | **A pre-run for every catalogue entry, seventeen in all, three of which end without an assessment; the drawer opens beside the map, so the map keeps its height from 1920×1080 down to 1280×720; a run by keyboard alone, named diagram axes and quotes in their language; the layout, design and accessibility suites; the documents complete; an independent review** |
 
 The plan for every milestone is [PLAN.md](PLAN.md). The first live run with a real key is Victor's to make (AC-21); the run book is below.
 
-## What you can do in 0.3.0
+## What you can do in 1.0.0
 
 - **Watch a pre-run assessment.** Every catalogue entry carries a pre-run, marked with a play sign in the catalogue: BundID, Deutschland-App, Online-Ausweis, FIT-Connect, ePayBL and Bundesportal (researched on 19 November 2026); EUDI Wallet, Mein Unternehmenskonto, KIPITZ, openCode, the German Administration Cloud, NOOTS and the Marktplatz Deutschland Digital (20 November 2026); and this prototype itself. Simulation replays it offline, without a key, labelled SIMULATION throughout: the agent's steps in the console, the blocks arriving on the map, then your review and your choice of lever, exactly as in a live run. Three entries are not services in operation yet: the sources of ZBDS, ZaPuK and low-code describe a component still being designed, a target architecture and a category, so their pre-runs record what the entry is and end without an assessment, as a live run would (TECH_NOTES.md §18). Every quote a pre-run cites is listed in `research/` with its URL and the date read ([DATA_SOURCES.md](DATA_SOURCES.md) §7).
 - **Compare two assessments.** Compare overlays any two loaded assessments on one spider diagram by layer, the first in teal and solid, the second in apricot and dashed, and sets them side by side in a table: the six layers, the overall score, the weakest link, the coverage, exclusive non-EU control and a column for the difference.
@@ -32,7 +32,9 @@ The plan for every milestone is [PLAN.md](PLAN.md). The first live run with a re
 - **Review the findings.** The Review tab lists every block. You confirm, skip, or correct a block's criticality, its maker or operator (country and parent), hosting, licence or exit path; each correction needs a reason, is recomputed at once, marked "corrected by reviewer", logged, and listed in the report apart from the agent's findings.
 - **Choose a lever.** Up to three levers, each priced by the engine on a copy of the blocks (the assessment never changes), plus "Keep as is". Approve needs a choice. The memo for your choice and the report land in the Outbox as drafts: "Draft. Nothing is sent."
 - **Keep the record.** The Audit tab exports the run's events and model calls as JSON; after a live run, "Save run as simulation" downloads it as a pre-run file.
-- Everything from 0.1.0 and 0.2.0 stays: both languages without a reload, Diagnostics with the golden cases, the intro, the map, the review, the levers and the recorder.
+- **Present it on any projector.** From 1920×1080 down to 1280×720, in both themes and both languages, nothing is cut and every target is at least 40 px. The drawer opens beside the map, over the console's column, so the map keeps its full height while you review or choose a lever; Hide brings the console back, and a new run folds the drawer away by itself.
+- **Use the keyboard or a screen reader.** A whole run works by keyboard alone, with a visible focus ring on every control; each axis of the spider diagram and each cell of the honeycomb has a name with its value; quotes carry the language they were read in; with reduced motion the map does not pulse.
+- Everything from 0.1.0 to 0.3.0 stays: both languages without a reload, Diagnostics with the golden cases, the intro, the map, the review, the levers, the recorder, Compare, the Portfolio, the exports and the method view.
 
 ## Run it
 
@@ -57,7 +59,7 @@ The key is asked for only when a live run starts and is checked with the free `G
 
 ## The first live run (AC-21): a run book
 
-Versions 0.2.0 and 0.3.0 were tested against a stand-in for the API that streams the real protocol (tests/live.mjs); the agent has not yet run against the real API, because no key is part of the build. The first live run is Victor's:
+Versions 0.2.0 to 1.0.0 were tested against a stand-in for the API that streams the real protocol (tests/live.mjs); the agent has not yet run against the real API, because no key is part of the build. The first live run is Victor's:
 
 1. **Prepare the key.** Create a dedicated key in a workspace with a low spend limit, for example a few euros a month. Nothing else is needed.
 2. **Open the app** at the live site after the merge, or locally as above, in Chrome or Edge, and open Diagnostics once: "Run all tests" checks that api.anthropic.com is reachable from your network, for free.
@@ -75,7 +77,7 @@ Please send back the audit export, and say how many blocks the console reports w
 
 ## Quality and tests
 
-`node tests/run-all.mjs` runs sixteen suites; GitHub Actions runs them on every push and pull request (Node.js 22, Ubuntu 24.04, Playwright 1.56.0). No test calls the real API or spends money: a stand-in answers for api.anthropic.com, streaming the server tools' blocks as the real API does. Besides the suites of 0.1.0 they cover all seventeen pre-runs under the brief's rules, with a planted defect for each rule (`runs`); the live agent's protocol, nudges, switched-off tools, evidence, caps, cost, guardrails and key (`live`); the thirty-four plays of the pre-runs, a correction with "Keep as is", the map, the review and the levers in the browser (`sims`); and from 0.3.0 Compare, the Portfolio on the brief's case S4, the four exports and the method view with its weights (`smoke`), with the exports and their schemas also checked without a browser (`unit`). [tests/README.md](tests/README.md) explains each and how to run the browser suites.
+`node tests/run-all.mjs` runs eighteen suites; GitHub Actions runs them on every push and pull request (Node.js 22, Ubuntu 24.04, Playwright 1.56.0). No test calls the real API or spends money: a stand-in answers for api.anthropic.com, streaming the server tools' blocks as the real API does. Besides the suites of 0.1.0 they cover all seventeen pre-runs under the brief's rules, with a planted defect for each rule (`runs`); the live agent's protocol, nudges, switched-off tools, evidence, caps, cost, guardrails and key (`live`); the thirty-four plays of the pre-runs, a correction with "Keep as is", the map, the review and the levers in the browser (`sims`); and from 0.3.0 Compare, the Portfolio on the brief's case S4, the four exports and the method view with its weights (`smoke`), with the exports and their schemas also checked without a browser (`unit`). Version 1.0.0 adds the layout at five sizes from 1920×1080 to 1280×720, in both themes and both languages, through six states of a run and with thirty blocks (`layout`); the colour grammar in the running app, reduced motion and captures for a projector and for colour-blind viewers (`design`); a run by keyboard alone (`accept`) and the accessible names of the diagram (`smoke`). [tests/README.md](tests/README.md) explains each and how to run the browser suites.
 
 ## Files
 
@@ -93,7 +95,7 @@ Please send back the audit export, and say how many blocks the console reports w
 | `TECH_NOTES.md` | What the code relies on, verified with dates; the agent, the evidence check, the guardrails, the simulation format; decisions and deviations |
 | `DESIGN.md` | The interface and its colour grammar |
 | `DATA_SOURCES.md` | Every source of the bundled data and the pre-runs, with the date read |
-| `REVIEW.md` | The shared shell, the modules adapted for two languages, and the review to come |
+| `REVIEW.md` | The shared shell, the modules adapted for two languages, and the independent review of 1.0.0 |
 | `DEMO_SCRIPT.md` | The talk tracks |
 
 Built by Victor Pflüger in Germany. Design system: Vici.
