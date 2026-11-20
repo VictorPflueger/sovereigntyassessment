@@ -7,8 +7,8 @@
 //   - DATA_SOURCES §7 states for each pre-run the pages it cites outside the reference facts and their
 //     quotes, and its table lists exactly those pages; a page listed but not cited must be one the pre-run
 //     reads and the entry must say "N sources read, M of them with the K quotes cited";
-//   - every quote a research note lists is cited by its pre-run, unless it follows, under the same source, a
-//     paragraph that begins "Not cited" and says why.
+//   - every quote a research note lists is cited by its pre-run, unless it is the quote right after a
+//     paragraph that begins "Not cited" and says why, under the same source.
 // Taken from the Timetable Translator's tests/docs.mjs, with this app's documents for version 0.2.0;
 // the minimum lengths grow with the milestones (PLAN.md h).
 // Usage: node tests/docs.mjs
@@ -146,7 +146,9 @@ if (text["DATA_SOURCES.md"]) {
       if (head) { url = head[1]; marked = false; continue; }
       if (/^Not cited\b.{10,}/.test(line)) { marked = true; continue; }
       const q = line.match(/^> (.+)$/);
-      if (!q || !url || marked) continue;
+      if (!q || !url) continue;
+      // A marker covers the one quote after it, no more.
+      if (marked) { marked = false; continue; }
       if (!cites.has(`${url}\n${q[1].replace(/\s+/g, " ").trim()}`)) problems.push(`research/${id}.md lists a quote its pre-run does not cite, unmarked: "${q[1].slice(0, 70)}"`);
     }
   }
