@@ -1,6 +1,6 @@
 # Sovereignty Assessment (this prototype): research notes
 
-Sovereignty Assessment, this prototype, researched on 20 November 2026: its repository's README, GitHub's page on Pages and its general privacy statement, Microsoft's announcement of the acquisition of GitHub, Anthropic's pages on data residency, server tools and regional compliance and its privacy policy, Google's terms for Chrome and its terms of service, and Vici's page. No public source read states the country of the prototype's maker, so the blocks he makes are gaps until a review adds it.
+Sovereignty Assessment, this prototype, researched on 20 November 2026: its repository's README, GitHub's page on Pages and its general privacy statement, Microsoft's announcement of the acquisition of GitHub, Anthropic's pages on data residency, server tools and regional compliance and its privacy policy, Google's terms for Chrome and its terms of service, and Vici's page. The README's statement that Victor Pflüger built the prototype in Germany was added at his request on 20 November 2026, after the review of version 0.3.0, and is cited as the maker's own public statement.
 
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/sovereignty-assessment.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
@@ -10,7 +10,7 @@ Read on 2026-11-20 (English).
 > How digitally sovereign is a German public service?
 > The prototype is static HTML, CSS and JavaScript modules: no build step, no backend, no dependency.
 > Live mode talks only to the Claude API; web search and web fetch run on Anthropic's servers.
-> Built by Victor Pflüger.
+> Built by Victor Pflüger in Germany.
 > GitHub Actions runs them on every push and pull request (Node.js 22, Ubuntu 24.04, Playwright 1.56.0).
 > Design system: Vici.
 > Use a current Chrome or Edge.

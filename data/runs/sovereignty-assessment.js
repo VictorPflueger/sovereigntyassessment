@@ -52,12 +52,12 @@
     },
     "owner": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "operator": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "status": {
@@ -98,7 +98,7 @@
      {
       "url": "https://github.com/VictorPflueger/sovereigntyassessment",
       "title": "GitHub - VictorPflueger/sovereigntyassessment",
-      "quote": "Built by Victor Pflüger.",
+      "quote": "Built by Victor Pflüger in Germany.",
       "lang": "en",
       "supports": [
        "owner",
@@ -562,8 +562,8 @@
   },
   {
    "say": {
-    "en": "Applications: the prototype's own code. The repository names its maker but no licence, and no source read says in which country the maker is.",
-    "de": "Anwendungen: der eigene Code des Prototyps. Das Repository nennt seinen Urheber, aber keine Lizenz, und keine gelesene Quelle sagt, in welchem Land der Urheber ist."
+    "en": "Applications: the prototype's own code. The repository names its maker and where he built it, but no licence.",
+    "de": "Anwendungen: der eigene Code des Prototyps. Das Repository nennt seinen Urheber und wo er ihn gebaut hat, aber keine Lizenz."
    }
   },
   {
@@ -579,18 +579,18 @@
      "de": "Die Agentenschleife, die Engine, die Ansichten und die Vorab-Läufe, die alle im Browser der Besucher laufen."
     },
     "note": {
-     "en": "The repository shows no licence. No source read states the maker's country, so the block is a gap; the review can add it with a reason.",
-     "de": "Das Repository zeigt keine Lizenz. Keine gelesene Quelle nennt das Land des Urhebers, daher ist der Baustein eine Lücke; die Prüfung kann es mit Begründung ergänzen."
+     "en": "The repository shows no licence. Its README says that Victor Pflüger built the prototype in Germany.",
+     "de": "Das Repository zeigt keine Lizenz. Seine README sagt, dass Victor Pflüger den Prototyp in Deutschland gebaut hat."
     },
     "criticality": "critical",
     "tech": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "operator": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -600,7 +600,7 @@
      {
       "url": "https://github.com/VictorPflueger/sovereigntyassessment",
       "title": "GitHub - VictorPflueger/sovereigntyassessment",
-      "quote": "Built by Victor Pflüger.",
+      "quote": "Built by Victor Pflüger in Germany.",
       "lang": "en",
       "supports": [
        "tech",
@@ -637,18 +637,18 @@
      "de": "Die Stile und Komponenten der Oberfläche."
     },
     "note": {
-     "en": "Its code is under the MIT licence; it has the same maker as the prototype, whose country no source read states.",
-     "de": "Sein Code steht unter der MIT-Lizenz; es hat denselben Urheber wie der Prototyp, dessen Land keine gelesene Quelle nennt."
+     "en": "Its code is under the MIT licence; it has the same maker as the prototype.",
+     "de": "Sein Code steht unter der MIT-Lizenz; es hat denselben Urheber wie der Prototyp."
     },
     "criticality": "important",
     "tech": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "operator": {
      "name": "Victor Pflüger",
-     "country": "UNKNOWN",
+     "country": "DE",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -669,6 +669,17 @@
       "url": "https://victorpflueger.github.io/ViciDesign/index.html",
       "title": "Vici Design System",
       "quote": "Vici is Victor Pflüger",
+      "lang": "en",
+      "supports": [
+       "tech",
+       "operator"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://github.com/VictorPflueger/sovereigntyassessment",
+      "title": "GitHub - VictorPflueger/sovereigntyassessment",
+      "quote": "Built by Victor Pflüger in Germany.",
       "lang": "en",
       "supports": [
        "tech",
@@ -774,20 +785,21 @@
   },
   {
    "say": {
-    "en": "Every layer has blocks. GitHub and Anthropic are US companies that keep data in the United States; the code and Vici are gaps, because no source read says where their maker is.",
-    "de": "Jede Ebene hat Bausteine. GitHub und Anthropic sind US-Unternehmen, die Daten in den Vereinigten Staaten halten; der Code und Vici sind Lücken, weil keine gelesene Quelle sagt, wo ihr Urheber ist."
+    "en": "Every layer has blocks. GitHub and Anthropic are US companies that keep data in the United States; the code and Vici are made in Germany.",
+    "de": "Jede Ebene hat Bausteine. GitHub und Anthropic sind US-Unternehmen, die Daten in den Vereinigten Staaten halten; der Code und Vici sind in Deutschland hergestellt."
    }
   },
   {
    "tool": "ui_request_review",
    "input": {
     "summary": {
-     "en": "Seven building blocks. The overall score is {{fact:score.overall}}, indicative; evidence coverage is {{fact:coverage}}, and exclusive non-EU control of the critical blocks is {{fact:share.exclusive_non_eu}}. The code and Vici are gaps because no source read states their maker's country; you can add it with a reason. Please check, correct or confirm.",
-     "de": "Sieben Bausteine. Der Gesamtwert ist {{fact:score.overall}}, indikativ; die Belegabdeckung beträgt {{fact:coverage}}, und die ausschließliche Nicht-EU-Kontrolle der kritischen Bausteine liegt bei {{fact:share.exclusive_non_eu}}. Der Code und Vici sind Lücken, weil keine gelesene Quelle das Land ihres Urhebers nennt; Sie können es mit Begründung ergänzen. Bitte prüfen, korrigieren oder bestätigen Sie."
+     "en": "Seven building blocks. The overall score is {{fact:score.overall}}, indicative; evidence coverage is {{fact:coverage}}, and exclusive non-EU control of the critical blocks is {{fact:share.exclusive_non_eu}}. The hosting, the model and its web tools are at {{fact:seal.B-01}}, {{fact:seal.B-03}} and {{fact:seal.B-04}}: US companies, with data in the United States. Please check, correct or confirm.",
+     "de": "Sieben Bausteine. Der Gesamtwert ist {{fact:score.overall}}, indikativ; die Belegabdeckung beträgt {{fact:coverage}}, und die ausschließliche Nicht-EU-Kontrolle der kritischen Bausteine liegt bei {{fact:share.exclusive_non_eu}}. Das Hosting, das Modell und seine Web-Werkzeuge stehen auf {{fact:seal.B-01}}, {{fact:seal.B-03}} und {{fact:seal.B-04}}: US-Unternehmen, mit Daten in den Vereinigten Staaten. Bitte prüfen, korrigieren oder bestätigen Sie."
     },
     "focus": [
-     "B-05",
-     "B-06"
+     "B-01",
+     "B-03",
+     "B-04"
     ]
    }
   },
@@ -872,8 +884,8 @@
   {
    "report": {
     "findings": {
-     "en": "# Sovereignty Assessment: findings\n\nThis prototype, assessed with its own method. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}; exclusive non-EU control of the critical blocks is {{fact:share.exclusive_non_eu}}.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): GitHub Pages serves the static files. GitHub is a US company that Microsoft acquired; it logs the IP addresses of a Pages site's visitors and keeps personal data in several regions, the United States among them.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the code lives on GitHub, and GitHub Actions runs the tests on every push and pull request.\n- **Platform** ({{fact:score.layer.platform}}): Live mode runs on Anthropic's Claude API. Anthropic is a US company; the only workspace geo is the United States, and by default inference may run in any available geography.\n- **Base services** ({{fact:score.layer.base_service}}): web search and web fetch run as server tools on Anthropic's infrastructure.\n- **Applications**: the prototype's own code, built by Victor Pflüger. No source read states the maker's country, so the block is a gap until a review adds it.\n- **Interface and access** ({{fact:score.layer.access}}): Vici, the design system of the same maker, with its code under the MIT licence; and the visitor's browser, Chrome or Edge, both from US makers.\n\nA sovereignty tool on a US model: yes, and the method says so in its own terms. Live mode depends on Anthropic in the United States and the site on GitHub; Simulation and the engine run in the browser without calling the model. The weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}.",
-     "de": "# Souveränitätsbewertung: Befunde\n\nDieser Prototyp, mit seiner eigenen Methode bewertet. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}; die ausschließliche Nicht-EU-Kontrolle der kritischen Bausteine liegt bei {{fact:share.exclusive_non_eu}}.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): GitHub Pages liefert die statischen Dateien aus. GitHub ist ein US-Unternehmen, das Microsoft übernommen hat; es protokolliert die IP-Adressen der Besucher einer Pages-Website und hält personenbezogene Daten in mehreren Regionen, darunter die Vereinigten Staaten.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Der Code liegt auf GitHub, und GitHub Actions führt die Tests bei jedem Push und Pull Request aus.\n- **Plattform** ({{fact:score.layer.platform}}): Der Live-Modus läuft auf der Claude-API von Anthropic. Anthropic ist ein US-Unternehmen; die einzige Workspace-Region sind die Vereinigten Staaten, und standardmäßig darf die Inferenz in jeder verfügbaren Region laufen.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Websuche und Web-Abruf laufen als Server-Werkzeuge auf der Infrastruktur von Anthropic.\n- **Anwendungen**: der eigene Code des Prototyps, gebaut von Victor Pflüger. Keine gelesene Quelle nennt das Land des Urhebers, daher ist der Baustein eine Lücke, bis eine Prüfung es ergänzt.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Vici, das Designsystem desselben Urhebers, dessen Code unter der MIT-Lizenz steht, und der Browser der Besucher, Chrome oder Edge, beide von US-Herstellern.\n\nEin Souveränitätswerkzeug auf einem US-Modell: ja, und die Methode sagt es in ihren eigenen Begriffen. Der Live-Modus hängt an Anthropic in den Vereinigten Staaten und die Website an GitHub; Simulation und Engine laufen im Browser, ohne das Modell aufzurufen. Das schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}."
+     "en": "# Sovereignty Assessment: findings\n\nThis prototype, assessed with its own method. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}; exclusive non-EU control of the critical blocks is {{fact:share.exclusive_non_eu}}.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): GitHub Pages serves the static files. GitHub is a US company that Microsoft acquired; it logs the IP addresses of a Pages site's visitors and keeps personal data in several regions, the United States among them.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the code lives on GitHub, and GitHub Actions runs the tests on every push and pull request.\n- **Platform** ({{fact:score.layer.platform}}): Live mode runs on Anthropic's Claude API. Anthropic is a US company; the only workspace geo is the United States, and by default inference may run in any available geography.\n- **Base services** ({{fact:score.layer.base_service}}): web search and web fetch run as server tools on Anthropic's infrastructure.\n- **Applications** ({{fact:score.layer.applications}}): the prototype's own code, built by Victor Pflüger in Germany, as its README says.\n- **Interface and access** ({{fact:score.layer.access}}): Vici, the design system of the same maker, with its code under the MIT licence; and the visitor's browser, Chrome or Edge, both from US makers.\n\nA sovereignty tool on a US model: yes, and the method says so in its own terms. The code and the design system are made in Germany, but Live mode depends on Anthropic in the United States and the site on GitHub; Simulation and the engine run in the browser without calling the model. The weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}.",
+     "de": "# Souveränitätsbewertung: Befunde\n\nDieser Prototyp, mit seiner eigenen Methode bewertet. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}; die ausschließliche Nicht-EU-Kontrolle der kritischen Bausteine liegt bei {{fact:share.exclusive_non_eu}}.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): GitHub Pages liefert die statischen Dateien aus. GitHub ist ein US-Unternehmen, das Microsoft übernommen hat; es protokolliert die IP-Adressen der Besucher einer Pages-Website und hält personenbezogene Daten in mehreren Regionen, darunter die Vereinigten Staaten.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Der Code liegt auf GitHub, und GitHub Actions führt die Tests bei jedem Push und Pull Request aus.\n- **Plattform** ({{fact:score.layer.platform}}): Der Live-Modus läuft auf der Claude-API von Anthropic. Anthropic ist ein US-Unternehmen; die einzige Workspace-Region sind die Vereinigten Staaten, und standardmäßig darf die Inferenz in jeder verfügbaren Region laufen.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Websuche und Web-Abruf laufen als Server-Werkzeuge auf der Infrastruktur von Anthropic.\n- **Anwendungen** ({{fact:score.layer.applications}}): der eigene Code des Prototyps, gebaut von Victor Pflüger in Deutschland, wie seine README sagt.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Vici, das Designsystem desselben Urhebers, dessen Code unter der MIT-Lizenz steht, und der Browser der Besucher, Chrome oder Edge, beide von US-Herstellern.\n\nEin Souveränitätswerkzeug auf einem US-Modell: ja, und die Methode sagt es in ihren eigenen Begriffen. Code und Designsystem sind in Deutschland hergestellt, doch der Live-Modus hängt an Anthropic in den Vereinigten Staaten und die Website an GitHub; Simulation und Engine laufen im Browser, ohne das Modell aufzurufen. Das schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}."
     }
    }
   }

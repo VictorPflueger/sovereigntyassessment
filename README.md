@@ -96,4 +96,4 @@ Please send back the audit export, and say how many blocks the console reports w
 | `REVIEW.md` | The shared shell, the modules adapted for two languages, and the review to come |
 | `DEMO_SCRIPT.md` | The talk tracks |
 
-Built by Victor Pflüger. Design system: Vici.
+Built by Victor Pflüger in Germany. Design system: Vici.
