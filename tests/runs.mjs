@@ -1,6 +1,7 @@
 // The pre-run assessments under the rules of section 8 of the brief (AC-12), without a browser:
-//   all        tools/check-runs.mjs passes every pre-run in data/runs/, all six of the brief, each played in
-//              both languages along every lever choice, with its verified flags equal to research/
+//   all        tools/check-runs.mjs passes every pre-run in data/runs/: the brief's six, the five of decision
+//              D3 (0.3.0) and the self-assessment, each played in both languages along every lever choice, with
+//              its verified flags equal to research/; index.html loads every pre-run file
 //   planted    each rule catches its defect, planted in a copy of a passing pre-run: a missing language,
 //              different placeholders, an audit failure, an unknown fact key, a block without evidence, an
 //              unknown URL, a long quote, a quote missing from research/, a key-like string, a thinking
@@ -15,6 +16,9 @@ import { APP_ROOT, ONLY, wanted } from "./lib/harness.mjs";
 const { checkRun, readRunFile, runIds } = await import(pathToFileURL(path.join(APP_ROOT, "tools/check-runs.mjs")).href);
 const results = [];
 const SIX = ["bundesportal", "bundid", "deutschland-app", "epaybl", "fit-connect", "online-ausweis"];
+// D3 (0.3.0): the remaining entries with enough public evidence, and this prototype's self-assessment.
+const D3 = ["dvc", "eudi-wallet", "kipitz", "muk", "opencode", "sovereignty-assessment"];
+const ALL = [...SIX, ...D3].sort();
 
 // ---- all --------------------------------------------------------------------------------------------------
 if (wanted("all")) {
@@ -23,11 +27,13 @@ if (wanted("all")) {
   const ids = runIds();
   const problems = [];
   if (r.status !== 0) problems.push(`tools/check-runs.mjs exited ${r.status}: ${out.split("\n").filter((l) => /FAIL|\[/.test(l)).slice(0, 12).join(" | ")}`);
-  if (JSON.stringify(ids) !== JSON.stringify(SIX)) problems.push(`the pre-runs are ${JSON.stringify(ids)}, not the brief's six`);
+  if (JSON.stringify(ids) !== JSON.stringify(ALL)) problems.push(`the pre-runs are ${JSON.stringify(ids)}, not ${JSON.stringify(ALL)}`);
   const m = out.match(/CHECK-RUNS OK \((\d+) pre-runs, (\d+) plays\)/);
-  if (!m || Number(m[1]) !== 6) problems.push(`no "CHECK-RUNS OK (6 pre-runs …)" line`);
-  for (const id of SIX) if (!new RegExp(`^PASS ${id}:`, "m").test(out)) problems.push(`no PASS line for ${id}`);
-  results.push({ name: `all: the six pre-runs pass tools/check-runs.mjs${m ? ` (${m[2]} plays)` : ""}`, ok: !problems.length, problems });
+  if (!m || Number(m[1]) !== ALL.length) problems.push(`no "CHECK-RUNS OK (${ALL.length} pre-runs …)" line`);
+  for (const id of ALL) if (!new RegExp(`^PASS ${id}:`, "m").test(out)) problems.push(`no PASS line for ${id}`);
+  const html = readFileSync(path.join(APP_ROOT, "index.html"), "utf8");
+  for (const id of ids) if (!html.includes(`<script src="data/runs/${id}.js" defer></script>`)) problems.push(`index.html does not load data/runs/${id}.js`);
+  results.push({ name: `all: the ${ALL.length} pre-runs pass tools/check-runs.mjs${m ? ` (${m[2]} plays)` : ""}, and index.html loads each`, ok: !problems.length, problems });
 }
 
 // ---- planted ----------------------------------------------------------------------------------------------

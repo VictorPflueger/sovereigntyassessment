@@ -1,5 +1,6 @@
 // The simulation player in the running app (AC-11, AC-13, AC-14, AC-15), offline and without a key:
-//   play       each of the six pre-runs plays to its report in English and in German (12 plays): the
+//   play       every pre-run in data/runs/ plays to its report in English and in German (two plays per
+//              pre-run file; twenty-four from version 0.3.0): the
 //              SIMULATION badge and tape, the tiles and the spider diagram equal to the engine's
 //              recomputation of the final blocks, the memo and the report in the Outbox in the run's
 //              language, no unresolved placeholder or broken value anywhere, no request to any host
@@ -18,13 +19,15 @@
 // Usage: node tests/sims.mjs [case…]
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
+import { readdirSync } from "node:fs";
 import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, SKIP_INTRO } from "./lib/harness.mjs";
 
 const OUT = await outDir("sims");
 const { base: BASE, close } = await serveStatic(APP_ROOT, 8768);
 const browser = await launchBrowser();
 const results = [];
-const SIX = ["bundid", "deutschland-app", "online-ausweis", "fit-connect", "epaybl", "bundesportal"];
+// Every bundled pre-run: the brief's six, the five of decision D3 and the self-assessment (0.3.0).
+const PRE_RUNS = readdirSync(path.join(APP_ROOT, "data/runs")).filter((f) => f.endsWith(".js")).map((f) => f.slice(0, -3)).sort();
 const LAYERS = ["infrastructure", "devsecops", "platform", "base_service", "applications", "access"];
 const TERMINAL = ["done", "stopped", "aborted", "error"];
 
@@ -54,7 +57,7 @@ async function newPage({ lang = "en", viewport = { width: 1600, height: 1000 } }
     window.__ev = [];
     window.__getState = st.getState;
     bus.onAny((e) => window.__ev.push({ type: e.type, payload: JSON.parse(JSON.stringify(e.payload ?? null)) }));
-    // Faster than the speed buttons offer, so twelve plays fit in a test run; the player reads this.
+    // Faster than the speed buttons offer, so every play fits in a test run; the player reads this.
     st.setState({ speed: 40 });
   });
   return { context, page, log, external };
@@ -134,7 +137,7 @@ const brokenText = (page) => page.evaluate(() => {
 if (wanted("play")) {
   let passed = 0;
   let total = 0;
-  for (const entry of SIX) {
+  for (const entry of PRE_RUNS) {
     for (const lang of ["en", "de"]) {
       total += 1;
       const t = await newPage({ lang });
@@ -175,8 +178,9 @@ if (wanted("play")) {
       if (ok) passed += 1;
     }
   }
-  results.push({ name: `play: ${passed} of ${total} pre-run plays complete`, ok: passed === total && total === 12, problems: passed === total ? [] : ["see the failed plays above"], summaryOnly: true });
-  if (passed === total && total === 12) console.log(`SIMS PLAY OK (${passed} of ${total})`);
+  const expected = 2 * PRE_RUNS.length;
+  results.push({ name: `play: ${passed} of ${total} pre-run plays complete (${PRE_RUNS.length} pre-run files)`, ok: passed === total && total === expected, problems: passed === total ? [] : ["see the failed plays above"], summaryOnly: true });
+  if (passed === total && total === expected) console.log(`SIMS PLAY OK (${passed} of ${total}, two per pre-run file)`);
 }
 
 // ---- alternate -----------------------------------------------------------------------------------------------

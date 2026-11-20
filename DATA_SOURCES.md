@@ -1,8 +1,8 @@
 # Sovereignty Assessment: data sources
 
-What the app reads, where each bundled fact comes from, and when it was read. Every source below was opened with this build's web tools on the date given; nothing is from memory. Version 0.2.0, 19 November 2026.
+What the app reads, where each bundled fact comes from, and when it was read. Every source below was opened with this build's web tools on the date given; nothing is from memory. Version 0.3.0, 20 November 2026.
 
-**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services with verified starting URLs, a first set of reference facts with verbatim quotes, and six pre-run assessments for Simulation with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
+**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services and this prototype with verified starting URLs, a first set of reference facts with verbatim quotes, and twelve pre-run assessments for Simulation with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
 
 ---
 
@@ -23,11 +23,12 @@ Nothing else. The page's security policy allows exactly one outside host, api.an
 | Deutschland-Stack, Kriterien: https://deutschland-stack.gov.de/kriterien/ | 2026-11-19 | The minimum criterion "Wechselfähigkeit zwischen Betreibern und Anbietern" (the exit path); the preference for the European single market (decision D2) |
 | BMDS, Deutschland-Stack, Sachstand: https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf | 2026-11-19 | The catalogue's entries and the brief's quotes about them |
 | European Commission, Cloud Sovereignty Framework v1.2.1, October 2025, read as a copy at https://ppc.land/content/files/2025/11/Cloud-Sovereignty-Framework.pdf; implementation guidance https://commission.europa.eu/document/download/2ad80a48-166f-4c77-a513-80c53ca2a128_en | 2026-11-19 | The SEAL scale from SEAL-0 "No Sovereignty" to SEAL-4 "Full Digital Sovereignty"; SEAL-0 and SEAL-1 as the levels of exclusive non-EU control. The Commission's own download of v1.2.1 was not opened in this build (it needed an approval that was not given) |
+| The same framework, re-read for the method view (version 0.3.0) | 2026-11-20 | The names of SEAL-0 to SEAL-4 as the method view shows them, with the source and the date read (TECH_NOTES.md §21) |
 | European Union, EU countries: https://european-union.europa.eu/principles-countries-history/country-profiles_en and https://european-union.europa.eu/principles-countries-history/eu-countries_en?page=1 | 2026-11-19 | The 27 member states, so the 26 other than Germany in `js/classes.js` |
 
 ## 3. The catalogue (data/catalogue.js)
 
-Sixteen entries, each with names in English and German, category, a one-line description, status and starting URLs. Every URL below was opened with web fetch on 19 November 2026, and each entry's description and status rest on what these pages say. Press sources are marked; official sources come first.
+Seventeen entries, each with names in English and German, category, a one-line description, status and starting URLs: sixteen services and, from version 0.3.0, this prototype in the category `self_assessment`. Every URL below was opened with web fetch on 19 November 2026 (the prototype's on 20 November 2026), and each entry's description and status rest on what these pages say. Press sources are marked; official sources come first.
 
 | Entry | Starting URL | Title | Read |
 |---|---|---|---|
@@ -57,6 +58,8 @@ Sixteen entries, each with names in English and German, category, a one-line des
 | Bundesportal | https://www.gesetze-im-internet.de/egovg/__9a.html | § 9a EGovG - Einzelnorm | 2026-11-19 |
 | Deutschland-App | https://www.bundestag.de/1223070 | Deutschland-App: Prototyp wird in sechs Kommunen erprobt | 2026-11-19 |
 | Deutschland-App | https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app | Wiesbaden becomes pilot municipality for Germany app | 2026-11-19 |
+| This prototype (self-assessment, version 0.3.0) | https://github.com/VictorPflueger/sovereigntyassessment | GitHub - VictorPflueger/sovereigntyassessment | 2026-11-20 |
+| This prototype (self-assessment, version 0.3.0) | https://docs.github.com/en/articles/about-github-pages | About GitHub Pages | 2026-11-20 |
 
 **Two readings to know.** The BMDS document lists "DVC" among the best practices of federal cooperation without spelling it out; the catalogue reads it as the Deutsche Verwaltungscloud, which the BMI's press release calls "DVC". The document writes "D-APP" where the catalogue says Deutschland-App, and "Onlineausweis" where it says Online-Ausweis. ZBDS has no page of its own that this build found: the entry rests on the BMDS's two Deutschland-Stack documents and says so.
 
@@ -83,7 +86,7 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Six catalogue entries ship with a pre-run assessment for Simulation, written by hand on 19 November 2026 in both languages (`source: "hand_authored"`, `as_of: "2026-11-19"`). Each cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources, all read on 2026-11-19; the reference facts a pre-run uses are those of §4, verified when they were built.
+Twelve catalogue entries ship with a pre-run assessment for Simulation. The first six were written by hand on 19 November 2026, the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), all in both languages (`source: "hand_authored"`, `as_of: "2026-11-19"`). Each cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built. The five catalogue entries without a pre-run (NOOTS, ZaPuK, ZBDS, low-code and the Marktplatz Deutschland Digital) have a research note in `research/` that lists the catalogue sources read and says why they are not enough.
 
 ### BundID (`data/runs/bundid.js`)
 
@@ -177,3 +180,89 @@ Six catalogue entries ship with a pre-run assessment for Simulation, written by 
 | [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German |
 | [BundID](https://id.bund.de/en/) | German |
 | [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German |
+
+### EUDI Wallet (`data/runs/eudi-wallet.js`)
+
+7 sources with 10 quotes; the reference facts on app distribution.
+
+| Source | Language | Read |
+|---|---|---|
+| [The national EUDI Wallet Project \| EUDI-Wallet](https://eudi-wallet.gov.de/en/about) | English | 2026-11-20 |
+| [Demo of the EUDI wallet app: what the digital wallet can already do](https://heise.de/-10418753) | English | 2026-11-20 |
+| [d-you startet am 2. Januar 2027: Deutschlands digitale Identität](https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/) | German | 2026-11-20 |
+| [The digital ID in the EUDI Wallet \| EUDI-Wallet](https://eudi-wallet.gov.de/en/news/digitaler-ausweis) | English | 2026-11-20 |
+| [FAQ zur EUDI-Wallet: Die wichtigsten Fragen und Antworten zur digitalen Brieftasche](https://netzpolitik.org/?p=512498) | German | 2026-11-20 |
+| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
+| [Google Terms of Service – Privacy & Terms – Google](https://policies.google.com/terms) | English | 2026-11-20 |
+
+### Mein Unternehmenskonto (`data/runs/muk.js`)
+
+9 sources with 15 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Das Unternehmenskonto auf Basis von ELSTER - Unternehmenskonto](https://info.mein-unternehmenskonto.de/) | German | 2026-11-20 |
+| [Verwaltungsvorschrift über die Betriebsbedingungen des einheitlichen Organisationskontos - Bürgerservice](https://www.gesetze-bayern.de/Content/Document/BayVV_206_D_12940/true) | German | 2026-11-20 |
+| [BayMBl. 2022 Nr. 237 - Verkündungsplattform Bayern](https://www.verkuendung-bayern.de/baymbl/2022-237/) | German | 2026-11-20 |
+| [Steuererklärung; Elektronische Übermittlung - BayernPortal](https://www.bayernportal.de/dokumente/leistung/8777623333) | German | 2026-11-20 |
+| [Datenschutz bei ELSTER](https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf) | German | 2026-11-20 |
+| [Handreichung zum Registrierungsprozess von ELSTER-Organisationszertifikaten im Rahmen von Mein Unternehmenskonto](https://itvsh.de/fileadmin/user_upload/Dokumente/DiPlan_SH/Handreichung_zum_Registrierungsprozess_von_ELSTER_zentrale_Stelle_1.2.pdf) | German | 2026-11-20 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
+| [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+
+### KIPITZ (`data/runs/kipitz.js`)
+
+4 sources with 11 quotes; the reference facts on the Federation's IT.
+
+| Source | Language | Read |
+|---|---|---|
+| [So nutzt der öffentliche Dienst Künstliche Intelligenz: Exklusive Umfrage bei Bund und Ländern](https://oeffentlicher-dienst-news.de/so-nutzt-der-oeffentliche-dienst-kuenstliche-intelligenz-bund-laender/) | German | 2026-11-20 |
+| [Invisible Revolution: Federal Government Flooding Administration with AI](https://heise.de/-11127774) | English | 2026-11-20 |
+| [SVA ist beim KI-Projekt des Bundes dabei \| ChannelPartner](https://www.channelpartner.de/article/4176536/sva-ist-beim-ki-projekt-des-bundes-dabei.html) | German | 2026-11-20 |
+| [ITZBund treibt Multi-Cloud und KI voran \| CIO DE](https://www.cio.de/article/4068266/itzbund-treibt-multi-cloud-und-ki-voran.html) | German | 2026-11-20 |
+
+### openCode (`data/runs/opencode.js`)
+
+7 sources with 14 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [About openCode \| openCode.de](https://opencode.de/en/about-opencode) | English | 2026-11-20 |
+| [Frequently asked questions \| openCode.de](https://opencode.de/en/frequently-asked-questions) | English | 2026-11-20 |
+| [Data Privacy \| openCode.de](https://opencode.de/en/data-privacy) | English | 2026-11-20 |
+| [GitLab To Announce Third Quarter Fiscal 2026 Financial Results](https://about.gitlab.com/press/releases/2025-11-18-gitlab-to-announce-third-quarter-2026-financial-results/) | English | 2026-11-20 |
+| [Keycloak joins CNCF as an incubating project \| CNCF](https://www.cncf.io/blog/2023/04/11/keycloak-joins-cncf-as-an-incubating-project/) | English | 2026-11-20 |
+| [Privacy Policy \| Linux Foundation](https://linuxfoundation.org/legal/privacy-policy) | English | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+
+### German Administration Cloud (DVC) (`data/runs/dvc.js`)
+
+6 sources with 12 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Deutsche Verwaltungscloud – Startseite](https://www.deutsche-verwaltungscloud.de) | German | 2026-11-20 |
+| [DVC – Die neuen Cloud-Betriebsplattformen für die öffentliche Verwaltung](https://pretalx.com/public-it/talk/L93YNQ/) | German | 2026-11-20 |
+| [Sechs Bundesländer starten Open-Source-Bildungsplattform \| ChannelPartner](https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html) | German | 2026-11-20 |
+| [SVA ist beim KI-Projekt des Bundes dabei \| ChannelPartner](https://www.channelpartner.de/article/4176536/sva-ist-beim-ki-projekt-des-bundes-dabei.html) | German | 2026-11-20 |
+| [Air Gapping: Bundesverwaltung vergibt Cloud-Großauftrag an Ionos \| CIO DE](https://www.cio.de/article/3696729/bundesverwaltung-vergibt-cloud-grossauftrag-an-ionos.html) | German | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+
+### This prototype, the self-assessment (`data/runs/sovereignty-assessment.js`)
+
+11 sources with 23 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [GitHub - VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment) | English | 2026-11-20 |
+| [About GitHub Pages](https://docs.github.com/en/articles/about-github-pages) | English | 2026-11-20 |
+| [GitHub General Privacy Statement - GitHub Docs](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement) | English | 2026-11-20 |
+| [Microsoft to acquire GitHub for $7.5 billion](https://news.microsoft.com/2018/06/04/microsoft-to-acquire-github-for-7-5-billion/) | English | 2026-11-20 |
+| [Privacy Policy \ Anthropic](https://www.anthropic.com/privacy) | English | 2026-11-20 |
+| [Data residency - Claude Platform Docs](https://platform.claude.com/docs/en/manage-claude/data-residency) | English | 2026-11-20 |
+| [Tool reference - Claude Platform Docs](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-reference) | English | 2026-11-20 |
+| [Vici Design System](https://victorpflueger.github.io/ViciDesign/index.html) | English | 2026-11-20 |
+| [Google Terms of Service – Privacy & Terms – Google](https://policies.google.com/terms) | English | 2026-11-20 |
+| [Google Chrome and ChromeOS Additional Terms of Service](https://www.google.com/intl/en/chrome/terms/) | English | 2026-11-20 |
+| [Regional compliance \| Claude by Anthropic](https://claude.com/regional-compliance) | English | 2026-11-20 |

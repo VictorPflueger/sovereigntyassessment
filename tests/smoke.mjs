@@ -270,7 +270,7 @@ if (wanted("catalogue")) {
     await page.keyboard.press("Escape");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("catalogue: chips, sources, suggestions by mouse and keyboard, Enter starts", t, checks, [
-    [checks.chips === 16 && JSON.stringify(checks.groups) === JSON.stringify(["Base services", "Platforms and access"]), `16 chips in two groups (${checks.chips}, ${JSON.stringify(checks.groups)})`],
+    [checks.chips === 17 && JSON.stringify(checks.groups) === JSON.stringify(["Base services", "Platforms and access", "This prototype"]), `17 chips in three groups, the self-assessment last (${checks.chips}, ${JSON.stringify(checks.groups)})`],
     [/^Enter a base service or platform first/.test(checks.needService || "") && checks.focus === "service-input", "an empty field asks for a service and takes the focus"],
     [checks.field === "FIT-Connect" && checks.pressed === true && checks.detail?.startsWith("FIT-Connect"), "a chip fills the field and shows the entry"],
     [checks.sources?.length >= 1 && checks.sources.every((u) => u.startsWith("https://")), "its starting sources link out"],

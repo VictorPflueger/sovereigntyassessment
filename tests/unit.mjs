@@ -154,7 +154,9 @@ await group("schemas", "the eleven schemas: the brief's example block, the golde
   for (const row of fixture("s2-assessment.json").blocks) check.ok(ok({ ...blockFromRow(row), evidence: example.evidence }, "BuildingBlock"), `S2 ${row.id}`);
   check.equal(ok(blockFromRow(fixture("s2-assessment.json").blocks[0]), "BuildingBlock"), false, "a block without evidence");
   const cat = dataScript("data/catalogue.js").SA_CATALOGUE;
-  check.equal(cat.entries.length, 16);
+  // Sixteen services and, from version 0.3.0, this prototype's self-assessment in a category of its own.
+  check.equal(cat.entries.length, 17);
+  check.equal(cat.entries.filter((e) => e.category === "self_assessment").map((e) => e.id).join(), "sovereignty-assessment");
   for (const e of cat.entries) check.ok(ok(e, "CatalogueEntry"), `catalogue ${e.id}`);
   const rf = dataScript("data/ref_facts.js").SA_REF_FACTS;
   check.ok(rf.facts.length >= 6);

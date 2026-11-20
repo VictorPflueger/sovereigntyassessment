@@ -166,7 +166,8 @@ const RUNNERS = {
     const invalidFacts = facts.filter((f) => !validate(f.evidence, schemas.Evidence || {}, schemas).valid || !f.statement?.en || !f.statement?.de).map((f) => f.id);
     const checks = [
       { key: "diag.data.schemas", ok: Object.keys(schemas).length === 11, vars: { n: Object.keys(schemas).length } },
-      { key: "diag.data.catalogue", ok: entries.length === 16 && !invalidEntries.length && !dupes.length && !!schemas.CatalogueEntry, vars: { n: entries.length, bad: [...invalidEntries, ...dupes].join(", ") || "–" } },
+      // Sixteen services and, from version 0.3.0, the self-assessment of this prototype.
+      { key: "diag.data.catalogue", ok: entries.length === 17 && entries.filter((e) => e.category === "self_assessment").length === 1 && !invalidEntries.length && !dupes.length && !!schemas.CatalogueEntry, vars: { n: entries.length, bad: [...invalidEntries, ...dupes].join(", ") || "–" } },
       { key: "diag.data.refFacts", ok: facts.length > 0 && !invalidFacts.length && !!schemas.Evidence, vars: { n: facts.length, bad: invalidFacts.join(", ") || "–" } }
     ];
     const ok = checks.every((c) => c.ok);
