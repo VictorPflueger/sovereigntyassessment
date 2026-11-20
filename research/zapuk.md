@@ -2,7 +2,7 @@
 
 ZaPuK, researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes. Its sources describe no service in operation, so the run ends with the outcome "not_a_service" and records no building blocks; the quotes below are those its profile, narration and report rest on.
 
-Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/zapuk.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/zapuk.js cites it, except the quotes that follow a paragraph beginning "Not cited", which says why. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
 ### [Föderale Zielarchitektur für Postfach- und Kommunikationslösungen: Überblick und Handlungsempfehlung, Version 1.0](https://www.it-planungsrat.de/fileadmin/beschluesse/2025/Beschluss_2025_28_ZaPuK_%C3%9Cberblick.pdf)
 Read on 2026-11-20 (German).
@@ -17,6 +17,9 @@ Read on 2026-11-20 (German).
 
 > Postfach (in Ausgestaltung)
 > Zahlungsabwicklung (ZBDS) und Postfach/Benachrichtigung (ZaPuk) sind Gegenstand einer Konzeptionierung
+
+Not cited by this pre-run: the ZBDS pre-run cites it.
+
 > inklusive Betriebs- und Finanzierungsmodell bis spätestens zur 52. Sitzung des IT-Planungsrats.
 
 ### [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782)

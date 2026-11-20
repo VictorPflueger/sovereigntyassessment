@@ -656,8 +656,8 @@
   },
   {
    "say": {
-    "en": "Every layer has blocks or a status. Most blocks are made and run in Germany, though much rests on press reports; who runs the sign-in with the online ID and the messenger is open, and the messenger comes from Switzerland.",
-    "de": "Jede Ebene hat Bausteine oder einen Status. Die meisten Bausteine werden in Deutschland hergestellt und betrieben, vieles stützt sich aber auf Presseberichte; wer die Anmeldung mit dem Online-Ausweis und den Messenger betreibt, ist offen, und der Messenger kommt aus der Schweiz."
+    "en": "Every layer has blocks or a status. Every block is made in Germany and most are run there, though much rests on press reports; who runs the sign-in with the online ID and the messenger is open.",
+    "de": "Jede Ebene hat Bausteine oder einen Status. Alle Bausteine werden in Deutschland hergestellt und die meisten dort betrieben, vieles stützt sich aber auf Presseberichte; wer die Anmeldung mit dem Online-Ausweis und den Messenger betreibt, ist offen."
    }
   },
   {

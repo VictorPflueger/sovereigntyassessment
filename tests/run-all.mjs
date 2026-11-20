@@ -16,7 +16,7 @@ const SUITES = [
   { id: "audit", what: "fact audit: F01 to F29, the non-breaking-space variants, decisions D9 and D10", file: "tests/audit.mjs", browser: false },
   { id: "runs", what: "the seventeen pre-runs under section 8 of the brief, index.html loading each, and each rule's planted defect", file: "tests/runs.mjs", browser: false },
   { id: "hygiene", what: "no client, prospect, contact or meeting named in any published file", file: "tests/hygiene.mjs", browser: false },
-  { id: "docs", what: "documentation set complete, every path and section it names exists, every pre-run's sources counted", file: "tests/docs.mjs", browser: false },
+  { id: "docs", what: "documentation set complete, every path and section it names exists, every pre-run's sources counted and its research note in step", file: "tests/docs.mjs", browser: false },
   { id: "parity", what: "shared shell identical to the sister app's (needs a Rebate Hunter checkout)", file: "tests/parity.mjs", browser: false, optional: true },
   { id: "smoke", what: "start flow, both languages, the catalogue, Diagnostics, intro, tiles, Compare, Portfolio, exports, the method view, accessible names, loading failures", file: "tests/smoke.mjs", browser: true },
   { id: "accept", what: "acceptance: storage keys, the key and its dialog, the security policy, frames, a run by keyboard alone", file: "tests/accept.mjs", browser: true },

@@ -2,7 +2,7 @@
 
 Online-Ausweis (the online ID), researched on 19 November 2026: the AusweisApp's own pages, the Personalausweisportal's pages on eID servers and services, the Bundesverwaltungsamt's page on authorisation certificates, D-Trust's product sheet, the BSI's fact sheet on the identity card (published by Stadt Düren), a parliamentary paper, a netzpolitik.org article, the App Store listing and Apple's legal pages, and the bundled reference facts on app distribution (verified at build time).
 
-Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/online-ausweis.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/online-ausweis.js cites it, except the quotes that follow a paragraph beginning "Not cited", which says why. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
 ### [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us)
 Read on 2026-11-20 (English); first read on 2026-11-19, when the quote was cut at 125 characters by the fetch tool, and read again in full for the review of version 1.0.0.
@@ -41,7 +41,10 @@ Read on 2026-11-19 (German).
 ### [BVA - Vergabestelle für Berechtigungszertifikate](https://www.bva.bund.de/DE/Services/Behoerden/Produkt/PA-VfB/pa-vfb_node.html)
 Read on 2026-11-19 (German).
 
+Not cited since the review (R-01): it does not state what it was cited for; the authorisation certificates rest on the article that names the Bundesverwaltungsamt.
+
 > Unternehmen und Behörden erhalten nur dann Zugang zu den elektronischen Ausweisdaten von Bürgerinnen und Bürgern
+
 
 ### [Der neue Personalausweis – die Fakten auf einen Blick (BSI, via Stadt Düren)](https://onlinedienste.dueren.de/suche/-/vr-bis-detail/dokument/12224/download)
 Read on 2026-11-19 (German).
@@ -56,7 +59,10 @@ Read on 2026-11-19 (English).
 ### [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805)
 Read on 2026-11-19 (English).
 
+Not cited since the review (R-01): it does not say who runs the store.
+
 > on the App Store
+
 
 ### [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/)
 Read on 2026-11-20 (English); first read on 2026-11-19 for the two addresses, and read again for the review of version 1.0.0 for what the page says the Irish entity does. Under "Apple Media Services and iCloud", the address of Apple Distribution International follows the first sentence below and ends ", for all other users, excluding iCloud users in China mainland."

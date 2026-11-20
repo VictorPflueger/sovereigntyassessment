@@ -6,7 +6,9 @@
 //   - the README links the live site and names the version js/config.js carries;
 //   - DATA_SOURCES §7 states for each pre-run the pages it cites outside the reference facts and their
 //     quotes, and its table lists exactly those pages; a page listed but not cited must be one the pre-run
-//     reads and the entry must say "N sources read, M of them with the K quotes cited".
+//     reads and the entry must say "N sources read, M of them with the K quotes cited";
+//   - every quote a research note lists is cited by its pre-run, unless it follows, under the same source, a
+//     paragraph that begins "Not cited" and says why.
 // Taken from the Timetable Translator's tests/docs.mjs, with this app's documents for version 0.2.0;
 // the minimum lengths grow with the milestones (PLAN.md h).
 // Usage: node tests/docs.mjs
@@ -126,6 +128,27 @@ if (text["DATA_SOURCES.md"]) {
       if (+plain[1] !== pages.size || +plain[2] !== quotes.size) problems.push(`DATA_SOURCES.md says ${id} has ${plain[1]} sources with ${plain[2]} quotes; it cites ${pages.size} with ${quotes.size}`);
       for (const u of uncited) problems.push(`DATA_SOURCES.md lists ${u} under ${id}, which does not cite it`);
     } else problems.push(`DATA_SOURCES.md does not count the sources of ${id}`);
+    // The research note: each quote it lists is one the pre-run cites, or is marked as not cited.
+    const notePath = path.join(APP_ROOT, "research", `${id}.md`);
+    if (!fs.existsSync(notePath)) { problems.push(`research/${id}.md is missing`); continue; }
+    const cites = new Set();
+    const all = (v) => {
+      if (Array.isArray(v)) return v.forEach(all);
+      if (!v || typeof v !== "object") return;
+      if (typeof v.url === "string" && typeof v.quote === "string") cites.add(`${v.url}\n${v.quote.replace(/\s+/g, " ").trim()}`);
+      Object.values(v).forEach(all);
+    };
+    all(def.steps);
+    let url = null;
+    let marked = false;
+    for (const line of fs.readFileSync(notePath, "utf8").split("\n")) {
+      const head = line.match(/^###\s+\[.*\]\((https?:\/\/[^\s)]+)\)\s*$/);
+      if (head) { url = head[1]; marked = false; continue; }
+      if (/^Not cited\b.{10,}/.test(line)) { marked = true; continue; }
+      const q = line.match(/^> (.+)$/);
+      if (!q || !url || marked) continue;
+      if (!cites.has(`${url}\n${q[1].replace(/\s+/g, " ").trim()}`)) problems.push(`research/${id}.md lists a quote its pre-run does not cite, unmarked: "${q[1].slice(0, 70)}"`);
+    }
   }
 }
 
