@@ -304,6 +304,9 @@ if (wanted("diagnostics")) {
     await page.click("#btn-diagnostics");
     await page.waitForSelector(".diag-table");
     await page.waitForFunction(() => document.querySelectorAll('.diag-checks li').length >= 10);
+    // The local checks start on opening; the method check imports the golden cases first, which can take a
+    // moment on a loaded machine. Wait until each has an outcome, without pressing Run all.
+    await page.waitForFunction(() => ["method", "languages", "privacy", "data"].every((id) => !["idle", "running"].includes(document.querySelector(`.diag-table tr[data-test="${id}"] .diag-status`)?.dataset.s)), null, { timeout: 15000 }).catch(() => {});
     checks.local = await statuses();
     await runAll();
     checks.en = await statuses();
