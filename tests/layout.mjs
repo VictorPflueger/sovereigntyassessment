@@ -124,6 +124,14 @@ async function measure(page) {
           labels.slice(i + 1).forEach((b) => { if (hit(A, box(b))) out.push(`the spider's labels "${name(a)}" and "${name(b)}" overlap`); });
           for (const v of values) if (hit(A, box(v))) out.push(`the spider's label "${name(a)}" covers the value "${name(v)}"`);
         });
+        // The level ticks on the first axis stay clear of the labels and the values.
+        const ticks = [...svgEl.querySelectorAll("text.sp-tick")].filter((t) => t.textContent.trim());
+        for (const k of ticks) for (const o of [...labels, ...values]) if (hit(box(k), box(o))) out.push(`the spider's tick "${name(k)}" and its text "${name(o)}" overlap`);
+        // Each value stands clear of its own marker.
+        for (const v of values) {
+          const m = svgEl.querySelector(`.sp-markers:not(.sp-markers--b) polygon[data-axis="${v.dataset.axis}"]`);
+          if (m && !v.closest(".sp-markers--b") && hit(box(v), box(m))) out.push(`the spider's value "${name(v)}" covers its marker`);
+        }
       }
       const groups = [...sov.querySelectorAll(".hc-group")].filter(shown);
       groups.forEach((g, i) => {

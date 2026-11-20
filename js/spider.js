@@ -146,23 +146,36 @@ export function spiderGeometry(kind, n, box = null, longest = 0, labels = null, 
  * id and the codes), and failing that only the id. Returns per axis { x, y (first baseline), anchor,
  * lines, status, leader }.
  */
-export function blockLabels(labels, statusLines, { n, geo, H, lh, gap }) {
-  const margin = 8;
-  const room = H - 2 * margin;
-  const side = (i) => (i === 0 || Math.cos(axisAngle(i, n)) > 1e-9 ? "right" : "left");
+const BLOCK_MARGIN = 8;
+const blockSide = (i, n) => (i === 0 || Math.cos(axisAngle(i, n)) > 1e-9 ? "right" : "left");
+
+/**
+ * How much of each label the block view's two columns keep so that the busier column fits the drawing's
+ * height: "full", the first line ("first": the id and the codes), or only the id ("id"). It depends on
+ * the height alone, not on the web's radius, so the web can be sized for the lines that will be shown.
+ */
+export function blockLabelMode(labels, n, H, lh) {
+  const room = H - 2 * BLOCK_MARGIN;
   const counts = { right: 0, left: 0 };
-  labels.forEach((_, i) => { counts[side(i)] += 1; });
+  labels.forEach((_, i) => { counts[blockSide(i, n)] += 1; });
   const busiest = Math.max(counts.right, counts.left);
-  // How many lines a label may keep so that the busier column fits.
-  const fullLines = (i) => labels[i].length;
-  const need = (linesOf) => Math.max(...["right", "left"].map((sd) => labels.reduce((sum, _, i) => sum + (side(i) === sd ? linesOf(i) * lh + 4 : 0), 0)));
-  let mode = "full";
-  if (need(fullLines) > room) mode = need(() => 1) <= room || busiest <= 1 ? "first" : "id";
-  const shown = labels.map((l, i) => {
-    if (mode === "full") return { lines: l, status: statusLines[i] };
-    const first = String(l[0]);
-    return { lines: [mode === "id" ? first.split(" ")[0] : first], status: 0 };
-  });
+  const need = (linesOf) => Math.max(...["right", "left"].map((sd) => labels.reduce((sum, l, i) => sum + (blockSide(i, n) === sd ? linesOf(l) * lh + 4 : 0), 0)));
+  if (need((l) => l.length) <= room) return "full";
+  return need(() => 1) <= room || busiest <= 1 ? "first" : "id";
+}
+
+/** The lines a block label keeps in a mode of blockLabelMode. */
+function blockShown(lines, mode) {
+  if (mode === "full") return lines;
+  const first = String(lines[0]);
+  return [mode === "id" ? first.split(" ")[0] : first];
+}
+
+export function blockLabels(labels, statusLines, { n, geo, H, lh, gap }) {
+  const margin = BLOCK_MARGIN;
+  const side = (i) => blockSide(i, n);
+  const mode = blockLabelMode(labels, n, H, lh);
+  const shown = labels.map((l, i) => ({ lines: blockShown(l, mode), status: mode === "full" ? statusLines[i] : 0 }));
   const R = geo.r + gap;
   const out = new Array(labels.length);
   for (const sd of ["right", "left"]) {
@@ -218,6 +231,12 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     });
   }
   let longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
+  // The block view's web leaves room beside it for the lines its columns will show: with many blocks those
+  // are the ids and the codes only, so the names do not shrink the web.
+  if (kind === "block" && box && box.h > 0) {
+    const mode = blockLabelMode(labels, n, Math.max(220, Math.round(box.h)), big ? 17 : 14);
+    longest = Math.max(0, ...labels.map((l) => Math.max(0, ...blockShown(l, mode).map((x) => String(x).length))));
+  }
   let { W, H, ...geo } = spiderGeometry(kind, n, box, longest, labels, big);
   // A web too small for its labels at full length (a short map: a small screen, German): the layer view
   // falls back to the layers' short names, with the status line kept, and fits the web again.
@@ -232,6 +251,21 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   }
   // A small web (a short map): no ring labels, smaller values, so nothing crowds the markers.
   const tight = geo.r < 90;
+  // How far a value moves from its marker across the axis (angle phi; a is the axis) so that the text's
+  // box, with 2 px for its halo, clears the marker's box: either beside it or above or below it, whichever
+  // is nearer. The value is centred on x and its baseline is 5 px below the point (and 4 px out along the
+  // axis); in the app's font a digit is at most 0.67 em wide and the box runs from 0.94 em above the
+  // baseline to 0.24 em below it. The marker is a flat-topped hexagon of radius s.
+  const valueOffset = (a, phi, text, s) => {
+    const fs = big && !tight ? 17 : 13;
+    const halfW = String(text).length * 0.335 * fs + s + 2;
+    const halfH = 0.588 * fs + s * 0.866 + 2;
+    const c = Math.cos(phi);
+    const sn = Math.sin(phi);
+    const byX = Math.abs(c) > 1e-6 ? (halfW - Math.sign(c) * 4 * Math.cos(a)) / Math.abs(c) : Infinity;
+    const byY = Math.abs(sn) > 1e-6 ? (halfH - Math.sign(sn) * (4 * Math.sin(a) + 5 - 0.353 * fs)) / Math.abs(sn) : Infinity;
+    return Math.max(s + 2, Math.min(byX, byY));
+  };
   const ring = Math.max(n, 3) === n ? n : 6; // fewer than three axes: hexagon rings
   // A group, not one image: each axis is an image named with its label and value (AC-20), so a screen
   // reader can step through the axes; the rings and the markers are decoration beside those names.
@@ -248,8 +282,16 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     }
     rings.append(svg("polygon", { class: f === 1 ? "sp-ring sp-ring--outer" : "sp-ring", points: pts.join(" ") }));
   }
+  // The level ticks run up the first axis, beside that axis's value and, in the block view, its label. The
+  // outer ring needs no tick (the label or the value stands there, and the ring is the top of the scale);
+  // a tick the value would cover gives way to it.
+  const showValues = !(kind === "block" && n > 12);
+  const v0 = axes[0]?.value;
+  const valueY = showValues && Number.isFinite(v0) ? geo.cy - geo.r * (Math.max(0, Math.min(100, v0)) / 100) + 1 : null;
   for (const tk of tight ? [] : ticks) {
-    rings.append(svg("text", { class: "sp-tick", x: r2(geo.cx + 6), y: r2(geo.cy - geo.r * tk.f - 4) }, tk.text));
+    const y = geo.cy - geo.r * tk.f - 4;
+    if (tk.f >= 1 || (valueY !== null && Math.abs(y - valueY) < 15)) continue;
+    rings.append(svg("text", { class: "sp-tick", x: r2(geo.cx + 6), y: r2(y) }, tk.text));
   }
   root.append(rings);
 
@@ -303,9 +345,8 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   if (pts.length >= 2) root.append(svg("polygon", { class: "sp-area", "aria-hidden": "true", points: pts.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
 
   // Hexagon markers with the value beside them. With more than twelve blocks the values would crowd each
-  // other at the centre: the rings with their level ticks give the level, the honeycomb and the table
-  // the number.
-  const showValues = !(kind === "block" && n > 12);
+  // other at the centre (showValues, above): the rings with their level ticks give the level, the
+  // honeycomb and the table the number.
   const marks = svg("g", { class: "sp-markers", "aria-hidden": "true" });
   axes.forEach((ax, i) => {
     if (ax.value === null || ax.value === undefined) return;
@@ -314,9 +355,10 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     marks.append(svg("polygon", { class: "sp-marker", points: hexPoints(x, y, big ? 8 : 6.5), "data-axis": ax.id }));
     if (!showValues) return;
     const a = axisAngle(i, n);
-    const off = big ? 20 : 15;
-    const tx = x + Math.cos(a + Math.PI / 2) * off * 0.9 + Math.cos(a) * 4;
-    const ty = y + Math.sin(a + Math.PI / 2) * off * 0.9 + Math.sin(a) * 4 + 5;
+    const phi = a + Math.PI / 2;
+    const off = valueOffset(a, phi, ax.valueText, big ? 8 : 6.5);
+    const tx = x + Math.cos(phi) * off + Math.cos(a) * 4;
+    const ty = y + Math.sin(phi) * off + Math.sin(a) * 4 + 5;
     marks.append(svg("text", { class: big && !tight ? "sp-value" : "sp-value sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, ax.valueText));
   });
   root.append(marks);
@@ -333,9 +375,10 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
       const [x, y] = axisPoint(i, n, val(i) / 100, geo);
       marks2.append(svg("polygon", { class: "sp-marker sp-marker--b", points: hexPoints(x, y, big ? 7.5 : 6), "data-axis": ax.id, "data-value": String(second.values[i]) }));
       const a = axisAngle(i, n);
-      const off = big ? 20 : 15;
-      const tx = x + Math.cos(a - Math.PI / 2) * off * 0.9 + Math.cos(a) * 4;
-      const ty = y + Math.sin(a - Math.PI / 2) * off * 0.9 + Math.sin(a) * 4 + 5;
+      const phi = a - Math.PI / 2;
+      const off = valueOffset(a, phi, second.texts?.[i] ?? "", big ? 7.5 : 6);
+      const tx = x + Math.cos(phi) * off + Math.cos(a) * 4;
+      const ty = y + Math.sin(phi) * off + Math.sin(a) * 4 + 5;
       marks2.append(svg("text", { class: big && !tight ? "sp-value sp-value--b" : "sp-value sp-value--b sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, second.texts?.[i] ?? ""));
     });
     root.append(marks2);

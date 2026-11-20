@@ -119,6 +119,12 @@
 /* A narrow group's head: the score or status goes under the layer's name rather than over the next group. */
 .hc-head { flex-wrap: wrap; column-gap: 6px; row-gap: 0; }
 .hc-layer, .hc-score { min-width: 0; overflow-wrap: anywhere; }
+/* The groups share their rows, so every head ends on one line and every group's cells start on one line,
+   however many lines a head wraps to: each group is a subgrid of two of the honeycomb's rows. */
+@supports (grid-template-rows: subgrid) {
+  .hc-group { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+  .hc-head { align-content: flex-end; }
+}
 /* The block view on a short map: every block has its own axis there, so the spider takes the
    honeycomb's room and keeps its labels apart. */
 @container mappanel (max-height: 640px) {
