@@ -86,22 +86,22 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg; ePayBL and Bundesportal keep 19 November 2026. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
 
 ### BundID (`data/runs/bundid.js`)
 
-11 sources with 19 quotes; the reference facts on the Federation's IT and app distribution.
+11 sources read, 10 of them with the 19 quotes cited; the reference facts on the Federation's IT and app distribution. The AusweisApp's page in the App Store is read for the app's distribution but, since the review (R-01), no longer cited: it does not say who runs the store.
 
 | Source | Language | Read |
 |---|---|---|
-| [BundID](https://id.bund.de/en/) | German | 2026-11-19 |
+| [BundID](https://id.bund.de/en/) | German | 2026-11-20 |
 | [Die BundID: sicherer Zugang zu allen eServices \| Bundesagentur für Arbeit](https://www.arbeitsagentur.de/bundid) | German | 2026-11-19 |
 | [ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)](https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf) | German | 2026-11-19 |
 | [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
 | [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English | 2026-11-19 |
 | [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
 | [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
-| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-19 |
+| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
 | [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes) | English | 2026-11-20 |
 | [Who we are](https://cncf.io/about/who-we-are/) | English | 2026-11-20 |
 | [Privacy Policy \| Linux Foundation](https://linuxfoundation.org/legal/privacy-policy) | English | 2026-11-20 |
@@ -123,7 +123,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### Online-Ausweis (`data/runs/online-ausweis.js`)
 
-11 sources with 16 quotes; the reference facts on app distribution.
+11 sources read, 9 of them with the 16 quotes cited; the reference facts on app distribution. Since the review (R-01), two pages read are no longer cited, as their quotes did not state what they were cited for: the BVA's page on the authorisation certificates and the AusweisApp's page in the App Store.
 
 | Source | Language | Read |
 |---|---|---|
@@ -137,11 +137,11 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 | [Der neue Personalausweis – die Fakten auf einen Blick (BSI, via Stadt Düren)](https://onlinedienste.dueren.de/suche/-/vr-bis-detail/dokument/12224/download) | German | 2026-11-19 |
 | [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
 | [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
-| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-19 |
+| [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
 
 ### FIT-Connect (`data/runs/fit-connect.js`)
 
-9 sources with 15 quotes.
+9 sources read, 8 of them with the 14 quotes cited. The FITKO's one-pager is read for the SDKs but, since the verification of the review's fixes noted the registry's maker, no longer cited: it says who develops FIT-Connect, not who makes the registry that distributes its SDK.
 
 | Source | Language | Read |
 |---|---|---|
@@ -157,7 +157,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### ePayBL (`data/runs/epaybl.js`)
 
-11 sources with 18 quotes.
+11 sources read, 10 of them with the 17 quotes cited. The SID's slides on the award are read for the development block but, since the re-check of the review's fixes, no longer cited: they state the SID's responsibility for Saxony's payment component, not who runs the joint development.
 
 | Source | Language | Read |
 |---|---|---|
@@ -182,7 +182,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 | [§ 9a EGovG - Einzelnorm](https://www.gesetze-im-internet.de/egovg/__9a.html) | German | 2026-11-19 |
 | [Umsetzung des Onlinezugangsgesetzes (hib 1402/2020)](https://www.bundestag.de/presse/hib/814130-814130) | German | 2026-11-19 |
 | [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-19 |
-| [BundID](https://id.bund.de/en/) | German | 2026-11-19 |
+| [BundID](https://id.bund.de/en/) | German | 2026-11-20 |
 | [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-19 |
 
 ### EUDI Wallet (`data/runs/eudi-wallet.js`)
@@ -311,7 +311,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### ZaPuK (target architecture for mailbox and communication solutions) (`data/runs/zapuk.js`)
 
-3 sources with 8 quotes.
+3 sources with 7 quotes cited; the research note holds an eighth from the same Drucksache, which the ZBDS pre-run cites.
 
 | Source | Language | Read |
 |---|---|---|

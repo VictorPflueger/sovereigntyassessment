@@ -58,6 +58,8 @@
 .review-party { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 8px; margin: 0; padding: 6px 10px 10px; border: 1px solid var(--vc-border-subtle); }
 .review-party legend { font-weight: var(--vc-weight-semibold); font-size: var(--vc-font-size-sm); }
 .country-input.vc-input { text-transform: uppercase; }
+/* The placeholder is a word, "unknown" or "unbekannt", not a code: set as written, it fits the field at 1280×720. */
+.country-input.vc-input::placeholder { text-transform: none; }
 .review-msg { margin: 0; color: var(--vc-danger-text); min-height: 1em; font-size: var(--vc-font-size-sm); }
 .review-actions, .review-footer, .levers-footer, .audit-actions, .outbox-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .review-footer { margin-top: 12px; }

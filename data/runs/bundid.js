@@ -85,7 +85,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Informationstechnikzentrum Bund (ITZBund)",
+      "quote": "Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)",
       "lang": "de",
       "supports": [
        "operator"
@@ -161,7 +161,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Informationstechnikzentrum Bund (ITZBund)",
+      "quote": "Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)",
       "lang": "de",
       "supports": [
        "operator"
@@ -468,7 +468,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
+      "quote": "Realisierung: Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
       "lang": "de",
       "supports": [
        "tech"
@@ -478,7 +478,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Informationstechnikzentrum Bund (ITZBund)",
+      "quote": "Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)",
       "lang": "de",
       "supports": [
        "operator"
@@ -568,7 +568,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
+      "quote": "Realisierung: Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
       "lang": "de",
       "supports": [
        "tech"
@@ -578,7 +578,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Informationstechnikzentrum Bund (ITZBund)",
+      "quote": "Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)",
       "lang": "de",
       "supports": [
        "operator"
@@ -630,6 +630,26 @@
       "lang": "en",
       "supports": [
        "tech"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Depending on your location, the Apple entity providing the services is:",
+      "lang": "en",
+      "supports": [
+       "operator"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Apple Media Services include, where available, the App Store",
+      "lang": "en",
+      "supports": [
+       "operator"
       ],
       "verified": true
      },
@@ -744,7 +764,7 @@
    "report": {
     "findings": {
      "en": "# BundID: findings\n\nThe BundID is the federal user account for online administrative services. According to its imprint, the site is offered by the BMDS, implemented by the AKDB and run by the ITZBund. Its overall score is {{fact:score.overall}}, indicative.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): the account runs at the ITZBund, whose data centres carry the Federation's consolidated IT.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): a service partner's reference names a Kubernetes platform at the ITZBund on which the account runs. Kubernetes is open source and hosted by the Cloud Native Computing Foundation, part of the US-based Linux Foundation, so the platform's technology counts as made in the US.\n- **Platform**: no source read names a platform the account relies on.\n- **Base services** ({{fact:score.layer.base_service}}): signing in with the online ID uses the AusweisApp, developed by Governikus on behalf of the BSI and published as open source.\n- **Applications** ({{fact:score.layer.applications}}): the account software comes from the AKDB.\n- **Interface and access** ({{fact:score.layer.access}}): people sign in in the browser; on iPhones the AusweisApp comes from the App Store, which Apple Distribution International operates for European users as part of the Apple group.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. Evidence coverage is {{fact:coverage}}; exclusive non-EU control of critical blocks is {{fact:share.exclusive_non_eu}}. Where the data centres are is not stated in the sources read.",
-     "de": "# BundID: Befunde\n\nDie BundID ist das Nutzerkonto des Bundes für Online-Verwaltungsleistungen. Laut Impressum ist die Seite ein Angebot des BMDS, umgesetzt von der AKDB und betrieben vom ITZBund. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Das Konto läuft beim ITZBund, in dessen Rechenzentren die konsolidierte IT des Bundes betrieben wird.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die Referenz eines Dienstleisters nennt eine Kubernetes-Plattform beim ITZBund, auf der das Konto läuft. Kubernetes ist quelloffen und wird von der Cloud Native Computing Foundation getragen, die zur Linux Foundation mit Sitz in den USA gehört; die Technik der Plattform zählt daher als in den USA hergestellt.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf die das Konto angewiesen ist.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Anmeldung mit dem Online-Ausweis nutzt die AusweisApp, die Governikus im Auftrag des BSI entwickelt und als Open Source veröffentlicht.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die Software des Kontos stammt von der AKDB.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Anmeldung läuft im Browser; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die ausschließliche Kontrolle kritischer Bausteine außerhalb der EU beträgt {{fact:share.exclusive_non_eu}}. Wo die Rechenzentren stehen, sagen die gelesenen Quellen nicht."
+     "de": "# BundID: Befunde\n\nDie BundID ist das Nutzerkonto des Bundes für Online-Verwaltungsleistungen. Laut Impressum ist die Seite ein Angebot des BMDS, umgesetzt von der AKDB und betrieben vom ITZBund. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Das Konto läuft beim ITZBund, in dessen Rechenzentren die konsolidierte IT des Bundes betrieben wird.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die Referenz eines Dienstleisters nennt eine Kubernetes-Plattform beim ITZBund, auf der das Konto läuft. Kubernetes ist quelloffen und wird von der Cloud Native Computing Foundation getragen, die zur Linux Foundation mit Sitz in den USA gehört; die Technik der Plattform zählt daher als in den USA hergestellt.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf die das Konto angewiesen ist.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Anmeldung mit dem Online-Ausweis nutzt die AusweisApp, die Governikus im Auftrag des BSI entwickelt und als Open Source veröffentlicht.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die Software des Kontos stammt von der AKDB.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Anmeldung läuft im Browser; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die exklusive Nicht-EU-Kontrolle der kritischen Bausteine beträgt {{fact:share.exclusive_non_eu}}. Wo die Rechenzentren stehen, sagen die gelesenen Quellen nicht."
     }
    }
   }

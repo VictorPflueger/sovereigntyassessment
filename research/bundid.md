@@ -5,11 +5,11 @@ BundID, researched on 19 November 2026: the BundID site and its imprint, the Bun
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/bundid.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
 ### [BundID](https://id.bund.de/en/)
-Read on 2026-11-19 (German).
+Read on 2026-11-20 (German); first read on 2026-11-19, when the two names were quoted without the labels before them in the imprint, and read again for the review of version 1.0.0. Each label is a heading and its name the line after it.
 
 > Diese Webseite ist ein Angebot des Bundesministerium für Digitales und Staatsmodernisierung
-> Informationstechnikzentrum Bund (ITZBund)
-> Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)
+> Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)
+> Realisierung: Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)
 > Ihr aktuell verwendeter Webbrowser unterstützt nicht alle Funktionen der BundID.
 
 ### [Die BundID: sicherer Zugang zu allen eServices | Bundesagentur für Arbeit](https://www.arbeitsagentur.de/bundid)
@@ -46,10 +46,12 @@ Read on 2026-11-19 (English).
 > on the App Store
 
 ### [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/)
-Read on 2026-11-19 (English).
+Read on 2026-11-20 (English); first read on 2026-11-19 for the two addresses, and read again for the review of version 1.0.0 for what the page says the Irish entity does. Under "Apple Media Services and iCloud", the address of Apple Distribution International follows the first sentence below and ends ", for all other users, excluding iCloud users in China mainland."
 
+> Depending on your location, the Apple entity providing the services is:
 > Apple Distribution International Ltd., located at Hollyhill Industrial Estate, Hollyhill, Cork, Republic of Ireland
 > Apple Inc., located at One Apple Park Way, Cupertino, California, United States
+> Apple Media Services include, where available, the App Store
 
 ### [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes)
 Read on 2026-11-20 (English).

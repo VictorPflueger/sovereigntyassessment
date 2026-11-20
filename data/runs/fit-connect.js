@@ -685,13 +685,13 @@
      "de": "Liefert Entwicklern das Java-SDK, mit dem Systeme an FIT-Connect angebunden werden."
     },
     "note": {
-     "en": "Maven Central is maintained by Sonatype, which moved its headquarters to Maryland; where the registry is hosted is not stated in the sources read.",
-     "de": "Maven Central wird von Sonatype betreut, das seinen Hauptsitz nach Maryland verlegt hat; wo das Verzeichnis gehostet wird, steht nicht in den gelesenen Quellen."
+     "en": "Maven Central is maintained by Sonatype, which moved its headquarters to Maryland, so the registry counts as made and run by Sonatype (the rule for a block built from a named product). Where it is hosted and under which licence it runs are not stated in the sources read.",
+     "de": "Maven Central wird von Sonatype betreut, das seinen Hauptsitz nach Maryland verlegt hat; das Verzeichnis gilt daher als von Sonatype hergestellt und betrieben (die Regel für einen Baustein aus einem benannten Produkt). Wo es gehostet wird und unter welcher Lizenz es läuft, steht nicht in den gelesenen Quellen."
     },
     "criticality": "important",
     "tech": {
-     "name": "Föderale IT-Kooperation (FITKO)",
-     "country": "DE",
+     "name": "Sonatype, Inc.",
+     "country": "US",
      "parent": null
     },
     "operator": {
@@ -700,35 +700,16 @@
      "parent": null
     },
     "hosting": "UNKNOWN",
-    "licence": "open_source",
+    "licence": "unknown",
     "exit": "easy",
     "evidence": [
-     {
-      "url": "https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf",
-      "title": "FIT-Connect Onepager (FITKO)",
-      "quote": "Es wird von der Föderalen IT-Kooperation (FITKO) entwickelt und betrieben.",
-      "lang": "de",
-      "supports": [
-       "tech"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
-      "title": "Maven Central: dev.fitko.fitconnect:sdk-client",
-      "quote": "EUPL-1.2",
-      "lang": "en",
-      "supports": [
-       "licence"
-      ],
-      "verified": true
-     },
      {
       "url": "https://sonatype.com/about",
       "title": "About Sonatype | Our Company & Mission | Sonatype",
       "quote": "As the maintainers of Maven Central and creators of Nexus Repository",
       "lang": "en",
       "supports": [
+       "tech",
        "operator"
       ],
       "verified": true
@@ -739,6 +720,7 @@
       "quote": "With Jackson coming on board, Sonatype moves its headquarters from Silicon Valley to Maryland.",
       "lang": "en",
       "supports": [
+       "tech",
        "operator"
       ],
       "verified": true
@@ -837,7 +819,7 @@
    "report": {
     "findings": {
      "en": "# FIT-Connect: findings\n\nFIT-Connect, the base infrastructure for submitting applications for administrative services, is developed and operated by the FITKO on behalf of the IT-Planungsrat. Its overall score is {{fact:score.overall}}, indicative.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): according to the FIT-Connect FAQ, the Zustelldienst runs in Dataport's data centre and the authentication server in the data centre of Global Access, both German providers.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the FITKO develops FIT-Connect and runs its technical infrastructure.\n- **Platform** ({{fact:score.layer.platform}}): the Zustelldienst is operated by IT.Niedersachsen; the software of the authentication server is not named in the sources read, so that block is partly unknown.\n- **Base services**: planning documents name re-used base services, but no source read says who runs them for FIT-Connect.\n- **Applications** ({{fact:score.layer.applications}}): the Java SDK lists the EUPL among its licences.\n- **Interface and access** ({{fact:score.layer.access}}): the Java SDK reaches developers through Maven Central, which Sonatype maintains.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. Evidence coverage is {{fact:coverage}}; exclusive non-EU control of critical blocks is {{fact:share.exclusive_non_eu}}.",
-     "de": "# FIT-Connect: Befunde\n\nFIT-Connect, die Basisinfrastruktur für das Einreichen von Anträgen auf Verwaltungsleistungen, wird im Auftrag des IT-Planungsrats von der FITKO entwickelt und betrieben. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Laut der FAQ von FIT-Connect läuft der Zustelldienst im Rechenzentrum von Dataport und der Authentifizierungsserver im Rechenzentrum von Global Access, beides Anbieter aus Deutschland.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO entwickelt FIT-Connect und betreibt die technische Infrastruktur.\n- **Plattform** ({{fact:score.layer.platform}}): Den Zustelldienst betreibt IT.Niedersachsen; die Software des Authentifizierungsservers nennen die gelesenen Quellen nicht, daher ist dieser Baustein teilweise unbekannt.\n- **Basisdienste**: Planungsunterlagen nennen nachgenutzte Basisdienste, doch keine gelesene Quelle sagt, wer sie für FIT-Connect betreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Das Java-SDK nennt die EUPL unter seinen Lizenzen.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Das Java-SDK erreicht Entwickler über Maven Central, das Sonatype betreut.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die ausschließliche Kontrolle kritischer Bausteine außerhalb der EU beträgt {{fact:share.exclusive_non_eu}}."
+     "de": "# FIT-Connect: Befunde\n\nFIT-Connect, die Basisinfrastruktur für das Einreichen von Anträgen auf Verwaltungsleistungen, wird im Auftrag des IT-Planungsrats von der FITKO entwickelt und betrieben. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Laut der FAQ von FIT-Connect läuft der Zustelldienst im Rechenzentrum von Dataport und der Authentifizierungsserver im Rechenzentrum von Global Access, beides Anbieter aus Deutschland.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO entwickelt FIT-Connect und betreibt die technische Infrastruktur.\n- **Plattform** ({{fact:score.layer.platform}}): Den Zustelldienst betreibt IT.Niedersachsen; die Software des Authentifizierungsservers nennen die gelesenen Quellen nicht, daher ist dieser Baustein teilweise unbekannt.\n- **Basisdienste**: Planungsunterlagen nennen nachgenutzte Basisdienste, doch keine gelesene Quelle sagt, wer sie für FIT-Connect betreibt.\n- **Anwendungen** ({{fact:score.layer.applications}}): Das Java-SDK nennt die EUPL unter seinen Lizenzen.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Das Java-SDK erreicht Entwickler über Maven Central, das Sonatype betreut.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die exklusive Nicht-EU-Kontrolle der kritischen Bausteine beträgt {{fact:share.exclusive_non_eu}}."
     }
    }
   }

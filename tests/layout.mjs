@@ -19,6 +19,9 @@
 //              measures (the verification's N1 and N2)
 //   table      the map's table view at the end of BundID's run, at 1280×720 and 1920×1080 in both languages:
 //              both tables inside their panel and no cell's text cut (the review's R-23)
+//   form       the review's correction form for each of BundID's blocks, at 1280×720 and 1366×768 in both
+//              languages: every placeholder fits its field, no label or legend cut, nothing wider than the
+//              drawer, and the reason field, reached by keyboard, clear of the tab bar
 //   blocks30   a run of thirty blocks, five per layer, at 1920×1080 and 1280×720 in English and German:
 //              the block view's thirty labels inside the diagram and apart from each other, and the
 //              honeycomb's thirty cells inside the map panel, none cut
@@ -419,6 +422,72 @@ if (wanted("table")) {
   const jobs = [];
   for (const [width, height] of [[1280, 720], [1920, 1080]]) for (const lang of ["de", "en"]) jobs.push({ width, height, lang, entry: "bundid", theme: lang === "de" ? "dark" : "light" });
   results.push(...(await Promise.all(jobs.map(tableView))));
+}
+
+// ---- form ----------------------------------------------------------------------------------------------------
+async function reviewForm({ width, height, theme, lang, entry }) {
+  const label = `${width}×${height} ${theme} ${lang}`;
+  const { context, page, errors } = await newPage({ width, height, lang, theme });
+  const problems = [];
+  let forms = 0;
+  try {
+    await page.click(`.catalogue-chip[data-entry="${entry}"]`);
+    await page.click("#btn-start");
+    await page.waitForSelector('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await waitState(page, ["awaiting_review"]);
+    await page.waitForTimeout(300);
+    const n = await page.locator(".review-correct").count();
+    for (let i = 0; i < n; i++) {
+      await page.locator(".review-correct").nth(i).click();
+      await page.waitForSelector(".review-form .review-reason");
+      // Into the reason field by keyboard, from the field before it.
+      await page.locator('.review-form input[name="operator.parent.country"]').focus();
+      await page.keyboard.press("Tab");
+      await settle(page);
+      const f = await page.evaluate(() => {
+        const form = document.querySelector(".review-form");
+        const out = [];
+        const ctx = document.createElement("canvas").getContext("2d");
+        for (const el of form.querySelectorAll("input[placeholder]")) {
+          if (el.value) continue;
+          const ph = getComputedStyle(el, "::placeholder");
+          const cs = getComputedStyle(el);
+          ctx.font = `${ph.fontStyle} ${ph.fontWeight} ${ph.fontSize} ${ph.fontFamily}`;
+          const text = ph.textTransform === "uppercase" ? el.placeholder.toUpperCase() : ph.textTransform === "lowercase" ? el.placeholder.toLowerCase() : el.placeholder;
+          const w = ctx.measureText(text).width;
+          const box = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          if (w > box + 0.5) out.push(`placeholder "${text}" of ${el.name} is ${w.toFixed(1)} px in a ${box.toFixed(1)} px field`);
+        }
+        for (const t of form.querySelectorAll("label > span, legend")) if (t.scrollWidth > t.clientWidth + 1) out.push(`label "${t.textContent.trim()}" cut`);
+        const body = form.closest(".drawer-body") || form.parentElement;
+        if (body.scrollWidth > body.clientWidth + 1) out.push(`the drawer scrolls sideways (${body.scrollWidth} > ${body.clientWidth})`);
+        const r = document.activeElement;
+        if (!r?.classList.contains("review-reason")) out.push(`Tab from the last country field reached ${r?.tagName}, not the reason field`);
+        else {
+          const F = r.getBoundingClientRect();
+          for (const b of document.querySelectorAll("#drawer .drawer-tabs")) {
+            const B = b.getBoundingClientRect();
+            if (B.height && B.left < F.right && F.left < B.right && B.top < F.bottom && F.top < B.bottom) out.push(`the reason field (${Math.round(F.top)}–${Math.round(F.bottom)}) meets the tab bar (${Math.round(B.top)}–${Math.round(B.bottom)})`);
+          }
+        }
+        return { block: form.dataset.block, out };
+      });
+      forms += 1;
+      problems.push(...f.out.map((x) => `${f.block}: ${x}`));
+      if (f.out.length) await page.screenshot({ path: path.join(OUT, `form-${entry}-${f.block}-${width}x${height}-${theme}-${lang}.png`) });
+      await page.locator(".review-form .vc-button--ghost").click();
+      await page.waitForSelector(".review-form", { state: "detached" });
+    }
+  } catch (e) { problems.push(`exception: ${String(e.message).split("\n")[0]}`); }
+  problems.push(...errors.map((e) => `page error: ${e}`));
+  await context.close();
+  return { name: `form ${label}: ${entry}, ${forms} correction forms, placeholders and labels whole, the reason field clear`, ok: !problems.length && forms >= 6, problems };
+}
+if (wanted("form")) {
+  const jobs = [];
+  for (const [width, height] of [[1280, 720], [1366, 768]]) for (const lang of ["de", "en"]) jobs.push({ width, height, lang, entry: "bundid", theme: lang === "de" ? "dark" : "light" });
+  results.push(...(await Promise.all(jobs.map(reviewForm))));
 }
 
 // ---- blocks30 ------------------------------------------------------------------------------------------------

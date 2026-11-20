@@ -1,4 +1,4 @@
-/* Pre-run assessment of Federal Portal (Bundesportal) (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of Federal Portal (Bundesportal) (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/bundesportal.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "bundesportal",
  "entry_id": "bundesportal",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "Bundesportal",
  "steps": [
@@ -333,7 +333,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
+      "quote": "Realisierung: Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)",
       "lang": "de",
       "supports": [
        "tech"
@@ -343,7 +343,7 @@
      {
       "url": "https://id.bund.de/en/",
       "title": "BundID",
-      "quote": "Informationstechnikzentrum Bund (ITZBund)",
+      "quote": "Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)",
       "lang": "de",
       "supports": [
        "operator"

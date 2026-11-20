@@ -1,4 +1,4 @@
-/* Pre-run assessment of ePayBL (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of ePayBL (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/epaybl.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "epaybl",
  "entry_id": "epaybl",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "ePayBL",
  "steps": [
@@ -166,8 +166,8 @@
      "de": "Plant und steuert die Entwicklung von ePayBL für ihre Mitglieder."
     },
     "note": {
-     "en": "The community's office is in Saxony; the SID holds the process responsibility for the Saxon payment component.",
-     "de": "Die Geschäftsstelle der Gemeinschaft sitzt in Sachsen; der SID trägt die Verfahrensverantwortung für die sächsische Basiskomponente Zahlungsverkehr."
+     "en": "The developer community of the Federation and twelve Länder develops ePayBL for its members and so runs its own development; its office is in Saxony.",
+     "de": "Die Entwicklergemeinschaft aus Bund und zwölf Ländern entwickelt die ePayBL für ihre Mitglieder und betreibt damit ihre Entwicklung selbst; ihre Geschäftsstelle sitzt in Sachsen."
     },
     "criticality": "critical",
     "tech": {
@@ -176,7 +176,7 @@
      "parent": null
     },
     "operator": {
-     "name": "Staatsbetrieb Sächsische Informatik Dienste (SID)",
+     "name": "Entwicklergemeinschaft ePayBL",
      "country": "DE",
      "parent": null
     },
@@ -190,7 +190,8 @@
       "quote": "Die Entwicklergemeinschaft besteht aktuell aus Vertretern vom Bund und zwölf Bundesländern.",
       "lang": "de",
       "supports": [
-       "tech"
+       "tech",
+       "operator"
       ],
       "verified": true
      },
@@ -201,16 +202,6 @@
       "lang": "de",
       "supports": [
        "tech"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://www.sid.sachsen.de/download/SID_Kundenforum_2025_ORANGE_ePayBL.pdf",
-      "title": "Wie schaffte es ePayBL zur Auszeichnung? Hinter den Kulissen eines Preisträgers (SID-Kundenforum)",
-      "quote": "SID: Verfahrensverantwortung für Basiskomponente Zahlungsverkehr",
-      "lang": "de",
-      "supports": [
-       "operator"
       ],
       "verified": true
      }
@@ -746,8 +737,8 @@
   {
    "report": {
     "findings": {
-     "en": "# ePayBL: findings\n\nePayBL is the software of the Federation and the Länder with which authorities take fees for their online services. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says in which data centres the instances run.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): a community of the Federation and twelve Länder develops ePayBL; its office is in Saxony, and the SID holds the process responsibility for the Saxon payment component.\n- **Platform**: no source read names a platform that ePayBL runs on.\n- **Base services** ({{fact:score.layer.base_service}}): card payments rely on Mastercard and Visa, which Reuters calls U.S. companies; PayPal is provided by PayPal (Europe) in Luxembourg, a subsidiary of PayPal Holdings, Inc. in San Jose, California.\n- **Applications** ({{fact:score.layer.applications}}): public IT service providers such as Dataport, the SID and the KDN run the instances; Saxony-Anhalt's slides mention a manufacturer of ePayBL without naming it, so who builds the software is a gap.\n- **Interface and access** ({{fact:score.layer.access}}): the payment page is part of the ePayBL software and has the same gap.\n\nSaxony-Anhalt's slides plan Wero, the wallet of the European Payments Initiative, for ePayBL 4 in the fourth quarter of 2026.",
-     "de": "# ePayBL: Befunde\n\nePayBL ist die Software von Bund und Ländern, mit der Behörden Gebühren für ihre Onlinedienste einnehmen. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, in welchen Rechenzentren die Instanzen laufen.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Eine Gemeinschaft aus Bund und zwölf Ländern entwickelt ePayBL; ihre Geschäftsstelle sitzt in Sachsen, und der SID trägt die Verfahrensverantwortung für die sächsische Basiskomponente Zahlungsverkehr.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf der ePayBL läuft.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Kartenzahlung beruht auf Mastercard und Visa, die Reuters als US-Unternehmen bezeichnet; PayPal erbringt die PayPal (Europe) in Luxemburg, eine Tochter der PayPal Holdings, Inc. in San Jose, Kalifornien.\n- **Anwendungen** ({{fact:score.layer.applications}}): Öffentliche IT-Dienstleister wie Dataport, der SID und der KDN betreiben die Instanzen; die Folien Sachsen-Anhalts erwähnen einen Hersteller der ePayBL, ohne ihn zu nennen, daher ist offen, wer die Software baut.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Bezahlseite ist Teil der ePayBL-Software und hat dieselbe Lücke.\n\nDie Folien Sachsen-Anhalts planen Wero, die Wallet der European Payments Initiative, für ePayBL 4 im vierten Quartal 2026."
+     "en": "# ePayBL: findings\n\nePayBL is the software of the Federation and the Länder with which authorities take fees for their online services. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says in which data centres the instances run.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): a community of the Federation and twelve Länder develops ePayBL, and its office is in Saxony.\n- **Platform**: no source read names a platform that ePayBL runs on.\n- **Base services** ({{fact:score.layer.base_service}}): card payments rely on Mastercard and Visa, which Reuters calls U.S. companies; PayPal is provided by PayPal (Europe) in Luxembourg, a subsidiary of PayPal Holdings, Inc. in San Jose, California.\n- **Applications** ({{fact:score.layer.applications}}): public IT service providers such as Dataport, the SID and the KDN run the instances; Saxony-Anhalt's slides mention a manufacturer of ePayBL without naming it, so who builds the software is a gap.\n- **Interface and access** ({{fact:score.layer.access}}): the payment page is part of the ePayBL software and has the same gap.\n\nSaxony-Anhalt's slides plan Wero, the wallet of the European Payments Initiative, for ePayBL 4 in the fourth quarter of 2026.",
+     "de": "# ePayBL: Befunde\n\nePayBL ist die Software von Bund und Ländern, mit der Behörden Gebühren für ihre Onlinedienste einnehmen. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, in welchen Rechenzentren die Instanzen laufen.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Eine Gemeinschaft aus Bund und zwölf Ländern entwickelt ePayBL, und ihre Geschäftsstelle sitzt in Sachsen.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf der ePayBL läuft.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Kartenzahlung beruht auf Mastercard und Visa, die Reuters als US-Unternehmen bezeichnet; PayPal erbringt die PayPal (Europe) in Luxemburg, eine Tochter der PayPal Holdings, Inc. in San Jose, Kalifornien.\n- **Anwendungen** ({{fact:score.layer.applications}}): Öffentliche IT-Dienstleister wie Dataport, der SID und der KDN betreiben die Instanzen; die Folien Sachsen-Anhalts erwähnen einen Hersteller der ePayBL, ohne ihn zu nennen, daher ist offen, wer die Software baut.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Bezahlseite ist Teil der ePayBL-Software und hat dieselbe Lücke.\n\nDie Folien Sachsen-Anhalts planen Wero, die Wallet der European Payments Initiative, für ePayBL 4 im vierten Quartal 2026."
     }
    }
   }

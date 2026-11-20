@@ -23,10 +23,10 @@ Read on 2026-11-19 (German).
 > Lösungen werden primär am europäischen Markt eingekauft oder als Open Source entwickelt.
 
 ### [BundID](https://id.bund.de/en/)
-Read on 2026-11-19 (German).
+Read on 2026-11-20 (German); first read on 2026-11-19, when the two names were quoted without the labels before them in the imprint, and read again for the review of version 1.0.0. Each label is a heading and its name the line after it.
 
-> Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)
-> Informationstechnikzentrum Bund (ITZBund)
+> Realisierung: Anstalt für Kommunale Datenverarbeitung in Bayern (AKDB)
+> Laufender Betrieb: Informationstechnikzentrum Bund (ITZBund)
 
 ### [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf)
 Read on 2026-11-19 (German).

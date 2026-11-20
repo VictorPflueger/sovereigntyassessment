@@ -575,6 +575,26 @@
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
       "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Depending on your location, the Apple entity providing the services is:",
+      "lang": "en",
+      "supports": [
+       "operator"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
+      "quote": "Apple Media Services include, where available, the App Store",
+      "lang": "en",
+      "supports": [
+       "operator"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
+      "title": "Legal - Privacy Policy Affiliated Company - Apple",
       "quote": "Apple Distribution International Ltd., located at Hollyhill Industrial Estate, Hollyhill, Cork, Republic of Ireland",
       "lang": "en",
       "supports": [

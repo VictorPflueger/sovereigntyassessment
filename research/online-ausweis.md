@@ -59,7 +59,9 @@ Read on 2026-11-19 (English).
 > on the App Store
 
 ### [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/)
-Read on 2026-11-19 (English).
+Read on 2026-11-20 (English); first read on 2026-11-19 for the two addresses, and read again for the review of version 1.0.0 for what the page says the Irish entity does. Under "Apple Media Services and iCloud", the address of Apple Distribution International follows the first sentence below and ends ", for all other users, excluding iCloud users in China mainland."
 
+> Depending on your location, the Apple entity providing the services is:
 > Apple Distribution International Ltd., located at Hollyhill Industrial Estate, Hollyhill, Cork, Republic of Ireland
 > Apple Inc., located at One Apple Park Way, Cupertino, California, United States
+> Apple Media Services include, where available, the App Store
