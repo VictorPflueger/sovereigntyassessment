@@ -9,7 +9,7 @@
 import { t, getLang } from "./i18n/index.js";
 import { escapeHtml } from "./dom.js";
 import { renderMarkdown } from "./md.js";
-import { reportParts } from "./drafts.js";
+import { reportParts, markQuoteLangs } from "./drafts.js";
 import { redactSecrets } from "./keystore.js";
 import { spiderSvg, wrapWords } from "./spider.js";
 import { LAYERS } from "./engine.js";
@@ -96,7 +96,7 @@ export function reportHtml(report, { lang = getLang(), result = null, service = 
   const findings = renderMarkdown(p.findings);
   findings.className = "findings";
   if (report.lang) findings.setAttribute("lang", report.lang);
-  const closing = renderMarkdown(p.closing);
+  const closing = markQuoteLangs(renderMarkdown(p.closing), report.closing?.sources || []);
   closing.className = "closing";
   const title = t("export.html.title", { service }, lang);
   const facts = result?.facts || {};

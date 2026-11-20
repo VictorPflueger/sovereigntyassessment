@@ -66,6 +66,8 @@ export function createSovMap(host, catalogue, { onPickBlock, onShow } = {}) {
         return {
           id: l,
           lines: wrapWords(t(`layer.${l}`), 22, 3),
+          // A short map uses the layer's short name; the axis's tooltip and the table keep the full one.
+          short: [t(`layer.${l}.short`)],
           value,
           valueText: value === null ? t(`map.status.${status}`) : fmtScore(value),
           title: `${t(`layer.${l}.full`)}: ${value === null ? t(`map.status.${status}`) : fmtScore(value)}`

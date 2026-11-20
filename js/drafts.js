@@ -93,6 +93,46 @@ function weakestLine(before, after, id, lang) {
     : t("memo.fig.weakest.now", { before: now }, lang);
 }
 
+/**
+ * Marks each source quote's language in a rendered report (AC-20): the text of every quote listed in
+ * `sources` is wrapped in a span with the quote's lang, so a German quote in an English report is read as
+ * German. root: the rendered Markdown. Returns root.
+ */
+export function markQuoteLangs(root, sources = []) {
+  // The Markdown renderer keeps a figure and its percent sign together with a no-break space.
+  const quotes = (sources || []).filter((s) => s?.quote && s?.lang).flatMap((s) => {
+    const text = String(s.quote);
+    const kept = text.replace(/(\d) %/g, "$1\u00a0%");
+    return [{ text, lang: String(s.lang) }, ...(kept !== text ? [{ text: kept, lang: String(s.lang) }] : [])];
+  });
+  if (!root || !quotes.length) return root;
+  const doc = root.ownerDocument;
+  const walker = doc.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */);
+  const nodes = [];
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) nodes.push(n);
+  for (const node of nodes) {
+    let rest = node;
+    for (;;) {
+      const text = rest.nodeValue;
+      let hit = null;
+      for (const q of quotes) {
+        const i = text.indexOf(q.text);
+        if (i >= 0 && (!hit || i < hit.i)) hit = { i, q };
+      }
+      if (!hit) break;
+      const quote = rest.splitText(hit.i);
+      const tail = quote.splitText(hit.q.text.length);
+      const span = doc.createElement("span");
+      span.className = "quote-text";
+      span.setAttribute("lang", hit.q.lang);
+      quote.parentNode.replaceChild(span, quote);
+      span.appendChild(quote);
+      rest = tail;
+    }
+  }
+  return root;
+}
+
 /** The report as Markdown: the agent's findings, then the parts code writes (reportParts). */
 export function reportMarkdown(report, lang = report.lang) {
   const p = reportParts(report, lang);

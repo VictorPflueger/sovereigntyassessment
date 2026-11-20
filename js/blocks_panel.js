@@ -58,30 +58,35 @@ export function createBlocksPanel(panel, { onCount } = {}) {
     if (!state.blocks.length) return;
     renderFilters();
     const rows = state.blocks.filter((b) => (state.layer === "all" || b.layer === state.layer) && (!state.unknownOnly || b.unknown_fields.length || b.unscored || b.partly_unknown));
-    const table = h("table", { class: "vc-table blocks-table" },
-      h("thead", {}, h("tr", {}, ...["map.col.block", "map.col.layer", "map.col.name", "map.col.criticality", "map.col.madeIn", "map.col.runBy", "blocks.col.hosting", "blocks.col.licence", "blocks.col.exit", "map.col.level"].map((k) => h("th", { scope: "col" }, t(k))))));
-    const tbody = h("tbody");
+    // Explicit roles keep the table a table for screen readers where a narrow drawer stacks its rows
+    // (css/panels.css); each cell names its column for that layout.
+    const COLS = ["map.col.block", "map.col.layer", "map.col.name", "map.col.criticality", "map.col.madeIn", "map.col.runBy", "blocks.col.hosting", "blocks.col.licence", "blocks.col.exit", "map.col.level"];
+    const label = (i) => t(COLS[i]);
+    const table = h("table", { class: "vc-table blocks-table", role: "table" },
+      h("thead", { role: "rowgroup" }, h("tr", { role: "row" }, ...COLS.map((k) => h("th", { scope: "col", role: "columnheader" }, t(k))))));
+    const tbody = h("tbody", { role: "rowgroup" });
     for (const b of rows) {
       const open = state.open.has(b.id);
       const toggle = h("button", { class: "row-toggle", type: "button", "aria-expanded": open ? "true" : "false", "aria-controls": `ev-${b.id}`, title: t("blocks.evidence") }, icon("chevronRight", 14), b.id);
       toggle.addEventListener("click", () => { if (state.open.has(b.id)) state.open.delete(b.id); else state.open.add(b.id); render(); });
       const unk = (f) => (b.unknown_fields.includes(f) ? h("span", { class: "unk-mark", title: t("blocks.unknown.title") }, " (" + t("blocks.unknown") + ")") : null);
       const corrected = b.corrections?.length ? h("span", { class: "vc-tag vc-tag--accent corrected-tag" }, t("blocks.corrected")) : null;
-      tbody.append(h("tr", { dataset: { block: b.id, open: open ? "true" : "false" } },
-        h("th", { scope: "row" }, toggle),
-        h("td", {}, t(`layer.${b.layer}.short`)),
-        h("td", { lang: b.lang || state.lang }, textOf(b.name), corrected),
-        h("td", {}, t(`value.criticality.${b.criticality}`)),
-        h("td", {}, h("span", { class: "cls-code" }, t(`class.${b.tech_class}.short`)), " ", h("span", { class: "party" }, partyText(b.tech, lang)), unk("tech"), unk("tech.parent")),
-        h("td", {}, h("span", { class: "cls-code" }, t(`class.${b.operator_class}.short`)), " ", h("span", { class: "party" }, partyText(b.operator, lang)), unk("operator"), unk("operator.parent")),
-        h("td", {}, t(`value.hosting.${b.hosting}`), unk("hosting")),
-        h("td", {}, t(`value.licence.${b.licence}`), unk("licence")),
-        h("td", {}, t(`value.exit.${b.exit}`), unk("exit")),
-        h("td", { class: "vc-tabular num" }, b.unscored ? t("map.gap") : fmtInt(b.level) + (b.partly_unknown ? " (" + t("map.partly") + ")" : ""))));
+      const cell = (i, attrs, ...kids) => h("td", { role: "cell", ...attrs, dataset: { label: label(i), ...(attrs?.dataset || {}) } }, ...kids);
+      tbody.append(h("tr", { role: "row", dataset: { block: b.id, open: open ? "true" : "false" } },
+        h("th", { scope: "row", role: "rowheader" }, toggle),
+        cell(1, { class: "col-more" }, t(`layer.${b.layer}.short`)),
+        cell(2, { class: "col-name", lang: b.lang || state.lang }, textOf(b.name), corrected),
+        cell(3, { class: "col-more" }, t(`value.criticality.${b.criticality}`)),
+        cell(4, { class: "col-more" }, h("span", { class: "cls-code" }, t(`class.${b.tech_class}.short`)), " ", h("span", { class: "party" }, partyText(b.tech, lang)), unk("tech"), unk("tech.parent")),
+        cell(5, { class: "col-more" }, h("span", { class: "cls-code" }, t(`class.${b.operator_class}.short`)), " ", h("span", { class: "party" }, partyText(b.operator, lang)), unk("operator"), unk("operator.parent")),
+        cell(6, { class: "col-more" }, t(`value.hosting.${b.hosting}`), unk("hosting")),
+        cell(7, { class: "col-more" }, t(`value.licence.${b.licence}`), unk("licence")),
+        cell(8, { class: "col-more" }, t(`value.exit.${b.exit}`), unk("exit")),
+        cell(9, { class: "vc-tabular num col-level" }, b.unscored ? t("map.gap") : fmtInt(b.level) + (b.partly_unknown ? " (" + t("map.partly") + ")" : ""))));
       if (open) {
         const role = textOf(b.role);
         const note = textOf(b.note);
-        tbody.append(h("tr", { class: "evidence-row", id: `ev-${b.id}` }, h("td", { colspan: "10" },
+        tbody.append(h("tr", { class: "evidence-row", id: `ev-${b.id}`, role: "row" }, h("td", { colspan: "10", role: "cell" },
           h("div", { class: "evidence-wrap" },
             h("div", { class: "narr-line" }, aiLabel("block"), h("p", { lang: b.lang || state.lang }, role, note ? ` ${note}` : ""), b.lang && b.lang !== lang ? langTag(b.lang) : null),
             b.unknown_fields.length ? h("p", { class: "unknown-why" }, icon("alert", 14), t("blocks.unknownWhy", { fields: b.unknown_fields.map((f) => t(`field.${f}`)).join(", ") })) : null,

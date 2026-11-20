@@ -83,7 +83,7 @@ export function fitLabel(lines, width, kind) {
   return [...keep, ...wrapWords(rest.join(" "), width, kind === "block" ? 3 : 4)];
 }
 
-export function spiderGeometry(kind, n, box = null, longest = 0) {
+export function spiderGeometry(kind, n, box = null, longest = 0, labels = null, big = true) {
   if (!box || !(box.w > 0) || !(box.h > 0)) {
     const W = 760;
     const H = 560;
@@ -91,14 +91,108 @@ export function spiderGeometry(kind, n, box = null, longest = 0) {
   }
   const W = Math.max(320, Math.round(box.w));
   const H = Math.max(220, Math.round(box.h));
-  // Room for the labels beside and above or below the web, from the longest label line at the label's
-  // size in the stylesheet (15 px in the layer view, 12 px in the block view, about half an em a
-  // character); three lines of a block's label need more height.
   const perChar = CHAR_PX[kind] || CHAR_PX.layer;
-  const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longest * perChar + 6);
-  const padY = kind === "layer" ? 50 : 60;
-  const r = Math.max(48, Math.min(230, (W - 2 * padX) / 2, (H - 2 * padY) / 2));
-  return { W, H, cx: W / 2, cy: H / 2 + 4, r };
+  const gap = kind === "layer" ? 20 : 14;
+  const cx = W / 2;
+  // The block view sets its labels in columns beside the web (blockLabels): the web leaves room for the
+  // longest label line on each side.
+  if (kind === "block" || !labels) {
+    const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longest * perChar + 6);
+    const padY = kind === "layer" ? 50 : 60;
+    const r = Math.max(48, Math.min(230, (W - 2 * padX) / 2, (H - 2 * padY) / 2));
+    return { W, H, cx, cy: H / 2 + 4, r };
+  }
+  // The layer view: the largest web whose every label, placed as spiderSvg places it, stays inside the
+  // drawing, from each label's lines (a long label wraps to more lines, a status line adds one). Each
+  // edge of a label moves with the radius along its axis, so each gives a bound; the centre moves up or
+  // down where that buys a larger web (a long label at the bottom, a short one at the top).
+  const font = big ? 15 : 12;
+  const lh = big ? 17 : 14;
+  const asc = font * 0.8;
+  const desc = font * 0.3;
+  const boxes = labels.map((lines, i) => {
+    const a = axisAngle(i, n);
+    const c = Math.cos(a);
+    const sn = Math.sin(a);
+    const L = Math.max(1, lines.length);
+    const w = Math.max(0, ...lines.map((l) => String(l).length)) * perChar;
+    const anchor = c > 0.3 ? "start" : c < -0.3 ? "end" : "middle";
+    const [x0, x1] = anchor === "start" ? [0, w] : anchor === "end" ? [-w, 0] : [-w / 2, w / 2];
+    const base = sn < -0.3 ? -(L - 1) * lh : sn > 0.3 ? 0.7 * lh : -((L - 1) * lh) / 2 + 5;
+    return { c, sn, x0, x1, y0: base - asc, y1: base + (L - 1) * lh + desc };
+  });
+  const lim = (coef, room) => (coef > 1e-6 ? room / coef - gap : Infinity);
+  const radiusAt = (cy) => Math.min(230, ...boxes.flatMap((b) => [
+    lim(b.c, W - 3 - cx - b.x1),
+    lim(-b.c, cx + b.x0 - 3),
+    lim(b.sn, H - 3 - cy - b.y1),
+    lim(-b.sn, cy + b.y0 - 3)
+  ]));
+  let best = { cy: H / 2 + 4, r: radiusAt(H / 2 + 4) };
+  for (let d = -60; d <= 60; d += 4) {
+    const cy = H / 2 + d;
+    const r = radiusAt(cy);
+    if (r > best.r + 0.5) best = { cy, r };
+  }
+  return { W, H, cx, cy: best.cy, r: Math.max(48, best.r) };
+}
+
+/**
+ * The block view's labels in two columns: an axis on the right half labels to the right of the web, one on
+ * the left half to the left (the first axis, at the top, counts as right). In each column the labels keep
+ * their axes' order from top to bottom and are pushed apart until none overlaps the next, within the
+ * drawing's height; each stays outside the web's circle, and one moved away from its axis end gets a
+ * leader line. When a column's labels cannot fit at full length, every label keeps its first line (the
+ * id and the codes), and failing that only the id. Returns per axis { x, y (first baseline), anchor,
+ * lines, status, leader }.
+ */
+export function blockLabels(labels, statusLines, { n, geo, H, lh, gap }) {
+  const margin = 8;
+  const room = H - 2 * margin;
+  const side = (i) => (i === 0 || Math.cos(axisAngle(i, n)) > 1e-9 ? "right" : "left");
+  const counts = { right: 0, left: 0 };
+  labels.forEach((_, i) => { counts[side(i)] += 1; });
+  const busiest = Math.max(counts.right, counts.left);
+  // How many lines a label may keep so that the busier column fits.
+  const fullLines = (i) => labels[i].length;
+  const need = (linesOf) => Math.max(...["right", "left"].map((sd) => labels.reduce((sum, _, i) => sum + (side(i) === sd ? linesOf(i) * lh + 4 : 0), 0)));
+  let mode = "full";
+  if (need(fullLines) > room) mode = need(() => 1) <= room || busiest <= 1 ? "first" : "id";
+  const shown = labels.map((l, i) => {
+    if (mode === "full") return { lines: l, status: statusLines[i] };
+    const first = String(l[0]);
+    return { lines: [mode === "id" ? first.split(" ")[0] : first], status: 0 };
+  });
+  const R = geo.r + gap;
+  const out = new Array(labels.length);
+  for (const sd of ["right", "left"]) {
+    const idx = labels.map((_, i) => i).filter((i) => side(i) === sd);
+    // Desired: centred on the axis end's height. Top to bottom on both sides.
+    const items = idx.map((i) => {
+      const a = axisAngle(i, n);
+      const h = shown[i].lines.length * lh;
+      return { i, h, want: geo.cy + Math.sin(a) * R, end: [geo.cx + Math.cos(a) * (geo.r + 4), geo.cy + Math.sin(a) * (geo.r + 4)] };
+    }).sort((p, q) => p.want - q.want);
+    // Push down from the top, then up from the bottom, so the column fits between the margins.
+    let y = margin;
+    for (const it of items) { it.top = Math.max(it.want - it.h / 2, y); y = it.top + it.h + 4; }
+    let bottom = H - margin;
+    for (let k = items.length - 1; k >= 0; k--) { const it = items[k]; if (it.top + it.h > bottom) it.top = bottom - it.h; bottom = it.top - 4; }
+    for (const it of items) {
+      const mid = it.top + it.h / 2;
+      // Outside the web's circle at the label's height (plus a little air), on its side.
+      const dy = Math.abs(mid - geo.cy);
+      const dx = dy < R ? Math.sqrt(R * R - dy * dy) : 0;
+      const x = sd === "right" ? geo.cx + Math.max(dx, 4) : geo.cx - Math.max(dx, 4);
+      const moved = Math.abs(mid - it.want) > lh * 0.6;
+      out[it.i] = {
+        x, y: it.top + lh * 0.78, anchor: sd === "right" ? "start" : "end",
+        lines: shown[it.i].lines, status: shown[it.i].status,
+        leader: moved ? [it.end, [sd === "right" ? x - 3 : x + 3, mid]] : null
+      };
+    }
+  }
+  return out;
 }
 
 export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc = "", box = null, second = null, id = "spider" }) {
@@ -123,12 +217,25 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
       return [...fitLabel(l.slice(0, -1), fit, kind), ...status];
     });
   }
-  const longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
-  const { W, H, ...geo } = spiderGeometry(kind, n, box, longest);
+  let longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
+  let { W, H, ...geo } = spiderGeometry(kind, n, box, longest, labels, big);
+  // A web too small for its labels at full length (a short map: a small screen, German): the layer view
+  // falls back to the layers' short names, with the status line kept, and fits the web again.
+  if (kind === "layer" && box && geo.r < 96 && axes.every((ax) => Array.isArray(ax.short) && ax.short.length)) {
+    const short = axes.map((ax, i) => [...ax.short.map(String), ...(statusLines[i] ? labels[i].slice(-statusLines[i]) : [])]);
+    const shortGeo = spiderGeometry(kind, n, box, Math.max(0, ...short.map((l) => Math.max(0, ...l.map((x) => x.length)))), short, big);
+    if (shortGeo.r > geo.r) {
+      labels = short;
+      longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
+      ({ W, H, ...geo } = shortGeo);
+    }
+  }
   // A small web (a short map): no ring labels, smaller values, so nothing crowds the markers.
   const tight = geo.r < 90;
   const ring = Math.max(n, 3) === n ? n : 6; // fewer than three axes: hexagon rings
-  const root = svg("svg", { class: "spider", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": `${id}-title ${id}-desc`, "data-view": kind, "data-axes": n, preserveAspectRatio: "xMidYMid meet" });
+  // A group, not one image: each axis is an image named with its label and value (AC-20), so a screen
+  // reader can step through the axes; the rings and the markers are decoration beside those names.
+  const root = svg("svg", { class: "spider", viewBox: `0 0 ${W} ${H}`, role: "group", "aria-labelledby": `${id}-title ${id}-desc`, "data-view": kind, "data-axes": n, preserveAspectRatio: "xMidYMid meet" });
   root.append(svg("title", { id: `${id}-title` }, title), svg("desc", { id: `${id}-desc` }, desc));
 
   // Rings for levels 1 to 4 (25, 50, 75, 100); level 0 is the centre.
@@ -147,27 +254,43 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   root.append(rings);
 
   // Axes, with their labels.
+  const lh = big ? 17 : 14;
+  const gap = kind === "layer" ? 20 : 14;
+  // The block view lays its labels out in two columns, one each side of the web, so that many blocks
+  // keep their labels apart (blockLabels); the layer view's six labels sit at their axes' ends.
+  const placed = kind === "block" ? blockLabels(labels, statusLines, { n, geo, H, lh, gap }) : null;
   const axesG = svg("g", { class: "sp-axes" });
   axes.forEach((ax, i) => {
     const [x2, y2] = axisPoint(i, n, 1, geo);
     const dashed = ax.dashed !== undefined ? !!ax.dashed : ax.value === null || ax.value === undefined;
-    const g = svg("g", { class: "sp-axis-g", "data-axis": ax.id, "data-value": dashed ? "" : String(ax.value), "data-dashed": dashed ? "true" : "false" });
+    const g = svg("g", { class: "sp-axis-g", role: "img", "aria-label": ax.title || ax.lines.join(" "), "data-axis": ax.id, "data-value": dashed ? "" : String(ax.value), "data-dashed": dashed ? "true" : "false" });
     g.append(svg("title", {}, ax.title || ax.lines.join(" ")));
     g.append(svg("line", { class: dashed ? "sp-axis sp-axis--dashed" : "sp-axis", x1: geo.cx, y1: geo.cy, x2: r2(x2), y2: r2(y2) }));
+    if (placed) {
+      const p = placed[i];
+      // A label moved away from its axis end is joined to it by a thin line.
+      if (p.leader) g.append(svg("polyline", { class: "sp-leader", points: p.leader.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
+      const text = svg("text", { class: big ? "sp-label" : "sp-label sp-label--small", x: r2(p.x), y: r2(p.y), "text-anchor": p.anchor });
+      p.lines.forEach((line, k) => {
+        const cls = k === 0 ? "sp-label-strong" : k >= p.lines.length - p.status ? "sp-label-muted" : null;
+        text.append(svg("tspan", { x: r2(p.x), dy: k === 0 ? 0 : lh, class: cls }, line));
+      });
+      g.append(text);
+      axesG.append(g);
+      return;
+    }
     // The label beyond the axis end, anchored away from the centre.
     const a = axisAngle(i, n);
     const cos = Math.cos(a);
     const sin = Math.sin(a);
-    const gap = kind === "layer" ? 20 : 14;
     const lx = geo.cx + cos * (geo.r + gap);
     const ly = geo.cy + sin * (geo.r + gap);
     const anchor = cos > 0.3 ? "start" : cos < -0.3 ? "end" : "middle";
     const lines = labels[i];
-    const lh = big ? 17 : 14;
     const startY = sin < -0.3 ? ly - (lines.length - 1) * lh : sin > 0.3 ? ly + lh * 0.7 : ly - ((lines.length - 1) * lh) / 2 + 5;
     const text = svg("text", { class: big ? "sp-label" : "sp-label sp-label--small", x: r2(lx), y: r2(startY), "text-anchor": anchor });
     lines.forEach((line, k) => {
-      const cls = k === 0 && kind === "block" ? "sp-label-strong" : k >= lines.length - statusLines[i] ? "sp-label-muted" : null;
+      const cls = k >= lines.length - statusLines[i] ? "sp-label-muted" : null;
       text.append(svg("tspan", { x: r2(lx), dy: k === 0 ? 0 : lh, class: cls }, line));
     });
     g.append(text);
@@ -177,15 +300,19 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
 
   // The service's area through the axes that have a value, in axis order.
   const pts = axes.map((ax, i) => (ax.value === null || ax.value === undefined ? null : axisPoint(i, n, Math.max(0, Math.min(100, ax.value)) / 100, geo))).filter(Boolean);
-  if (pts.length >= 2) root.append(svg("polygon", { class: "sp-area", points: pts.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
+  if (pts.length >= 2) root.append(svg("polygon", { class: "sp-area", "aria-hidden": "true", points: pts.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
 
-  // Hexagon markers with the value beside them.
-  const marks = svg("g", { class: "sp-markers" });
+  // Hexagon markers with the value beside them. With more than twelve blocks the values would crowd each
+  // other at the centre: the rings with their level ticks give the level, the honeycomb and the table
+  // the number.
+  const showValues = !(kind === "block" && n > 12);
+  const marks = svg("g", { class: "sp-markers", "aria-hidden": "true" });
   axes.forEach((ax, i) => {
     if (ax.value === null || ax.value === undefined) return;
     const f = Math.max(0, Math.min(100, ax.value)) / 100;
     const [x, y] = axisPoint(i, n, f, geo);
     marks.append(svg("polygon", { class: "sp-marker", points: hexPoints(x, y, big ? 8 : 6.5), "data-axis": ax.id }));
+    if (!showValues) return;
     const a = axisAngle(i, n);
     const off = big ? 20 : 15;
     const tx = x + Math.cos(a + Math.PI / 2) * off * 0.9 + Math.cos(a) * 4;
@@ -199,8 +326,8 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   if (second) {
     const val = (i) => { const v = second.values?.[i]; return v === null || v === undefined ? null : Math.max(0, Math.min(100, v)); };
     const pts2 = axes.map((ax, i) => (val(i) === null ? null : axisPoint(i, n, val(i) / 100, geo))).filter(Boolean);
-    if (pts2.length >= 2) root.append(svg("polygon", { class: "sp-area sp-area--b", points: pts2.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
-    const marks2 = svg("g", { class: "sp-markers sp-markers--b" });
+    if (pts2.length >= 2) root.append(svg("polygon", { class: "sp-area sp-area--b", "aria-hidden": "true", points: pts2.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
+    const marks2 = svg("g", { class: "sp-markers sp-markers--b", "aria-hidden": "true" });
     axes.forEach((ax, i) => {
       if (val(i) === null) return;
       const [x, y] = axisPoint(i, n, val(i) / 100, geo);

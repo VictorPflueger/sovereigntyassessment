@@ -203,6 +203,12 @@ export function initUI() {
   bus.on("report", () => setTimeout(() => exportPanel.render(), 0));
   bus.on("run_end", () => setTimeout(() => { refreshSession(); exportPanel.render(); }, 0));
   // The person's turn opens the tab where it is taken, with a merlot count on the tab.
+  // Where the drawer opens over the console's column (css/panels.css, from 1,101 px wide), the console
+  // must not hide what the person needs to read: a new run folds the drawer away, so the narration is in
+  // view, and so does a warning or an error the console writes.
+  const drawerBeside = () => !!(globalThis.CSS?.supports?.("anchor-name", "--sa-console") && globalThis.matchMedia?.("(min-width: 1101px)").matches);
+  bus.on("run_start", () => { if (drawerBeside() && drawer.isOpen()) drawer.setOpen(false); });
+  bus.on("notice", (ev) => { if (ev.payload?.level !== "info" && drawerBeside() && drawer.isOpen()) drawer.setOpen(false); });
   bus.on("review_request", () => { drawer.setCount("review", 1, true); drawer.show("review"); });
   bus.on("review_decision", (ev) => { if (ev.payload?.action !== "correct") drawer.setCount("review", 0); });
   bus.on("levers", (ev) => { drawer.setCount("levers", (ev.payload?.levers || []).length + 1, true); drawer.show("levers"); });

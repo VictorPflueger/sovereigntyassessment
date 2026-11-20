@@ -19,6 +19,10 @@
 //   exports           after a pre-run, the four exports with their names, in the active language, the HTML
 //                     self-contained, the JSON valid against the schemas (AC-17)
 //   method            the method view and its sources; a weight change recomputes, is logged and reported
+//   names             accessible names (AC-20): each of the spider's axes is an image named with its layer or
+//                     block and its value, each honeycomb cell is named with its block, level and codes, in
+//                     English and after a switch in German; every quote carries the language it was read
+//                     in, in the evidence of the Building blocks tab and in the report's sources
 //   missing-data      a data file is missing: the boot screen names it
 // Every case fails on a page error, a console error, a policy violation, or a request to another host
 // than this test server (api.anthropic.com is answered by a stand-in where a case needs it).
@@ -166,6 +170,10 @@ if (wanted("lang-switch")) {
     // A notice in the console, written by code: it follows the language too.
     await page.click("#btn-start");
     await page.waitForSelector('.entry[data-type="notice"]');
+    // The warning folded the drawer away from the console (it opens over the console's column); open it
+    // again, so its words are read open.
+    checks.foldedForNotice = await page.evaluate(() => document.querySelector("#drawer")?.dataset.open === "false");
+    await page.click("#tab-blocks");
     // A chosen entry: its name in the field follows the language.
     await page.click('.catalogue-chip[data-entry="online-ausweis"]');
     checks.en = await snapshot();
@@ -218,6 +226,7 @@ if (wanted("lang-switch")) {
     [en.field === "Online ID (eID)" && de.field === "Online-Ausweis (eID)", `the chosen entry's name in the field follows (${en.field} → ${de.field})`],
     [en.chip === "Online ID (eID)" && de.chip === "Online-Ausweis (eID)" && de.catalogueTitle === "Dienst auswählen", "the catalogue's names come from its German texts"],
     [en.preRun === "pre-run available" && de.preRun === "vorab erstellter Lauf verfügbar", "the pre-run mark's hidden label follows"],
+    [checks.foldedForNotice === true, "a warning in the console folds the drawer away from it"],
     [en.tab === "Building blocks" && de.tab === "Bausteine" && /Ausblenden/.test(de.drawerToggle || "") && de.drawerNote === "Nur Entwürfe. Nichts wird versendet." && de.builtBy === "Gebaut von" && de.empty === "Noch keine Bausteine", `the drawer: tabs, toggle, note, byline, empty state (${JSON.stringify({ tab: de.tab, toggle: de.drawerToggle })})`],
     [JSON.stringify(en.rail) === JSON.stringify(["Understand", "Research", "Score", "Your review", "Recommend"]) && JSON.stringify(de.rail) === JSON.stringify(["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"]), `the rail (${JSON.stringify(de.rail)})`],
     [de.console === "Agentenkonsole" && /^Geben Sie zuerst/.test(de.notice || "") && /^Enter a base service/.test(en.notice || ""), "the console and a notice written by code"],
@@ -602,6 +611,73 @@ if (wanted("exports")) {
     [checks.deValid && !checks.deValid.assessment.length && checks.deValid.lang === "de" && checks.deValid.entry === "epaybl", `the German assessment JSON is valid (${JSON.stringify(checks.deValid?.assessment)})`],
     [checks.enValid?.auditKind === "audit" && checks.enValid.auditRows > 20 && !checks.enValid.auditBad.length && !checks.deValid?.auditBad?.length, `every audit row is a valid AuditEvent (${JSON.stringify(checks.enValid?.auditBad)})`],
     [!keyLike(checks.en) && !keyLike(checks.switched) && !keyLike(checks.de), "no key-like string in any file"]
+  ]);
+}
+
+// ---- names (AC-20) -------------------------------------------------------------------------------------------------
+if (wanted("names")) {
+  const t = await newPage();
+  const { page } = t;
+  const checks = {};
+  /** The accessibility tree's view of the map: the spider's named images and the honeycomb's cells. */
+  const names = () => page.evaluate(() => ({
+    axes: [...document.querySelectorAll(".sov-spider svg.spider .sp-axis-g")].map((g) => ({ role: g.getAttribute("role"), name: g.getAttribute("aria-label") || "" })),
+    svgRole: document.querySelector(".sov-spider svg.spider")?.getAttribute("role"),
+    hidden: [...document.querySelectorAll(".sov-spider svg.spider > g.sp-markers, .sov-spider svg.spider > polygon.sp-area")].every((e) => e.getAttribute("aria-hidden") === "true"),
+    cells: [...document.querySelectorAll(".hc-cell")].map((c) => ({ block: c.dataset.block || null, name: c.getAttribute("aria-label") || "", tag: c.tagName, role: c.getAttribute("role") }))
+  }));
+  try {
+    await fast(page);
+    await page.click('.catalogue-chip[data-entry="bundid"]');
+    await page.click("#btn-start");
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await waitRun(page, ["awaiting_review"]);
+    checks.en = await names();
+    // The same names as the accessibility tree reports them (Playwright's ARIA snapshot).
+    checks.snapshot = await page.locator(".sov-spider svg.spider").ariaSnapshot();
+    await page.click('.sov-views button[data-view="block"]');
+    await page.waitForSelector('.spider[data-view="block"]');
+    checks.enBlocks = await names();
+    await page.click('.sov-views button[data-view="layer"]');
+    await page.click('#lang-switch button[data-lang="de"]');
+    await page.waitForFunction(() => document.documentElement.lang === "de");
+    await page.waitForTimeout(300);
+    checks.de = await names();
+    // The evidence of a block in the Building blocks tab: each quote with its language.
+    await openTab(page, "blocks");
+    await page.waitForSelector(".blocks-table .row-toggle");
+    await page.click(".blocks-table .row-toggle");
+    await page.waitForSelector("blockquote.evidence-quote");
+    checks.evidence = await page.$$eval("blockquote.evidence-quote", (qs) => qs.map((q) => ({ lang: q.getAttribute("lang"), text: q.textContent.trim().slice(0, 40) })));
+    await page.click('#lang-switch button[data-lang="en"]');
+    await openTab(page, "review");
+    await page.click("#btn-review-confirm");
+    await waitRun(page, ["awaiting_decision"]);
+    await page.click('.lever-card[data-lever="L1"] .lever-id');
+    await page.click("#btn-approve-lever");
+    await waitRun(page, ["done", "stopped", "aborted", "error"]);
+    await openTab(page, "outbox");
+    await page.waitForSelector('.outbox-card[data-draft="report"]');
+    checks.report = await page.evaluate(async () => {
+      const card = document.querySelector('.outbox-card[data-draft="report"] .md');
+      const spans = [...card.querySelectorAll(".quote-text")].map((s) => ({ lang: s.getAttribute("lang"), text: s.textContent }));
+      // The sources the report lists, as the run published them.
+      const items = [...card.querySelectorAll("li")].filter((li) => /“/.test(li.textContent));
+      return { spans, quoted: items.length, cardLang: card.getAttribute("lang") };
+    });
+  } catch (err) { checks.FAILED = String(err.message).split("\n").slice(0, 6).join(" / "); }
+  const layerNames = (n, re) => !!n && n.svgRole === "group" && n.hidden && n.axes.length === 6 && n.axes.every((a) => a.role === "img" && re.test(a.name));
+  const cellNames = (n, re) => !!n && n.cells.filter((c) => c.block).length >= 5 && n.cells.every((c) => (c.block ? c.tag === "BUTTON" && c.name.startsWith(c.block) && re.test(c.name) : c.role === "img" && c.name.length > 5));
+  const evidence = checks.evidence || [];
+  const spans = checks.report?.spans || [];
+  await finish("names: the spider's axes and the honeycomb's cells are named in both languages, and every quote carries its language", t, checks, [
+    [layerNames(checks.en, /^(Infrastructure|Development, security and operations|Platform|Base services|Applications and services|Interface and access) \(German: [^)]+\): (\d+|no evidence found|not researched yet)$/), `English: six named axes, the web a group (${JSON.stringify(checks.en?.axes?.map((a) => a.name))})`],
+    [/img "Infrastructure \(German: Infrastruktur\): 100"/.test(checks.snapshot || "") && (checks.snapshot.match(/img "/g) || []).length === 6, `the accessibility tree has the six axes (${(checks.snapshot || "").split("\n").slice(0, 3).join(" | ")})`],
+    [!!checks.enBlocks && checks.enBlocks.axes.length >= 5 && checks.enBlocks.axes.every((a) => a.role === "img" && /^B-\d\d .+: (level \d|gap)/.test(a.name)), `the block view: an axis per block, named (${JSON.stringify(checks.enBlocks?.axes?.slice(0, 2))})`],
+    [cellNames(checks.en, /level \d|gap|unknown/), `English: every cell named with its block (${JSON.stringify(checks.en?.cells?.slice(0, 2))})`],
+    [layerNames(checks.de, /^(Infrastruktur|Entwicklung, Sicherheit und Betrieb|Plattform|Basisdienst|Anwendungen und Dienstleistungen|Oberfläche und Zugang)/) && cellNames(checks.de, /Stufe \d|Lücke|unbekannt/), `German: the axes and cells named in German (${JSON.stringify(checks.de?.axes?.[0])}; ${JSON.stringify(checks.de?.cells?.[0])})`],
+    [evidence.length >= 1 && evidence.every((q) => /^(de|en)$/.test(q.lang || "")), `every quote in the evidence carries its language (${JSON.stringify(evidence)})`],
+    [spans.length >= 1 && spans.length >= (checks.report?.quoted || 0) && spans.every((q) => /^(de|en)$/.test(q.lang || "")) && spans.some((q) => q.lang === "de"), `every quote in the report's sources carries its language (${spans.length} quotes in ${checks.report?.quoted} sources; ${JSON.stringify(spans.slice(0, 2))})`]
   ]);
 }
 

@@ -9,7 +9,7 @@ import { icon } from "./icons.js";
 import { tx } from "./text.js";
 import { t, onLang, getLang } from "./i18n/index.js";
 import { renderMarkdown } from "./md.js";
-import { memoMarkdown, reportMarkdown } from "./drafts.js";
+import { memoMarkdown, reportMarkdown, markQuoteLangs } from "./drafts.js";
 import { aiLabel, langTag } from "./ai_label.js";
 
 export function createOutbox(panel, { onCount } = {}) {
@@ -20,12 +20,12 @@ export function createOutbox(panel, { onCount } = {}) {
   const body = h("div", { class: "panel-body outbox-body" });
   panel.append(emptyEl, body);
 
-  function draftCard(kind, markdown, lang, unchecked) {
+  function draftCard(kind, markdown, lang, unchecked, sources = null) {
     const copy = h("button", { class: "vc-button vc-button--secondary vc-button--sm", type: "button" }, icon("copy", 16), t("outbox.copy"));
     const done = h("span", { class: "outbox-copied", role: "status" });
     copy.addEventListener("click", async () => { done.textContent = (await copyText(markdown)) ? t("outbox.copied") : t("outbox.copyFailed"); });
     const md = h("div", { class: "md vc-prose", lang });
-    md.append(renderMarkdown(markdown));
+    md.append(sources ? markQuoteLangs(renderMarkdown(markdown), sources) : renderMarkdown(markdown));
     return h("article", { class: "vc-card outbox-card", dataset: { draft: kind } },
       h("header", { class: "outbox-head" },
         h("span", { class: "vc-tag outbox-kind" }, icon(kind === "memo" ? "memo" : "list", 14), t(`outbox.kind.${kind}`)),
@@ -41,7 +41,7 @@ export function createOutbox(panel, { onCount } = {}) {
     emptyEl.hidden = !!(state.memo || state.report);
     clear(body);
     if (state.memo) body.append(draftCard("memo", memoMarkdown(state.memo), state.memo.lang, state.memo.unchecked));
-    if (state.report) body.append(draftCard("report", reportMarkdown(state.report), state.report.lang, state.report.unchecked));
+    if (state.report) body.append(draftCard("report", reportMarkdown(state.report), state.report.lang, state.report.unchecked, state.report.closing?.sources || []));
     onCount?.((state.memo ? 1 : 0) + (state.report ? 1 : 0));
   }
 
