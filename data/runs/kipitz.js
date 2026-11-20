@@ -603,8 +603,8 @@
        "de": "Sprachmodelle aus der EU nutzen"
       },
       "rationale": {
-       "en": "The sources say KIPITZ uses open-source models, mostly from outside Europe, without naming them. Another administration uses a language model of the French provider Mistral, hosted on the German cloud of StackIT. If the models were made in the EU, the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Die Quellen sagen, dass KIPITZ quelloffene Modelle nutzt, überwiegend von außerhalb Europas, ohne sie zu nennen. Eine andere Verwaltung nutzt das Sprachmodell des französischen Anbieters Mistral, gehostet auf der deutschen Cloud von StackIT. Wären die Modelle in der EU hergestellt, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "The sources say KIPITZ uses open-source models, mostly from outside Europe, without naming them. Another administration uses a language model of a French provider, hosted on a German cloud. If the models were made in the EU, the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Die Quellen sagen, dass KIPITZ quelloffene Modelle nutzt, überwiegend von außerhalb Europas, ohne sie zu nennen. Eine andere Verwaltung nutzt das Sprachmodell eines französischen Anbieters, gehostet auf einer deutschen Cloud. Wären die Modelle in der EU hergestellt, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {

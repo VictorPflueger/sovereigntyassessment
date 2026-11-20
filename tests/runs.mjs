@@ -6,7 +6,8 @@
 //   planted    each rule catches its defect, planted in a copy of a passing pre-run: a missing language,
 //              different placeholders, an audit failure, an unknown fact key, a block without evidence, an
 //              unknown URL, a long quote, a quote missing from research/, a key-like string, a thinking
-//              block; the unchanged copy is the positive control and has no problem
+//              block, a field no quote supports (an exit path, an operator), a lever that names a company;
+//              the unchanged copy is the positive control and has no problem
 // Usage: node tests/runs.mjs [case…]
 import path from "node:path";
 import { readFileSync } from "node:fs";
@@ -59,7 +60,10 @@ if (wanted("planted")) {
     ["a long quote", "long_quote", (d) => { blockStep(d).input.evidence[0].quote = "x".repeat(151); }],
     ["a quote missing from research/", "quote_not_in_research", (d) => { const e = blockStep(d).input.evidence[0]; e.quote = `${e.quote.slice(0, 120)} (reworded)`; }],
     ["a key-like string", "key_like", (d) => { d.steps[firstIndex(d, (s) => s.say)].say.en += " sk-ant-api03-" + "Ab1".repeat(16); }],
-    ["a thinking block", "thinking", (d) => { d.steps.splice(1, 0, { say: { en: "x", de: "x" }, thinking: "private reasoning" }); }]
+    ["a thinking block", "thinking", (d) => { d.steps.splice(1, 0, { say: { en: "x", de: "x" }, thinking: "private reasoning" }); }],
+    ["an exit path no quote supports", "unsupported_field", (d) => { blockStep(d).input.exit = "hard"; }],
+    ["an operator no quote supports", "unsupported_field", (d) => { for (const e of blockStep(d).input.evidence) e.supports = e.supports.filter((f) => f !== "operator"); if (!blockStep(d).input.evidence.some((e) => e.supports.length)) blockStep(d).input.evidence[0].supports = ["tech"]; }],
+    ["a lever that names a company", "lever_names_company", (d) => { const l = d.steps[firstIndex(d, (s) => s.tool === "ui_propose_levers")].input.levers[0]; l.title.en = `${l.title.en} from Apple`; }]
   ];
   // Positive control: the unchanged copy passes.
   const control = await checkRun(structuredClone(base), { id, researchText: research });

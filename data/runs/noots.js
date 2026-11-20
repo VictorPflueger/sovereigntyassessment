@@ -664,8 +664,8 @@
        "de": "Den Technologiestack benennen und aus europäischen oder quelloffenen Produkten bauen"
       },
       "rationale": {
-       "en": "The sources do not name the products of the stack that Dataport prescribes. The federal office's document states the aim of independence from vendors and the use of open source. If the stack were made in the EU, the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Die Quellen nennen die Produkte des Stacks nicht, den Dataport vorgibt. Das Dokument des Bundesverwaltungsamts nennt als Ziel Herstellerunabhängigkeit und Open Source. Wäre der Stack in der EU hergestellt, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "The sources do not name the products of the stack that the operator prescribes. The federal office's document states the aim of independence from vendors and the use of open source. If the stack were made in the EU, the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Die Quellen nennen die Produkte des Stacks nicht, den der Betreiber vorgibt. Das Dokument des Bundesverwaltungsamts nennt als Ziel Herstellerunabhängigkeit und Open Source. Wäre der Stack in der EU hergestellt, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {

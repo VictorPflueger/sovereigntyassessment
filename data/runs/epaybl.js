@@ -680,12 +680,12 @@
      {
       "lever_id": "L1",
       "title": {
-       "en": "Move card payments to Wero once ePayBL 4 supports it",
-       "de": "Kartenzahlungen auf Wero verlagern, sobald ePayBL 4 es unterstützt"
+       "en": "Move card payments to a payment method made and run in the EU, once ePayBL 4 supports one",
+       "de": "Kartenzahlungen auf ein in der EU hergestelltes und betriebenes Zahlverfahren verlagern, sobald ePayBL 4 eines unterstützt"
       },
       "rationale": {
-       "en": "Saxony-Anhalt's slides say the manufacturer is building Wero into ePayBL 4, planned for the fourth quarter of 2026. Wero comes from the European Payments Initiative in Brussels. If card payments moved to Wero, the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Laut den Folien Sachsen-Anhalts baut der Hersteller Wero in ePayBL 4 ein, geplant für das vierte Quartal 2026. Wero kommt von der European Payments Initiative in Brüssel. Liefen die Kartenzahlungen über Wero, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "Saxony-Anhalt's slides say the manufacturer is building a new payment method into ePayBL 4, planned for the fourth quarter of 2026; according to its maker's own announcement, that method comes from a company in Brussels. If card payments moved to such a method, the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Laut den Folien Sachsen-Anhalts baut der Hersteller ein neues Zahlverfahren in ePayBL 4 ein, geplant für das vierte Quartal 2026; nach der eigenen Mitteilung seines Herstellers kommt dieses Verfahren von einem Unternehmen in Brüssel. Liefen die Kartenzahlungen über ein solches Verfahren, läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {

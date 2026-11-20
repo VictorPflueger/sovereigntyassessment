@@ -1,4 +1,4 @@
-/* Pre-run assessment of Deutschland-App (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of Deutschland-App (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/deutschland-app.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "deutschland-app",
  "entry_id": "deutschland-app",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "Deutschland-App",
  "steps": [
@@ -455,7 +455,7 @@
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
        "tech",

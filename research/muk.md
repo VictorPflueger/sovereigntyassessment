@@ -41,9 +41,9 @@ Read on 2026-11-20 (German).
 > die Entwicklung der Berechtigungssteuerung durch Dataport
 
 ### [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us)
-Read on 2026-11-20 (English).
+Read on 2026-11-20 (English); read again in full for the review of version 1.0.0, the fetch tool having cut the quote at 125 characters.
 
-> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office
+> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).
 
 ### [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren | CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html)
 Read on 2026-11-20 (German).

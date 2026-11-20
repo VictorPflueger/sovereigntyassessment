@@ -5,9 +5,9 @@ Online-Ausweis (the online ID), researched on 19 November 2026: the AusweisApp's
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/online-ausweis.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
 ### [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us)
-Read on 2026-11-19 (English).
+Read on 2026-11-20 (English); first read on 2026-11-19, when the quote was cut at 125 characters by the fetch tool, and read again in full for the review of version 1.0.0.
 
-> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office
+> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).
 
 ### [eID Server](https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html)
 Read on 2026-11-19 (English).

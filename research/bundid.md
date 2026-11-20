@@ -1,6 +1,6 @@
 # BundID: research notes
 
-BundID, researched on 19 November 2026: the BundID site and its imprint, the Bundesagentur für Arbeit's guide to signing in, a service partner's reference on the ITZBund's container platform, the AusweisApp's own pages, the App Store listing and Apple's legal pages, and the bundled reference facts on federal IT and app distribution (verified at build time, not repeated here).
+BundID, researched on 19 November 2026: the BundID site and its imprint, the Bundesagentur für Arbeit's guide to signing in, a service partner's reference on the ITZBund's container platform, the AusweisApp's own pages, the App Store listing and Apple's legal pages, and the bundled reference facts on federal IT and app distribution (verified at build time, not repeated here). For the independent review of version 1.0.0, on 20 November 2026: who stewards Kubernetes, the platform's technology (its main repository, the CNCF and the Linux Foundation), and the AusweisApp's sentence read again in full.
 
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/bundid.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
@@ -25,9 +25,9 @@ Read on 2026-11-19 (German).
 > auf welcher das Nutzerkonto Bund betrieben werden
 
 ### [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us)
-Read on 2026-11-19 (English).
+Read on 2026-11-20 (English); first read on 2026-11-19, when the quote was cut at 125 characters by the fetch tool, and read again in full for the review of version 1.0.0.
 
-> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office
+> Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).
 
 ### [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source)
 Read on 2026-11-19 (English).
@@ -50,3 +50,19 @@ Read on 2026-11-19 (English).
 
 > Apple Distribution International Ltd., located at Hollyhill Industrial Estate, Hollyhill, Cork, Republic of Ireland
 > Apple Inc., located at One Apple Park Way, Cupertino, California, United States
+
+### [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes)
+Read on 2026-11-20 (English).
+
+> Kubernetes is hosted by the Cloud Native Computing Foundation (CNCF).
+> Kubernetes, also known as K8s, is an open source system for managing containerized applications across multiple hosts.
+
+### [Who we are](https://cncf.io/about/who-we-are/)
+Read on 2026-11-20 (English).
+
+> CNCF is part of the nonprofit Linux Foundation.
+
+### [Privacy Policy | Linux Foundation](https://linuxfoundation.org/legal/privacy-policy)
+Read on 2026-11-20 (English).
+
+> The Linux Foundation, Attn: Legal Department, 548 Market St, PMB 57274, San Francisco, California 94104-5401, USA.

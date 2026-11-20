@@ -191,7 +191,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://www.bundestag.de/presse/hib/814130-814130",

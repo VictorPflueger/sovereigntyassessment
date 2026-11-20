@@ -195,7 +195,7 @@
     },
     "hosting": "EU",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -262,7 +262,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -321,7 +321,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -379,7 +379,7 @@
     },
     "hosting": "EU",
     "licence": "unknown",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -735,8 +735,8 @@
        "de": "Die SDKs aus einem Verzeichnis in der EU verteilen"
       },
       "rationale": {
-       "en": "The SDK's source code already lives on the FITKO's own GitLab, so a package registry run in Germany is a known path. With it the overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "Der Quellcode des SDK liegt bereits im eigenen GitLab der FITKO; ein Paketverzeichnis mit Betrieb in Deutschland ist daher ein bekannter Weg. Damit läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
+       "en": "The SDK's source code already lives on a code platform its operator runs itself, so a package registry run in Germany is a known path. With it the overall score would be {{fact:whatif.L1.overall}}.",
+       "de": "Der Quellcode des SDK liegt bereits auf einer Code-Plattform, die sein Betreiber selbst betreibt; ein Paketverzeichnis mit Betrieb in Deutschland ist daher ein bekannter Weg. Damit läge der Gesamtwert bei {{fact:whatif.L1.overall}}."
       },
       "changes": [
        {

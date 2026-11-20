@@ -1,4 +1,4 @@
-/* Pre-run assessment of BundID (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of BundID (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/bundid.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "bundid",
  "entry_id": "bundid",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "BundID",
  "steps": [
@@ -156,7 +156,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://id.bund.de/en/",
@@ -185,8 +185,8 @@
   },
   {
    "say": {
-    "en": "Development, security and operations: a reference from a service partner describes the container platform the account runs on.",
-    "de": "Entwicklung, Sicherheit und Betrieb: Eine Referenz eines Dienstleisters beschreibt die Container-Plattform, auf der das Konto läuft."
+    "en": "Development, security and operations: a reference from a service partner describes the container platform the account runs on. It is Kubernetes, so I read who stewards Kubernetes and where.",
+    "de": "Entwicklung, Sicherheit und Betrieb: Eine Referenz eines Dienstleisters beschreibt die Container-Plattform, auf der das Konto läuft. Es ist Kubernetes, also lese ich, wer Kubernetes verantwortet und wo."
    }
   },
   {
@@ -194,6 +194,50 @@
     "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
     "title": "ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)",
     "pdf": true
+   }
+  },
+  {
+   "search": {
+    "query": "Kubernetes \"open source\" project hosted by the Cloud Native Computing Foundation kubernetes.io",
+    "results": [
+     {
+      "url": "https://kubernetes.io/docs",
+      "title": "kubernetes.io"
+     },
+     {
+      "url": "https://github.com/kubernetes/kubernetes",
+      "title": "github.com"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://github.com/kubernetes/kubernetes",
+    "title": "GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management"
+   }
+  },
+  {
+   "search": {
+    "query": "\"CNCF is part of the\" \"Linux Foundation\" cncf.io about",
+    "results": [
+     {
+      "url": "https://cncf.io/about/who-we-are/",
+      "title": "Who we are"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://cncf.io/about/who-we-are/",
+    "title": "Who we are"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://linuxfoundation.org/legal/privacy-policy",
+    "title": "Privacy Policy | Linux Foundation"
    }
   },
   {
@@ -209,14 +253,17 @@
      "de": "Stellt die Dienste des Kontos bereit und betreibt sie."
     },
     "note": {
-     "en": "The ITZBund provides the platform together with two service partners, according to one of them.",
-     "de": "Das ITZBund stellt die Plattform laut einem der beiden Dienstleister gemeinsam mit diesen bereit."
+     "en": "Kubernetes is open source, hosted by the Cloud Native Computing Foundation, part of the Linux Foundation in San Francisco. The ITZBund provides the platform together with two service partners, according to one of them.",
+     "de": "Kubernetes ist quelloffen und wird von der Cloud Native Computing Foundation getragen, die zur Linux Foundation in San Francisco gehört. Das ITZBund stellt die Plattform laut einem der beiden Dienstleister gemeinsam mit ihnen bereit."
     },
     "criticality": "critical",
     "tech": {
-     "name": "Informationstechnikzentrum Bund (ITZBund)",
-     "country": "DE",
-     "parent": null
+     "name": "Kubernetes (a CNCF project)",
+     "country": "UNKNOWN",
+     "parent": {
+      "name": "The Linux Foundation",
+      "country": "US"
+     }
     },
     "operator": {
      "name": "Informationstechnikzentrum Bund (ITZBund)",
@@ -224,16 +271,55 @@
      "parent": null
     },
     "hosting": "UNKNOWN",
-    "licence": "unknown",
-    "exit": "possible",
+    "licence": "open_source",
+    "exit": "unknown",
     "evidence": [
+     {
+      "url": "https://github.com/kubernetes/kubernetes",
+      "title": "GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management",
+      "quote": "Kubernetes is hosted by the Cloud Native Computing Foundation (CNCF).",
+      "lang": "en",
+      "supports": [
+       "tech"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://github.com/kubernetes/kubernetes",
+      "title": "GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management",
+      "quote": "Kubernetes, also known as K8s, is an open source system for managing containerized applications across multiple hosts.",
+      "lang": "en",
+      "supports": [
+       "licence"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://cncf.io/about/who-we-are/",
+      "title": "Who we are",
+      "quote": "CNCF is part of the nonprofit Linux Foundation.",
+      "lang": "en",
+      "supports": [
+       "tech.parent"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://linuxfoundation.org/legal/privacy-policy",
+      "title": "Privacy Policy | Linux Foundation",
+      "quote": "The Linux Foundation, Attn: Legal Department, 548 Market St, PMB 57274, San Francisco, California 94104-5401, USA.",
+      "lang": "en",
+      "supports": [
+       "tech.parent"
+      ],
+      "verified": true
+     },
      {
       "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
       "title": "ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)",
       "quote": "Das ITZBund stellt im Auftrag des BMI gemeinsam mit SVA und ARWINET eine KubernetesPlattform zur Verfügung",
       "lang": "de",
       "supports": [
-       "tech",
        "operator"
       ],
       "verified": true
@@ -310,12 +396,12 @@
     },
     "hosting": "UNKNOWN",
     "licence": "open_source",
-    "exit": "possible",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
       "title": "AusweisApp: About us",
-      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office",
+      "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
        "tech",
@@ -378,7 +464,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://id.bund.de/en/",
@@ -478,7 +564,7 @@
     },
     "hosting": "UNKNOWN",
     "licence": "unknown",
-    "exit": "hard",
+    "exit": "unknown",
     "evidence": [
      {
       "url": "https://id.bund.de/en/",
@@ -494,16 +580,6 @@
       "url": "https://id.bund.de/en/",
       "title": "BundID",
       "quote": "Informationstechnikzentrum Bund (ITZBund)",
-      "lang": "de",
-      "supports": [
-       "operator"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://id.bund.de/en/",
-      "title": "BundID",
-      "quote": "Ihr aktuell verwendeter Webbrowser unterstützt nicht alle Funktionen der BundID.",
       "lang": "de",
       "supports": [
        "operator"
@@ -556,16 +632,6 @@
       "supports": [
        "tech",
        "licence"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://apps.apple.com/us/app/id948660805",
-      "title": "AusweisApp Bund App - App Store",
-      "quote": "on the App Store",
-      "lang": "en",
-      "supports": [
-       "operator"
       ],
       "verified": true
      },
@@ -632,9 +698,7 @@
     "changes": [
      {
       "block_id": "B-06",
-      "made_in": "EU",
-      "run_by": "EU",
-      "hosting": "EU"
+      "run_by": "EU"
      }
     ]
    }
@@ -646,19 +710,17 @@
      {
       "lever_id": "L1",
       "title": {
-       "en": "Also offer the AusweisApp through an app marketplace run in the EU",
-       "de": "Die AusweisApp auch über einen App-Marktplatz mit Betrieb in der EU anbieten"
+       "en": "Distribute the AusweisApp on iPhones through an app marketplace run in the EU",
+       "de": "Die AusweisApp für iPhones über einen in der EU betriebenen App-Marktplatz vertreiben"
       },
       "rationale": {
-       "en": "In the EU, iPhone users can install alternative app marketplaces, so the app need not depend on one store. The overall score would be {{fact:whatif.L1.overall}}.",
-       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren; die App muss also nicht von einem Store abhängen. Der Gesamtwert läge bei {{fact:whatif.L1.overall}}."
+       "en": "In the EU, iPhone users can install alternative app marketplaces. If the AusweisApp reached iPhones through a marketplace run in the EU rather than the phone maker's store, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on the phone maker's platform.",
+       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte Die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
       },
       "changes": [
        {
         "block_id": "B-06",
-        "made_in": "EU",
-        "run_by": "EU",
-        "hosting": "EU"
+        "run_by": "EU"
        }
       ],
       "evidence": [
@@ -683,8 +745,8 @@
   {
    "report": {
     "findings": {
-     "en": "# BundID: findings\n\nThe BundID is the federal user account for online administrative services. According to its imprint, the site is offered by the BMDS, implemented by the AKDB and run by the ITZBund. Its overall score is {{fact:score.overall}}, indicative.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): the account runs at the ITZBund, whose data centres carry the Federation's consolidated IT.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): a service partner's reference names a Kubernetes platform at the ITZBund on which the account runs.\n- **Platform**: no source read names a platform the account relies on.\n- **Base services** ({{fact:score.layer.base_service}}): signing in with the online ID uses the AusweisApp, developed by Governikus on behalf of the BSI and published as open source.\n- **Applications** ({{fact:score.layer.applications}}): the account software comes from the AKDB.\n- **Interface and access** ({{fact:score.layer.access}}): people sign in in the browser; on iPhones the AusweisApp comes from the App Store, which Apple Distribution International operates for European users as part of the Apple group.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. Evidence coverage is {{fact:coverage}}; exclusive non-EU control of critical blocks is {{fact:share.exclusive_non_eu}}. Where the data centres are is not stated in the sources read.",
-     "de": "# BundID: Befunde\n\nDie BundID ist das Nutzerkonto des Bundes für Online-Verwaltungsleistungen. Laut Impressum ist die Seite ein Angebot des BMDS, umgesetzt von der AKDB und betrieben vom ITZBund. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Das Konto läuft beim ITZBund, in dessen Rechenzentren die konsolidierte IT des Bundes betrieben wird.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die Referenz eines Dienstleisters nennt eine Kubernetes-Plattform beim ITZBund, auf der das Konto läuft.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf die das Konto angewiesen ist.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Anmeldung mit dem Online-Ausweis nutzt die AusweisApp, die Governikus im Auftrag des BSI entwickelt und als Open Source veröffentlicht.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die Software des Kontos stammt von der AKDB.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Anmeldung läuft im Browser; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die ausschließliche Kontrolle kritischer Bausteine außerhalb der EU beträgt {{fact:share.exclusive_non_eu}}. Wo die Rechenzentren stehen, sagen die gelesenen Quellen nicht."
+     "en": "# BundID: findings\n\nThe BundID is the federal user account for online administrative services. According to its imprint, the site is offered by the BMDS, implemented by the AKDB and run by the ITZBund. Its overall score is {{fact:score.overall}}, indicative.\n\n- **Infrastructure** ({{fact:score.layer.infrastructure}}): the account runs at the ITZBund, whose data centres carry the Federation's consolidated IT.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): a service partner's reference names a Kubernetes platform at the ITZBund on which the account runs. Kubernetes is open source and hosted by the Cloud Native Computing Foundation, part of the US-based Linux Foundation, so the platform's technology counts as made in the US.\n- **Platform**: no source read names a platform the account relies on.\n- **Base services** ({{fact:score.layer.base_service}}): signing in with the online ID uses the AusweisApp, developed by Governikus on behalf of the BSI and published as open source.\n- **Applications** ({{fact:score.layer.applications}}): the account software comes from the AKDB.\n- **Interface and access** ({{fact:score.layer.access}}): people sign in in the browser; on iPhones the AusweisApp comes from the App Store, which Apple Distribution International operates for European users as part of the Apple group.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. Evidence coverage is {{fact:coverage}}; exclusive non-EU control of critical blocks is {{fact:share.exclusive_non_eu}}. Where the data centres are is not stated in the sources read.",
+     "de": "# BundID: Befunde\n\nDie BundID ist das Nutzerkonto des Bundes für Online-Verwaltungsleistungen. Laut Impressum ist die Seite ein Angebot des BMDS, umgesetzt von der AKDB und betrieben vom ITZBund. Der Gesamtwert ist {{fact:score.overall}}, indikativ.\n\n- **Infrastruktur** ({{fact:score.layer.infrastructure}}): Das Konto läuft beim ITZBund, in dessen Rechenzentren die konsolidierte IT des Bundes betrieben wird.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die Referenz eines Dienstleisters nennt eine Kubernetes-Plattform beim ITZBund, auf der das Konto läuft. Kubernetes ist quelloffen und wird von der Cloud Native Computing Foundation getragen, die zur Linux Foundation mit Sitz in den USA gehört; die Technik der Plattform zählt daher als in den USA hergestellt.\n- **Plattform**: Keine gelesene Quelle nennt eine Plattform, auf die das Konto angewiesen ist.\n- **Basisdienste** ({{fact:score.layer.base_service}}): Die Anmeldung mit dem Online-Ausweis nutzt die AusweisApp, die Governikus im Auftrag des BSI entwickelt und als Open Source veröffentlicht.\n- **Anwendungen** ({{fact:score.layer.applications}}): Die Software des Kontos stammt von der AKDB.\n- **Oberfläche und Zugang** ({{fact:score.layer.access}}): Die Anmeldung läuft im Browser; auf iPhones kommt die AusweisApp aus dem App Store, den für europäische Nutzende Apple Distribution International als Teil des Apple-Konzerns betreibt.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Die Belegabdeckung beträgt {{fact:coverage}}; die ausschließliche Kontrolle kritischer Bausteine außerhalb der EU beträgt {{fact:share.exclusive_non_eu}}. Wo die Rechenzentren stehen, sagen die gelesenen Quellen nicht."
     }
    }
   }

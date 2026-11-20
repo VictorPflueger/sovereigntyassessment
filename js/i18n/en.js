@@ -797,6 +797,7 @@ export default Object.freeze({
   "method.classes.parent": "A provider that belongs to a group counts by its ultimate parent's country, so a German subsidiary of a US company counts as US.",
   "method.classes.public": "A German public body or public IT provider counts as DE.",
   "method.classes.steward": "An open-source project counts by its steward, the foundation or company that controls the main repository; without an identifiable steward it is UNKNOWN.",
+  "method.classes.product": "A block built from a named product, such as a container platform built from Kubernetes, is made by that product's maker, for open source its steward; whoever builds it from the product and runs it for the service is its operator.",
   "method.classes.sides": "Made in is the technology provider's origin, Run by the operator's.",
   "method.evidence.title": "Evidence",
   "method.evidence.counts": "A classification counts only with a source: a page this run's web search or web fetch returned, or one the bundled catalogue or reference facts list, with its title, a verbatim quote of at most 150 characters, the date it was read and the fields it supports.",

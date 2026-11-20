@@ -41,3 +41,6 @@ Read on 2026-11-20 (English).
 Read on 2026-11-20 (English).
 
 > Google LLC organized under the laws of the State of Delaware, USA, and operating under the laws of the USA
+
+### [eID: German version of the EUDI wallet with cloud-based key storage](https://heise.de/-10417676)
+Read on 2026-11-20 (English). The pre-run cites no quote from it: the planned cloud-based key storage it reports is recorded as a layer without evidence.

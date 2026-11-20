@@ -86,22 +86,25 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID and the Deutschland-App were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full, and BundID's platform names Kubernetes's steward from three newly read sources. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
 
 ### BundID (`data/runs/bundid.js`)
 
-8 sources with 15 quotes; the reference facts on the Federation's IT and app distribution.
+11 sources with 19 quotes; the reference facts on the Federation's IT and app distribution.
 
 | Source | Language | Read |
 |---|---|---|
 | [BundID](https://id.bund.de/en/) | German | 2026-11-19 |
 | [Die BundID: sicherer Zugang zu allen eServices \| Bundesagentur für Arbeit](https://www.arbeitsagentur.de/bundid) | German | 2026-11-19 |
 | [ITZBund stärkt Digitalisierung und Zukunftsfähigkeit (SVA, Referenz)](https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf) | German | 2026-11-19 |
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-19 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
 | [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English | 2026-11-19 |
 | [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
 | [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
 | [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-19 |
+| [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes) | English | 2026-11-20 |
+| [Who we are](https://cncf.io/about/who-we-are/) | English | 2026-11-20 |
+| [Privacy Policy \| Linux Foundation](https://linuxfoundation.org/legal/privacy-policy) | English | 2026-11-20 |
 
 ### Deutschland-App (`data/runs/deutschland-app.js`)
 
@@ -114,7 +117,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 | [SAP and Telekom develop central citizen app for Germany (heise online)](https://heise.de/-11247830) | English | 2026-11-19 |
 | [Verwaltungsdigitalisierung: Vieles unklar bei der Deutschland-App (netzpolitik.org)](https://netzpolitik.org/2026/verwaltungsdigitalisierung-vieles-unklar-bei-der-deutschland-app/) | German | 2026-11-19 |
 | [SAP: Erklärung zur Unternehmensführung 2025](https://ir-api.eqs.com//media/document/456cd775-917f-4e55-947e-2af8368267db/assets/sap-2025-ezu.pdf) | German | 2026-11-19 |
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-19 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
 | [About Wire](https://wire.com/en/about) | English | 2026-11-19 |
 | [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-19 |
 
@@ -124,7 +127,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 | Source | Language | Read |
 |---|---|---|
-| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-19 |
+| [AusweisApp: About us](https://www.ausweisapp.bund.de/en/about-us) | English | 2026-11-20 |
 | [eID Server](https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html) | English | 2026-11-19 |
 | [BT-Drucksache 20/13075: Evolutionslösung für den elektronischen Personalausweis – eID](https://dserver.bundestag.de/btd/20/130/2013075.pdf) | German | 2026-11-19 |
 | [AusweisApp: Open Source Software](https://www.ausweisapp.bund.de/en/open-source) | English | 2026-11-19 |
@@ -177,7 +180,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 |---|---|---|
 | [§ 9a EGovG - Einzelnorm](https://www.gesetze-im-internet.de/egovg/__9a.html) | German | 2026-11-19 |
 | [Umsetzung des Onlinezugangsgesetzes (hib 1402/2020)](https://www.bundestag.de/presse/hib/814130-814130) | German | 2026-11-19 |
-| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-19 |
 | [BundID](https://id.bund.de/en/) | German | 2026-11-19 |
 | [Deutschland-Stack: Wohin geht die Reise? (BMDS, Fachkongress des IT-Planungsrats)](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-19 |
 
@@ -252,11 +255,12 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### This prototype, the self-assessment (`data/runs/sovereignty-assessment.js`)
 
-11 sources with 23 quotes.
+12 sources with 23 quotes; the README is cited both on the repository's front page and at the commit that added the maker's sentence.
 
 | Source | Language | Read |
 |---|---|---|
 | [GitHub - VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment) | English | 2026-11-20 |
+| [sovereigntyassessment/README.md at 67d20c3 · VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment/blob/67d20c38a6e57c565cf4c45180788d2bb059caf6/README.md) | English | 2026-11-20 |
 | [About GitHub Pages](https://docs.github.com/en/articles/about-github-pages) | English | 2026-11-20 |
 | [GitHub General Privacy Statement - GitHub Docs](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement) | English | 2026-11-20 |
 | [Microsoft to acquire GitHub for $7.5 billion](https://news.microsoft.com/2018/06/04/microsoft-to-acquire-github-for-7-5-billion/) | English | 2026-11-20 |

@@ -797,6 +797,7 @@ export default Object.freeze({
   "method.classes.parent": "Ein Anbieter, der zu einer Gruppe gehört, zählt nach dem Land seiner obersten Muttergesellschaft; eine deutsche Tochter eines US-Unternehmens zählt also als US.",
   "method.classes.public": "Eine deutsche Behörde oder ein öffentlicher IT-Dienstleister zählt als DE.",
   "method.classes.steward": "Ein Open-Source-Projekt zählt nach seinem Träger, der Stiftung oder dem Unternehmen, das das Hauptrepositorium kontrolliert; ohne erkennbaren Träger ist es UNKNOWN.",
+  "method.classes.product": "Ein Baustein, der aus einem benannten Produkt gebaut ist, etwa eine Container-Plattform aus Kubernetes, wird vom Hersteller dieses Produkts hergestellt, bei Open Source von seinem Träger; wer ihn aus dem Produkt baut und für den Dienst betreibt, ist sein Betreiber.",
   "method.classes.sides": "„Hergestellt in“ ist die Herkunft des Technologieanbieters, „Betrieben in“ die des Betreibers.",
   "method.evidence.title": "Belege",
   "method.evidence.counts": "Eine Einordnung zählt nur mit Quelle: einer Seite, die die Websuche oder der Webabruf dieses Laufs geliefert hat, oder einer, die der mitgelieferte Katalog oder die Referenzfakten nennen, mit Titel, einem wörtlichen Zitat von höchstens 150 Zeichen, dem Lesedatum und den Feldern, die sie stützt.",

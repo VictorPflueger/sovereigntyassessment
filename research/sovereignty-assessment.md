@@ -10,10 +10,15 @@ Read on 2026-11-20 (English).
 > How digitally sovereign is a German public service?
 > The prototype is static HTML, CSS and JavaScript modules: no build step, no backend, no dependency.
 > Live mode talks only to the Claude API; web search and web fetch run on Anthropic's servers.
-> Built by Victor Pflüger in Germany.
 > GitHub Actions runs them on every push and pull request (Node.js 22, Ubuntu 24.04, Playwright 1.56.0).
 > Design system: Vici.
 > Use a current Chrome or Edge.
+
+
+### [sovereigntyassessment/README.md at 67d20c3 · VictorPflueger/sovereigntyassessment](https://github.com/VictorPflueger/sovereigntyassessment/blob/67d20c38a6e57c565cf4c45180788d2bb059caf6/README.md)
+Read on 2026-11-20 (English), through the GitHub API: the README at the commit that added the sentence, on the branch of version 1.0.0. Until that branch is merged, the repository's front page shows the README of main, without it (the review's finding R-04).
+
+> Built by Victor Pflüger in Germany.
 
 ### [About GitHub Pages](https://docs.github.com/en/articles/about-github-pages)
 Read on 2026-11-20 (English).
