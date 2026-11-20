@@ -48,3 +48,8 @@ Read on 2026-11-20 (German).
 Read on 2026-11-20 (German).
 
 > Lösungen werden primär am europäischen Markt eingekauft oder als Open Source entwickelt.
+
+### [Privacy | Shopware](https://www.shopware.com/en/privacy/website/)
+Read on 2026-11-20 (English), for the independent review of version 1.0.0: the maker's own address, which the t3n report gives only as Schöppingen.
+
+> shopware AG Ebbinghoff 10 D-48624 Schöppingen Germany

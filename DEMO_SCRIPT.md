@@ -9,16 +9,16 @@ Version 1.0.0, 20 November 2026. A five-minute demonstration in Simulation, two 
 3. Open **Diagnostics** and click **Run all tests**. Every row should pass: the Anthropic API reachable from this network, the method's golden cases recomputed here, both languages, the key and privacy rules, the catalogue and the reference facts.
 4. For Live mode, have a dedicated API key ready in a workspace with a low monthly spend limit. Paste it only when Start agent asks for it; click **Forget key** when you finish on a shared computer.
 5. Close the intro window once on the presentation laptop, so it does not open by itself during the talk ("How it works" brings it back).
-6. Leave the replay speed at ×1. BundID reaches the review in about 40 seconds at ×1 (measured on 20 November 2026 at 1920×1080), which leaves time to talk over the console in the minute the research takes; ×2 halves that, ×4 suits a three-minute slot.
+6. Leave the replay speed at ×1. BundID reaches the review in 44 seconds at ×1 (measured in three plays on 20 November 2026 at 1920×1080), which leaves time to talk over the console in the minute the research takes; ×2 halves that, ×4 suits a three-minute slot.
 
 ## The five minutes, in Simulation
 
 1. **The question (30 seconds).** "How sovereign is a public service, layer by layer? Here are sixteen German base services and platforms, each with its sources, and this prototype itself." Point at the play sign: every entry carries a pre-run, the prototype too.
 2. **Start (30 seconds).** Choose **BundID**, click **Start agent**, then **Simulation**. "This replays a run recorded from public sources on 20 November 2026; it says so on the tape, and it calls nothing."
-3. **Research (one minute).** The console narrates: the imprint, the data centres, the online ID, the app store. Open one step's details to show a quote and its source. "The model may not write a number. Every figure you see is computed in code; the model can only point at it."
+3. **Research (one minute).** The console narrates: the imprint, the data centres, the online ID, the app store. Open the **Building blocks** tab and a block's evidence to show a quote, its source and the day it was read, in the audience's language. A step's details in the console hold the call's raw record, in the tools' English field names, for the technical questions. "The model may not write a number. Every figure you see is computed in code; the model can only point at it."
 4. **The map (one minute).** The spider diagram fills in by layer; the dashed axis is a layer without evidence, not a zero. Switch to **By building block** and back, and show the honeycomb: the red cell is the AusweisApp's distribution through the App Store, made and run in the US.
 5. **Your review (one minute).** The Review tab opens by itself, beside the map, so the room sees the blocks you are judging. Correct a block to show that a person can overrule the agent with a reason, and that the score follows at once; or confirm.
-6. **The lever (one minute).** The levers are priced on a copy: "offer the app through a marketplace run in the EU" lifts the score, and the assessment itself does not change. Choose it, **Approve**, and the **Outbox** opens: the memo and the report are drafts, and nothing is sent. **Hide** brings the console back.
+6. **The lever (one minute).** The levers are priced on a copy: "Distribute the AusweisApp on iPhones through an app marketplace run in the EU" lifts the score, while the app still runs on the phone maker's platform, and the assessment itself does not change. Choose it, **Approve**, and the **Outbox** opens: the memo and the report are drafts, and nothing is sent. **Hide** brings the console back.
 
 ## Two more minutes: Compare and the Portfolio
 

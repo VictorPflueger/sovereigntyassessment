@@ -19,8 +19,12 @@ import { renderTables } from "./datatable.js";
 
 /** True when an as-of date is older than the staleness limit (brief §6.6: "Check for updates"). */
 export function isStale(asOf, today = appToday()) {
-  const d = new Date(`${asOf}T12:00:00`);
-  return !Number.isNaN(d.getTime()) && (today.getTime() - d.getTime()) / 86400000 > UI.staleDays;
+  // Whole calendar days, so a change to or from summer time moves nothing.
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(asOf || ""));
+  if (!m) return false;
+  const then = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const now = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  return (now - then) / 86400000 > UI.staleDays;
 }
 
 /**

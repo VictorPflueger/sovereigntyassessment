@@ -14,7 +14,10 @@
 //              the block view, values equal to the engine's, dashed axes where there is no score; the
 //              Made-in and Run-by mix beside it with the engine's counts; the table with the same numbers
 //   review     a correction needs a reason; two corrections recompute and are logged, the block marked;
-//              Confirm resolves; the report lists every correction; in a second run Skip resolves too
+//              Confirm resolves; the report lists every correction; in a second run, in German, the form
+//              shows an unknown maker as "unbekannt" with an empty country and changes nothing applied
+//              unchanged, the codes are spelled out, a tool call's raw record is labelled in German and
+//              marked as English, and Skip resolves too
 //   levers     at most three levers plus Keep as is; Approve needs a choice; a what-if never changes the
 //              assessment; the memo lands in the Outbox with "Draft. Nothing is sent."
 // Every case fails on a page error, a console error, a policy violation or any request to another host
@@ -381,11 +384,43 @@ if (wanted("review")) {
   try {
     await startSim(t2.page, "fit-connect");
     await toReview(t2.page);
+    // The German form shows an unknown maker in German, not as "unknown"/"UNKNOWN", and the codes are
+    // spelled out where the person reads them (the review's R-27). Applied unchanged, it changes nothing.
+    checks2.key = await text(t2.page, ".review-key");
+    const unk = await t2.page.$$eval(".review-block", (els) => els.find((e) => /^UNB·/.test(e.querySelector(".review-codes")?.textContent.trim() || ""))?.dataset.block || null);
+    checks2.unknownBlock = unk;
+    if (unk) {
+      await t2.page.click(`.review-block[data-block="${unk}"] .review-correct`);
+      const form = `.review-form[data-block="${unk}"]`;
+      await t2.page.waitForSelector(form);
+      checks2.form = await t2.page.$eval(form, (f) => ({
+        name: f.querySelector('input[name="tech.name"]').value,
+        country: f.querySelector('input[name="tech.country"]').value,
+        placeholder: f.querySelector('input[name="tech.country"]').placeholder
+      }));
+      await t2.page.fill(`${form} textarea[name="reason"]`, "Nur geöffnet.");
+      await t2.page.click(`${form} .review-apply`);
+      checks2.unchanged = await text(t2.page, `${form} .review-msg`);
+      // An empty name is refused with a message that says what a party needs.
+      await t2.page.fill(`${form} input[name="tech.name"]`, "");
+      await t2.page.click(`${form} .review-apply`);
+      checks2.noName = await text(t2.page, `${form} .review-msg`);
+      await t2.page.click(`${form} .vc-button--ghost`);
+    }
     await t2.page.click("#btn-review-skip");
     checks2.done = await text(t2.page, ".review-done");
     await chooseLever(t2.page, "keep");
     await waitState(t2.page, TERMINAL);
     checks2.state = await t2.page.evaluate(() => window.__getState().runState);
+    // Hide brings the console back. A step's details hold the raw record under a German line that says
+    // what it is; the record itself is marked as English (the review's R-21).
+    await t2.page.click(".drawer-toggle");
+    await t2.page.click(".result-toggle");
+    checks2.raw = await t2.page.$eval(".result[data-open='true'] .result-body", (el) => ({
+      note: el.querySelector(".result-note")?.textContent.trim() || null,
+      lang: el.querySelector(".result-json")?.getAttribute("lang") || null,
+      json: (() => { try { return Object.keys(JSON.parse(el.querySelector(".result-json")?.textContent || "")).join(); } catch { return null; } })()
+    })).catch(() => null);
     await t2.page.click("#tab-outbox");
     await t2.page.waitForSelector('.outbox-card[data-draft="report"]');
     checks2.report = await t2.page.$eval('.outbox-card[data-draft="report"] .md', (el) => el.innerText).catch(() => "");
@@ -407,7 +442,11 @@ if (wanted("review")) {
     [/Corrections by the reviewer/.test(checks.report || "") && /Card payments move to Wero next quarter\./.test(checks.report || "") && /PayPal confirmed hosting in the EU\./.test(checks.report || ""), "the report lists every correction"],
     [JSON.stringify(checks.audit) === JSON.stringify(["correct", "correct", "confirm"]), `the decisions on the bus (${JSON.stringify(checks.audit)})`],
     [checks2.done === "Sie haben die Prüfung übersprungen (0 Korrekturen). Die Befunde sind jetzt festgeschrieben." && checks2.state === "done", `in a second run, in German, Skip resolves and the run completes (${checks2.done}; ${checks2.state})`],
-    [/Die prüfende Person hat die Prüfung übersprungen\./.test(checks2.report || ""), "and its report says the review was skipped"]
+    [/Die prüfende Person hat die Prüfung übersprungen\./.test(checks2.report || ""), "and its report says the review was skipped"],
+    [/^Codes, hergestellt in · betrieben in: DE Deutschland, EU anderer EU-Staat, US USA, CN China, AND anderes Land, UNB unbekannt\.$/.test(checks2.key || "") && !!checks2.unknownBlock, `the German review spells out the codes (${checks2.key}; ${checks2.unknownBlock})`],
+    [checks2.form?.name === "unbekannt" && checks2.form.country === "" && checks2.form.placeholder === "unbekannt", `an unknown maker reads "unbekannt", its country an empty field that says so (${JSON.stringify(checks2.form)})`],
+    [/^Das Rohprotokoll des Aufrufs: /.test(checks2.raw?.note || "") && checks2.raw.lang === "en" && checks2.raw.json === "input,result", `a step's raw record is labelled in German and marked as English (${JSON.stringify(checks2.raw)})`],
+    [checks2.unchanged === "Nichts geändert: Ändern Sie ein Feld oder brechen Sie ab." && /^Anbieter und Betreiber brauchen je einen Namen\./.test(checks2.noName || ""), `applied unchanged it changes nothing, and an empty name is refused (${checks2.unchanged}; ${checks2.noName})`]
   ]);
 }
 
@@ -428,6 +467,8 @@ if (wanted("levers")) {
     await page.click("#btn-approve-lever", { force: true }).catch(() => {});
     checks.decisionsBeforeChoice = await page.evaluate(() => window.__ev.filter((e) => e.type === "lever_decision").length);
     checks.whatIf = await page.$eval('.lever-card[data-lever="L1"] [data-fact="whatif.L1.overall"]', (el) => el.textContent.trim());
+    // Both scores on the cards say "indicative" (the review's finding R-28).
+    checks.scoreLabels = await page.$$eval('.lever-card[data-lever="L1"] dt, .lever-card[data-lever="keep"] dt', (els) => els.map((e) => e.textContent.trim()));
     await page.click('.lever-card[data-lever="L1"] .lever-id');
     checks.approveEnabled = await page.$eval("#btn-approve-lever", (b) => !b.disabled);
     checks.tileWhileChoosing = await text(page, "#kpi-overall-value");
@@ -445,6 +486,7 @@ if (wanted("levers")) {
   await finish("levers: at most three plus Keep as is, Approve needs a choice, a what-if never changes the assessment, the memo is a draft", t, checks, [
     [Array.isArray(checks.cards) && checks.cards.length >= 2 && checks.cards.length <= 4 && checks.cards.filter((c) => c === "keep").length === 1 && checks.cards[checks.cards.length - 1] === "keep", `at most three levers plus Keep as is (${JSON.stringify(checks.cards)})`],
     [checks.approveDisabled === true && checks.decisionsBeforeChoice === 0 && checks.approveEnabled === true, "Approve needs a choice"],
+    [checks.scoreLabels?.includes("Overall score with the lever, indicative") && checks.scoreLabels.includes("Overall score now, indicative"), `the cards' scores say "indicative" (${JSON.stringify(checks.scoreLabels)})`],
     [close9(fin.overall, at.overall) && close9(fin.published, at.published) && checks.tileWhileChoosing === at.tileExpected && fin.tile === at.tileExpected, `the what-if leaves the assessment unchanged (overall ${at.overall} before and ${fin.overall} after; what-if ${checks.whatIf})`],
     [checks.memo?.note === "Draft. Nothing is sent." && /Decision: lever L1/.test(checks.memo.text) && new RegExp(`with the lever`).test(checks.memo.text), "the memo for L1 lands in the Outbox as a draft, with the what-if figure"]
   ]);

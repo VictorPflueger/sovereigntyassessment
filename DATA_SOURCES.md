@@ -86,7 +86,7 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID and the Deutschland-App were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full, and BundID's platform names Kubernetes's steward from three newly read sources. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg; ePayBL and Bundesportal keep 19 November 2026. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
 
 ### BundID (`data/runs/bundid.js`)
 
@@ -141,13 +141,14 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### FIT-Connect (`data/runs/fit-connect.js`)
 
-8 sources with 13 quotes.
+9 sources with 15 quotes.
 
 | Source | Language | Read |
 |---|---|---|
 | [Einführung in FIT-Connect \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/intro/) | German | 2026-11-19 |
 | [FAQ \| FIT-Connect](https://docs.fitko.de/fit-connect/docs/faq/) | German | 2026-11-19 |
 | [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German | 2026-11-19 |
+| [Dataport – Hamburgs zentraler IT-Dienstleister](https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538) | German | 2026-11-20 |
 | [Global Access Internet Services GmbH (connect professional, Anbieterkompass)](https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html) | German | 2026-11-19 |
 | [Maven Central: dev.fitko.fitconnect:sdk-client](https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client) | English | 2026-11-19 |
 | [FIT-Connect Onepager (FITKO)](https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf) | German | 2026-11-19 |
@@ -286,7 +287,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 
 ### Marktplatz Deutschland Digital (MDD) (`data/runs/marktplatz-deutschland-digital.js`)
 
-8 sources with 13 quotes.
+9 sources with 14 quotes.
 
 | Source | Language | Read |
 |---|---|---|
@@ -298,6 +299,7 @@ Every one of the seventeen catalogue entries ships with a pre-run for Simulation
 | [Sechs Bundesländer starten Open-Source-Bildungsplattform \| ChannelPartner](https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html) | German | 2026-11-20 |
 | [Shopware 6: Vom klassischen Shopsystem zur E-Commerce-Plattform](https://t3n.de/news/shopware-6-version-1165877/) | German | 2026-11-20 |
 | [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+| [Privacy \| Shopware](https://www.shopware.com/en/privacy/website/) | English | 2026-11-20 |
 
 ### ZBDS (central payment component) (`data/runs/zbds.js`)
 

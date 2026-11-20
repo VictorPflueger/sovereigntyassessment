@@ -228,7 +228,8 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   if (shortBox) labels = labels.map((l, i) => (statusLines[i] ? [l[0], l[l.length - 1]] : [l[0]]));
   if (box && box.w > 0 && !shortBox) {
     const room = (Math.max(320, Math.round(box.w)) - 2 * 60) / 2 - (kind === "layer" ? 22 : 16) - 8;
-    const fit = Math.max(8, Math.floor(room / (CHAR_PX[kind] || CHAR_PX.layer)));
+    // The block view's names wrap at no more than 24 characters: narrower columns leave the web its room.
+    const fit = Math.min(kind === "block" ? 24 : Infinity, Math.max(8, Math.floor(room / (CHAR_PX[kind] || CHAR_PX.layer))));
     labels = labels.map((l, i) => {
       // The status line of a dashed axis wraps on its own, after the name.
       if (!statusLines[i]) return fitLabel(l, fit, kind);
@@ -312,24 +313,57 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     rings.append(svg("polygon", { class: f === 1 ? "sp-ring sp-ring--outer" : "sp-ring", points: pts.join(" ") }));
   }
   // Where each value stands: across its axis from the marker, by valueOffset. In the block view a value in
-  // the outer half moves inward along its axis instead, so no value reaches beyond the web, where the
+  // the outer quarter moves inward along its axis instead, so no value reaches beyond the web, where the
   // block view's labels stand. Each with its box (the text's box and 2 px of halo).
   const valueFs = big && !tight ? 17 : 13;
-  const placeValue = (i, value, text, s, side) => {
-    const f = Math.max(0, Math.min(100, value)) / 100;
+  const meets = (p, q) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
+  // A value at angle phi from its marker: its text's anchor point and its box (with 2 px of halo).
+  const valueAt = (i, f, text, s, phi, extra = 0) => {
     const [x, y] = axisPoint(i, n, f, geo);
     const a = axisAngle(i, n);
-    const phi = kind === "block" && f >= 0.5 ? a + Math.PI : a + side * (Math.PI / 2);
-    const off = valueOffset(a, phi, text, s);
+    const off = valueOffset(a, phi, text, s) + extra;
     const tx = x + Math.cos(phi) * off + Math.cos(a) * 4;
     const ty = y + Math.sin(phi) * off + Math.sin(a) * 4 + 5;
     const hw = String(text).length * 0.335 * valueFs + 2;
     return { x, y, tx, ty, box: { l: tx - hw, r: tx + hw, t: ty - 0.94 * valueFs - 2, b: ty + 0.24 * valueFs + 2 } };
   };
-  const firstValues = showValues ? axes.map((ax, i) => (ax.value === null || ax.value === undefined ? null : placeValue(i, ax.value, ax.valueText, big ? 8 : 6.5, 1))) : [];
+  // Inside the web's circle: where the block view's values must stay, its labels standing beyond.
+  const insideWeb = (b) => [[b.l, b.t], [b.r, b.t], [b.l, b.b], [b.r, b.b]].every(([px, py]) => Math.hypot(px - geo.cx, py - geo.cy) <= geo.r + 2);
+  /**
+   * Places one series' values, the most constrained first, each where it covers no value already placed
+   * (taken), from its preferred side: across its axis on the series' side; inward along the axis for a
+   * block-view value in the outer quarter, so that it stays inside the web; out along its own axis at the
+   * centre, where several zeros would meet (the review's findings R-05 and R-29). Then the other side,
+   * inward, outward.
+   */
+  const placeSeries = (values, texts, s, side, taken) => {
+    const out = values.map(() => null);
+    const fOf = (i) => Math.max(0, Math.min(100, values[i])) / 100;
+    const has = (i) => values[i] !== null && values[i] !== undefined;
+    // The values with the fewest places go first: the block view's outer ones, which must stay inside the
+    // web, then those at the centre, then the rest, which can take either side.
+    const rank = (i) => (kind === "block" && fOf(i) >= 0.75 ? 0 : fOf(i) * geo.r < 6 ? 1 : 2);
+    const order = values.map((_, i) => i).filter(has).sort((p, q) => rank(p) - rank(q) || p - q);
+    for (const i of order) {
+      const f = fOf(i);
+      const a = axisAngle(i, n);
+      const atCentre = f * geo.r < 6;
+      const across = (sd) => a + sd * (Math.PI / 2);
+      const tries = atCentre ? [[a, side < 0 ? 26 : 8], [a, side < 0 ? 44 : 26]]
+        : kind === "block" && f >= 0.75 ? [[a + Math.PI, 0], [a + Math.PI, 14], [across(side), 0], [across(-side), 0]]
+          : [[across(side), 0], [across(-side), 0], [a + Math.PI, 0], [a, 0]];
+      const fits = (v) => !taken.some((t) => meets(t, v.box)) && (kind !== "block" || insideWeb(v.box));
+      const candidates = tries.map(([phi, extra]) => valueAt(i, f, texts[i], s, phi, extra));
+      const pick = candidates.find(fits) || candidates[0];
+      taken.push(pick.box);
+      out[i] = pick;
+    }
+    return out;
+  };
+  const takenBoxes = [];
+  const firstValues = showValues ? placeSeries(axes.map((ax) => ax.value), axes.map((ax) => ax.valueText), big ? 8 : 6.5, 1, takenBoxes) : [];
   // The level ticks run up the first axis. The outer ring needs no tick (the top of the scale, where a
   // label or a value stands); a tick that a value's box would cover gives way to the value.
-  const meets = (p, q) => p.l < q.r && q.l < p.r && p.t < q.b && q.t < p.b;
   for (const tk of tight ? [] : ticks) {
     const y = geo.cy - geo.r * tk.f - 4;
     const tickBox = { l: geo.cx + 4, r: geo.cx + 8 + String(tk.text).length * 7.5, t: y - 11, b: y + 3 };
@@ -416,11 +450,13 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     const pts2 = axes.map((ax, i) => (val(i) === null ? null : axisPoint(i, n, val(i) / 100, geo))).filter(Boolean);
     if (pts2.length >= 2) root.append(svg("polygon", { class: "sp-area sp-area--b", "aria-hidden": "true", points: pts2.map(([x, y]) => `${r2(x)},${r2(y)}`).join(" ") }));
     const marks2 = svg("g", { class: "sp-markers sp-markers--b", "aria-hidden": "true" });
+    // The second series' values, placed around the first's.
+    const secondValues = placeSeries(axes.map((_, i) => val(i)), axes.map((_, i) => second.texts?.[i] ?? ""), big ? 7.5 : 6, -1, takenBoxes);
     axes.forEach((ax, i) => {
       if (val(i) === null) return;
       const [x, y] = axisPoint(i, n, val(i) / 100, geo);
       marks2.append(svg("polygon", { class: "sp-marker sp-marker--b", points: hexPoints(x, y, big ? 7.5 : 6), "data-axis": ax.id, "data-value": String(second.values[i]) }));
-      const { tx, ty } = placeValue(i, val(i), second.texts?.[i] ?? "", big ? 7.5 : 6, -1);
+      const { tx, ty } = secondValues[i];
       marks2.append(svg("text", { class: big && !tight ? "sp-value sp-value--b" : "sp-value sp-value--b sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, second.texts?.[i] ?? ""));
     });
     root.append(marks2);

@@ -343,6 +343,27 @@
    }
   },
   {
+   "search": {
+    "query": "shopware AG Impressum Ebbinghoff Schöppingen",
+    "results": [
+     {
+      "url": "https://Shopware.com/en/contact/contact-financial/",
+      "title": "contact financial"
+     },
+     {
+      "url": "https://www.shopware.com/en/privacy/website/",
+      "title": "www.shopware.com"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.shopware.com/en/privacy/website/",
+    "title": "Privacy | Shopware"
+   }
+  },
+  {
    "tool": "rec_block",
    "input": {
     "layer": "platform",
@@ -355,8 +376,8 @@
      "de": "Die Shop-Software, auf der der Marktplatz aufbaut."
     },
     "note": {
-     "en": "Shopware's maker is based in Schöppingen; which edition and licence the portal uses is not stated. The FITKO's coordination office runs and develops the portal.",
-     "de": "Der Hersteller von Shopware sitzt in Schöppingen; welche Edition und Lizenz das Portal nutzt, steht nicht in den Quellen. Die Koordinierungsstelle der FITKO betreibt und entwickelt das Portal."
+     "en": "Shopware's maker, shopware AG, has its address in Schöppingen, Germany; which edition and licence the portal uses is not stated. The FITKO's coordination office runs and develops the portal, according to the FITKO's page and a FITKO handout from before the marketplace started.",
+     "de": "Der Hersteller von Shopware, die shopware AG, hat seine Anschrift in Schöppingen, Deutschland; welche Edition und Lizenz das Portal nutzt, steht nicht in den Quellen. Die Koordinierungsstelle der FITKO betreibt und entwickelt das Portal, laut der Seite der FITKO und einem Handout der FITKO aus der Zeit vor dem Start des Marktplatzes."
     },
     "criticality": "critical",
     "tech": {
@@ -388,6 +409,16 @@
       "title": "Shopware 6: Vom klassischen Shopsystem zur E-Commerce-Plattform",
       "quote": "Der Hersteller aus Schöppingen hat den Bereich der reinen Shopsysteme verlassen",
       "lang": "de",
+      "supports": [
+       "tech"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.shopware.com/en/privacy/website/",
+      "title": "Privacy | Shopware",
+      "quote": "shopware AG Ebbinghoff 10 D-48624 Schöppingen Germany",
+      "lang": "en",
       "supports": [
        "tech"
       ],

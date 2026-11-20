@@ -1,4 +1,4 @@
-/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-19): a recorded event stream that the
+/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-20): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/fit-connect.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "fit-connect",
  "entry_id": "fit-connect",
  "source": "hand_authored",
- "as_of": "2026-11-19",
+ "as_of": "2026-11-20",
  "method_version": "1.0",
  "query": "FIT-Connect",
  "steps": [
@@ -143,6 +143,35 @@
   },
   {
    "search": {
+    "query": "Dataport AöR Twin Data Center Hamburg Norderstedt Rechenzentren der Verwaltung",
+    "results": [
+     {
+      "url": "https://www.dataport.de/pressemitteilung/buergermeister-peter-tschentscher-besucht-rechenzentrum-von-dataport/",
+      "title": "Bürgermeister Peter Tschentscher besucht Rechenzentrum von Dataport"
+     },
+     {
+      "url": "https://www.datacenter-insider.de/das-dataport-rechenzentrum-zieht-um-und-der-betrieb-laeuft-a-522395/",
+      "title": "Das Dataport-Rechenzentrum zieht um und der Betrieb läuft"
+     },
+     {
+      "url": "https://www.stadt-und-werk.de/k21-meldungen/rechenzentren-auf-hoechstem-niveau/",
+      "title": "Rechenzentren auf höchstem Niveau - stadt+werk online"
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport"
+     }
+    ]
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+    "title": "Dataport – Hamburgs zentraler IT-Dienstleister"
+   }
+  },
+  {
+   "search": {
     "query": "Global Access Internet Services GmbH Rechenzentrum München Impressum",
     "results": [
      {
@@ -179,8 +208,8 @@
      "de": "Beherbergt den Zustelldienst, über den jeder Antrag läuft."
     },
     "note": {
-     "en": "Dataport is a public-law IT provider of several Länder; its data centres are in Hamburg and Norderstedt, according to a trade report.",
-     "de": "Dataport ist ein IT-Dienstleister mehrerer Länder in öffentlich-rechtlicher Form; seine Rechenzentren liegen laut einem Fachbericht in Hamburg und Norderstedt."
+     "en": "Dataport is a public-law IT provider of several Länder. Its data centre, the Twin Data Center, has a site in Hamburg, according to a newer page of the City of Hamburg; a trade report from long before FIT-Connect names Hamburg and Norderstedt as its sites.",
+     "de": "Dataport ist ein IT-Dienstleister mehrerer Länder in öffentlich-rechtlicher Form. Sein Rechenzentrum, das Twin Data Center, hat einen Standort in Hamburg, laut einer neueren Seite der Stadt Hamburg; ein Fachbericht, der lange vor FIT-Connect erschien, nennt Hamburg und Norderstedt als Standorte."
     },
     "criticality": "critical",
     "tech": {
@@ -223,6 +252,26 @@
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
       "title": "Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren | CIO DE",
       "quote": "Die Standorte liegen in Hamburg und im schleswig-holsteinischen Norderstedt direkt an der Hamburger Stadtgrenze.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Basis dafür ist ein leistungsfähiges, flexibles und sicheres Rechenzentrum – das Twin Data Center.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Der Hamburger Rechenzentrumsstandort hat dafür den Blauen Engel erhalten.",
       "lang": "de",
       "supports": [
        "hosting"
@@ -405,6 +454,26 @@
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
       "title": "Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren | CIO DE",
       "quote": "Die Standorte liegen in Hamburg und im schleswig-holsteinischen Norderstedt direkt an der Hamburger Stadtgrenze.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Basis dafür ist ein leistungsfähiges, flexibles und sicheres Rechenzentrum – das Twin Data Center.",
+      "lang": "de",
+      "supports": [
+       "hosting"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
+      "title": "Dataport – Hamburgs zentraler IT-Dienstleister",
+      "quote": "Der Hamburger Rechenzentrumsstandort hat dafür den Blauen Engel erhalten.",
       "lang": "de",
       "supports": [
        "hosting"

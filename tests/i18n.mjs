@@ -45,6 +45,16 @@ const SAME_ALLOWED = new Set(["mode.simulation", "diag.col.status", "diag.col.de
 const untranslated = same.filter((k) => !SAME_ALLOWED.has(k));
 check(!untranslated.length, "every text is translated (the same in both only for names and codes)", untranslated.map((k) => `${k}: "${EN[k]}"`).join("; "));
 
+// One term per figure (the review's finding R-20): the levers and the memo name exclusive non-EU control as
+// its tile does, in both languages.
+const termWrong = [EN, DE].flatMap((D, i) => {
+  const term = D["kpi.exclusive.label"];
+  const lang = i ? "de" : "en";
+  return [D["levers.exclusive"] === term ? null : `${lang} levers.exclusive`,
+    ...["memo.fig.exclusive.now", "memo.fig.exclusive.after"].map((k) => (String(D[k]).startsWith(`${term}:`) ? null : `${lang} ${k}`))].filter(Boolean);
+});
+check(!termWrong.length, "the levers and the memo name exclusive non-EU control as its tile does, in both languages", termWrong.join(", "));
+
 // ---- the files the app's words come from --------------------------------------------------------------
 // The shared shell's files that stay unchanged (tests/parity.mjs, IDENTICAL) are the sister apps' and
 // keep their own words where the app does not show them (js/api_messages.js translates the client's

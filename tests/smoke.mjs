@@ -393,8 +393,12 @@ if (wanted("kpi")) {
       window.__kpis.show(score(golden["s2-assessment.json"].blocks.map(blockFromRow)));
     });
     checks.en = await read();
+    // The weakest-link tile's tooltip says it weighs only the critical blocks (the review's finding R-22).
+    const tip = () => page.$eval('#test-kpis .kpi[data-tile="weakest"]', (el) => el.getAttribute("title") || "");
+    checks.tipEn = await tip();
     await page.click('#lang-switch button[data-lang="de"]');
     checks.de = (await read()).map((s) => s.replace(/[  ]/g, " "));
+    checks.tipDe = await tip();
     await page.evaluate(() => window.__kpis.reset());
     checks.reset = await read();
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
@@ -402,7 +406,8 @@ if (wanted("kpi")) {
     [JSON.stringify(checks.empty) === JSON.stringify(["no data", "no data", "no data", "no data"]), `no data before a run (${JSON.stringify(checks.empty)})`],
     [JSON.stringify(checks.en) === JSON.stringify(["72|indicative", "level 0|B-10 B-10", "92%|weighted share of blocks scored", "40%|of scored critical blocks"]), `S2 in English (${JSON.stringify(checks.en)})`],
     [JSON.stringify(checks.de) === JSON.stringify(["72|indikativ", "Stufe 0|B-10 B-10", "92 %|gewichteter Anteil bewerteter Bausteine", "40 %|der bewerteten kritischen Bausteine"]), `S2 in German (${JSON.stringify(checks.de)})`],
-    [JSON.stringify(checks.reset) === JSON.stringify(["keine Daten|indikativ", "keine Daten|kein bewerteter kritischer Baustein", "keine Daten|gewichteter Anteil bewerteter Bausteine", "keine Daten|der bewerteten kritischen Bausteine"]), `reset to no data (${JSON.stringify(checks.reset)})`]
+    [JSON.stringify(checks.reset) === JSON.stringify(["keine Daten|indikativ", "keine Daten|kein bewerteter kritischer Baustein", "keine Daten|gewichteter Anteil bewerteter Bausteine", "keine Daten|der bewerteten kritischen Bausteine"]), `reset to no data (${JSON.stringify(checks.reset)})`],
+    [/The lowest level among the critical blocks; important and supporting blocks count in the layer scores, not here\.$/.test(checks.tipEn || "") && /Die niedrigste Stufe unter den kritischen Bausteinen; wichtige und unterstützende Bausteine zählen in den Ebenenwerten, nicht hier\.$/.test(checks.tipDe || ""), `the weakest-link tile's tooltip in both languages (${checks.tipEn}; ${checks.tipDe})`]
   ]);
 }
 

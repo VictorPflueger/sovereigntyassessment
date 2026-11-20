@@ -13,13 +13,16 @@ import { loadedAssessments, onLoaded } from "./loaded.js";
 import { scoreAssessment, serviceName } from "./assessment.js";
 import { getWeights, onWeights } from "./weights.js";
 import { formatFact } from "./facts.js";
+import { isStale } from "./sovmap.js";
 
 /** How a loaded assessment is named in a list: its service, then where it comes from. */
 export function itemLabel(item, a, lang = getLang()) {
   const name = serviceName(a, lang);
-  if (item.origin === "prerun") return t("loaded.label.prerun", { name, date: fmtDate(a.as_of, lang) }, lang);
+  // An assessment older than ninety days says so here as on the map (the review's finding R-24).
+  const stale = item.origin !== "session" && a.as_of && isStale(a.as_of) ? ` · ${t("map.stale", null, lang)}` : "";
+  if (item.origin === "prerun") return t("loaded.label.prerun", { name, date: fmtDate(a.as_of, lang) }, lang) + stale;
   if (item.origin === "session") return t(a.source === "live" ? "loaded.label.sessionLive" : "loaded.label.session", { name }, lang);
-  return t("loaded.label.file", { name, date: fmtDate(a.as_of, lang) }, lang);
+  return t("loaded.label.file", { name, date: fmtDate(a.as_of, lang) }, lang) + stale;
 }
 
 /** The weakest critical link as text: "level 0 · B-06 App distribution on iOS", or no data. */

@@ -67,6 +67,10 @@
 .sov-table[hidden] { display: none; }
 .map-table caption { text-align: left; font-weight: var(--vc-weight-semibold); padding-bottom: 4px; }
 .map-table .num { text-align: right; }
+/* The map's tables fit their panel: headers and cells wrap rather than push the last column out of view
+   (the review's finding R-23). */
+.sov-table .map-table { width: 100%; }
+.sov-table .map-table th, .sov-table .map-table td { white-space: normal; overflow-wrap: anywhere; }
 
 /* Honeycomb: six groups, one per layer, cells filled by level. */
 .sov-bottom { min-height: 0; }

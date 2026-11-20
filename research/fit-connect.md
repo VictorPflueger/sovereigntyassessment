@@ -1,6 +1,6 @@
 # FIT-Connect: research notes
 
-FIT-Connect, researched on 19 November 2026: the FITKO's own documentation (introduction, FAQ, one-pager), the Java SDK's entry on Maven Central, a trade report on Dataport's data centres, a company directory entry for Global Access, and Sonatype's own pages.
+FIT-Connect, researched on 19 November 2026: the FITKO's own documentation (introduction, FAQ, one-pager), the Java SDK's entry on Maven Central, a trade report on Dataport's data centres, a company directory entry for Global Access, and Sonatype's own pages; on 20 November 2026 a newer page of the City of Hamburg on Dataport's data centre, after the review found the trade report dated (finding R-17).
 
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/fit-connect.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
@@ -22,6 +22,12 @@ Read on 2026-11-19 (German).
 
 > Die 2004 gegründete Anstalt des öffentlichen Rechts ist IT-Dienstleister der öffentlichen Verwaltung
 > Die Standorte liegen in Hamburg und im schleswig-holsteinischen Norderstedt direkt an der Hamburger Stadtgrenze.
+
+### [Dataport – Hamburgs zentraler IT-Dienstleister](https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538)
+Read on 2026-11-20 (German). A page of the City of Hamburg; it gives no date and mentions 2021, so it is newer than the trade report above.
+
+> Basis dafür ist ein leistungsfähiges, flexibles und sicheres Rechenzentrum – das Twin Data Center.
+> Der Hamburger Rechenzentrumsstandort hat dafür den Blauen Engel erhalten.
 
 ### [Global Access Internet Services GmbH (connect professional, Anbieterkompass)](https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html)
 Read on 2026-11-19 (German).

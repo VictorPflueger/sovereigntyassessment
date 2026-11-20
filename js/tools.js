@@ -636,6 +636,8 @@ export function createToolbox(ctx) {
         before: { ...run.result.facts },
         after: lever ? { ...lever.whatif.facts } : null,
         values: values(),
+        // The blocks' names by id, so the memo names its weakest link, not only its id (the review's R-26).
+        names: Object.fromEntries([...run.blocks.values()].map((b) => b.view).filter(Boolean).map((v) => [v.id, v.name])),
         weights: { ...run.weights },
         status: "draft",
         audit: a.unchecked ? "unchecked" : "passed",
@@ -666,6 +668,12 @@ export function createToolbox(ctx) {
           review: run.reviewAction,
           corrections: run.corrections.map((c) => ({ ...c })),
           decision: run.decision ? { lever_id: run.decision, title: lever ? lever.title : null, facts: lever ? { ...lever.whatif.facts } : null } : null,
+          // The blocks the findings and figures refer to by id, with their names and levels, so an
+          // exported report reads on its own (the review's R-26).
+          blocks: i.outcome === "assessed" ? [...run.blocks.values()].map((b) => b.view).filter(Boolean).map((v) => ({
+            id: v.id, layer: v.layer, name: v.name, lang: v.lang || null, criticality: v.criticality,
+            made_in: v.tech_class, run_by: v.operator_class, level: v.unscored ? null : v.level, partly_unknown: !!v.partly_unknown
+          })) : [],
           sources: sources()
         }
       };

@@ -6,7 +6,7 @@
 
 import { t } from "./i18n/index.js";
 import { renderFacts, formatFact } from "./facts.js";
-import { fmtDate, fmtWeight } from "./format.js";
+import { fmtDate, fmtWeight, fmtInt } from "./format.js";
 import { LAYERS } from "./engine.js";
 
 /** The layer weights as a line of text when they are not all equal (the person's assumption), else null. */
@@ -69,7 +69,7 @@ export function memoMarkdown(memo, lang = memo.lang) {
     "## " + t("memo.figures", null, lang),
     "",
     "- " + overall,
-    "- " + weakestLine(before, after, id, lang),
+    "- " + weakestLine(before, after, id, lang, memo.names),
     "- " + exclusive,
     ...(weightsLine(memo.weights, lang) ? ["- " + weightsLine(memo.weights, lang)] : []),
     "",
@@ -80,16 +80,19 @@ export function memoMarkdown(memo, lang = memo.lang) {
   return lines.join("\n");
 }
 
-function weakestText(values, prefix, lang) {
+function weakestText(values, prefix, lang, names) {
   const block = values?.[`${prefix}weakest.block`];
   if (!block) return t("memo.weakest.none", null, lang);
-  return t("memo.weakest.at", { block, level: formatFact("weakest.level", values[`${prefix}weakest.level`], lang) }, lang);
+  const level = formatFact("weakest.level", values[`${prefix}weakest.level`], lang);
+  const n = names?.[block];
+  const name = typeof n === "string" ? n : n?.[lang] || n?.en || "";
+  return name ? t("memo.weakest.atNamed", { block, name, level }, lang) : t("memo.weakest.at", { block, level }, lang);
 }
 
-function weakestLine(before, after, id, lang) {
-  const now = weakestText(before, "", lang);
+function weakestLine(before, after, id, lang, names) {
+  const now = weakestText(before, "", lang, names);
   return after
-    ? t("memo.fig.weakest.after", { before: now, after: weakestText(after, `whatif.${id}.`, lang) }, lang)
+    ? t("memo.fig.weakest.after", { before: now, after: weakestText(after, `whatif.${id}.`, lang, names) }, lang)
     : t("memo.fig.weakest.now", { before: now }, lang);
 }
 
@@ -133,6 +136,32 @@ export function markQuoteLangs(root, sources = []) {
   return root;
 }
 
+/**
+ * The report's table of building blocks, as the map's table has it: the ids the findings and figures
+ * use, with each block's name, layer, criticality, origins and level (the review's R-26). A name keeps
+ * the language it was recorded in; a "|" in it would end its cell, so it becomes "/".
+ */
+function blocksTable(blocks, lang) {
+  const cell = (s) => String(s ?? "").replace(/\|/g, "/").replace(/\s+/g, " ").trim();
+  const head = ["map.col.block", "map.col.layer", "map.col.name", "map.col.criticality", "map.col.madeIn", "map.col.runBy", "map.col.level"].map((k) => t(k, null, lang));
+  const rows = blocks.map((b) => [
+    b.id,
+    t(`layer.${b.layer}.short`, null, lang),
+    typeof b.name === "string" ? b.name : b.name?.[lang] || b.name?.en || "",
+    t(`value.criticality.${b.criticality}`, null, lang),
+    t(`class.${b.made_in}`, null, lang),
+    t(`class.${b.run_by}`, null, lang),
+    b.level === null || b.level === undefined ? t("map.gap", null, lang) : fmtInt(b.level, lang) + (b.partly_unknown ? " (" + t("map.partly", null, lang) + ")" : "")
+  ]);
+  return [
+    "## " + t("report.blocks", null, lang),
+    "",
+    "| " + head.map(cell).join(" | ") + " |",
+    "| " + head.map(() => "---").join(" | ") + " |",
+    ...rows.map((r) => "| " + r.map(cell).join(" | ") + " |")
+  ];
+}
+
 /** The report as Markdown: the agent's findings, then the parts code writes (reportParts). */
 export function reportMarkdown(report, lang = report.lang) {
   const p = reportParts(report, lang);
@@ -170,6 +199,7 @@ export function reportParts(report, lang = report.lang) {
   }
   const weights = weightsLine(c.weights, lang);
   if (weights) out.push("## " + t("report.assumptions", null, lang), "", weights, "");
+  if (report.outcome === "assessed" && c.blocks?.length) out.push(...blocksTable(c.blocks, lang), "");
   if (c.sources?.length) {
     out.push("## " + t("report.sources", null, lang), "");
     for (const s of c.sources) {

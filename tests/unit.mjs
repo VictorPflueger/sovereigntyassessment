@@ -2,7 +2,8 @@
 // shell (taken from the Timetable Translator's tests/unit.mjs); the schemas of the data contracts and
 // the validator; the formats in both languages; the catalogue's name matching; the API's errors in
 // both languages; the language module's choice of language; the golden copy that Diagnostics runs;
-// the page's security policy and storage keys, read from the files.
+// the page's security policy and storage keys, read from the files; the exports (the report's table of
+// blocks and the memo's named weakest link among them) and the ninety-day rule.
 // Usage: node tests/unit.mjs            (every group)
 //        node tests/unit.mjs format     (only the named groups)
 import assert from "node:assert/strict";
@@ -427,7 +428,7 @@ await group("guards", "sequence rules (brief §7): review after every layer, lev
 });
 
 // ---- the exports (AC-17): the JSON against the schemas, the import, the names, the language -----------
-await group("exports", "the assessment JSON of every pre-run is valid in both languages and imports to the same figures; broken copies are refused; the audit rows are valid AuditEvents; names; the report's language rule", async () => {
+await group("exports", "the assessment JSON of every pre-run is valid in both languages and imports to the same figures; broken copies are refused; the audit rows are valid AuditEvents; names; the report's language rule; the report's table of blocks and the memo's named weakest link", async () => {
   // The bundled data as the page has it: window globals.
   const win = {};
   for (const f of ["data/catalogue.js", "data/ref_facts.js", "data/schemas.js", ...fs.readdirSync(path.join(APP_ROOT, "data/runs")).map((x) => `data/runs/${x}`)]) {
@@ -482,12 +483,15 @@ await group("exports", "the assessment JSON of every pre-run is valid in both la
   const { createSimulationPlayer } = await mod("js/simulation.js");
   initAudit();
   let report = null;
+  let memo = null;
   const off = bus.on("report", (ev) => { report = ev.payload; });
+  const offMemo = bus.on("action_draft", (ev) => { memo = ev.payload; });
   const def = win.SA_RUNS.bundid;
   bus.beginRun({ run_id: "run-unit-exports", mode: "simulation" });
   bus.emit("run_start", { run_id: "run-unit-exports", mode: "simulation", query: def.query, entry_id: def.entry_id, lang: "en", source: def.source, as_of: def.as_of, weights: { infrastructure: 1 } });
   const played = await playProblems(def, { lang: "en", choice: "L1", createPlayer: createSimulationPlayer });
   off();
+  offMemo();
   bus.endRun();
   check.deepEqual(played.problems, []);
   const snap = auditSnapshot();
@@ -509,6 +513,23 @@ await group("exports", "the assessment JSON of every pre-run is valid in both la
   check.match(de, /# BundID: findings/);
   check.match(en, /## Corrections by the reviewer/);
   check.doesNotMatch(en, /The findings above are in/);
+  // The report maps the block ids its findings and figures use to the blocks' names (the review's R-26):
+  // one row per block, each name as the run recorded it (here in English, the run's language).
+  const ids = (report.closing?.blocks || []).map((b) => b.id);
+  check.ok(ids.length === 6 && ids[0] === "B-01", `the report's blocks (${ids.join(", ")})`);
+  check.match(en, /## Building blocks\n\n\| Block \| Layer \| Name \| Criticality \| Made in \| Run by \| Level \|/);
+  check.match(de, /## Bausteine\n\n\| Baustein \| Ebene \| Name \| Kritikalität \| Hergestellt in \| Betrieben in \| Stufe \|/);
+  const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  for (const b of report.closing.blocks) {
+    check.equal(typeof b.name, "string", `${b.id}'s name as recorded`);
+    for (const md of [en, de]) check.match(md, new RegExp(`\\| ${b.id} \\| [^|]+ \\| ${esc(b.name)} \\|`), `${b.id} named in its row`);
+  }
+  // The weakest link the figures name is in that table, and the memo names it by its name too.
+  const weakest = report.values?.["weakest.block"];
+  check.ok(ids.includes(weakest), `the weakest block ${weakest} is in the table`);
+  const { memoMarkdown } = await mod("js/drafts.js");
+  const weakestName = report.closing.blocks.find((b) => b.id === weakest)?.name;
+  check.match(memoMarkdown(memo, "en"), new RegExp(`Weakest critical link: ${weakest} \\(${esc(weakestName)}\\) at level`), "the memo names its weakest link");
   check.doesNotMatch(en + de, /\{\{fact:/);
   // Every export passes through the redaction: a key pasted into a correction's reason stays out of the
   // Markdown as it does out of the HTML and the JSON (the review's finding R-03).
@@ -518,6 +539,22 @@ await group("exports", "the assessment JSON of every pre-run is valid in both la
     const md = reportMarkdownExport(keyed, l);
     check.ok(md.includes("sk-ant-[REDACTED]") && !md.includes(fake), `the Markdown export in ${l} redacts a key in a correction's reason`);
   }
+});
+
+// ---- the ninety-day rule (brief §4): an assessment older than ninety days says "Check for updates" ----------
+await group("stale", "the ninety-day rule: an assessment older than ninety days is marked, on the map and in Compare and the Portfolio's labels; one of ninety days or fewer is not", async () => {
+  const { isStale } = await mod("js/sovmap.js");
+  const { itemLabel } = await mod("js/compare.js");
+  const today = new Date("2026-11-20T12:00:00");
+  check.equal(isStale("2026-08-22", today), false, "ninety days: not yet");
+  check.equal(isStale("2026-08-23", today), false, "eighty-nine days: no");
+  check.equal(isStale("2026-08-21", today), true, "ninety-one days: marked");
+  check.equal(isStale("not a date", today), false, "no date, no mark");
+  // Compare's and the Portfolio's labels carry the mark for an old pre-run or file, never for this session's run.
+  const old = { service: { query: "Example", name: "Example" }, as_of: "2020-01-15", source: "hand_authored" };
+  check.match(itemLabel({ origin: "prerun" }, old, "en"), /Check for updates$/);
+  check.match(itemLabel({ origin: "file" }, old, "de"), /Auf Aktualität prüfen$/);
+  check.doesNotMatch(itemLabel({ origin: "session" }, old, "en"), /Check for updates/);
 });
 
 // ---- report -----------------------------------------------------------------------------------------------

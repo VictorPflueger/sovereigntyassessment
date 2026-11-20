@@ -14,6 +14,8 @@
 //              with its status line), the review, the end with the drawer hidden and the block view, for
 //              the Marktplatz (three layers without evidence), NOOTS, BundID and the three pre-runs that end
 //              without an assessment: the same measures
+//   table      the map's table view at the end of BundID's run, at 1280×720 and 1920×1080 in both languages:
+//              both tables inside their panel and no cell's text cut (the review's R-23)
 //   blocks30   a run of thirty blocks, five per layer, at 1920×1080 and 1280×720 in English and German:
 //              the block view's thirty labels inside the diagram and apart from each other, and the
 //              honeycomb's thirty cells inside the map panel, none cut
@@ -133,6 +135,8 @@ async function measure(page) {
         // The level ticks on the first axis stay clear of the labels and the values.
         const ticks = [...svgEl.querySelectorAll("text.sp-tick")].filter((t) => t.textContent.trim());
         for (const k of ticks) for (const o of [...labels, ...values]) if (hit(box(k), box(o))) out.push(`the spider's tick "${name(k)}" and its text "${name(o)}" overlap`);
+        // The values stand apart from each other, also where several sit at the centre (the review's R-29).
+        values.forEach((v, i) => values.slice(i + 1).forEach((w) => { if (hit(box(v), box(w))) out.push(`the spider's values "${name(v)}" and "${name(w)}" overlap`); }));
         // Each value stands clear of its own marker.
         for (const v of values) {
           const m = svgEl.querySelector(`.sp-markers:not(.sp-markers--b) polygon[data-axis="${v.dataset.axis}"]`);
@@ -300,6 +304,61 @@ if (wanted("viewports")) {
   for (const [width, height] of SIZES) for (const theme of ["light", "dark"]) for (const lang of ["en", "de"]) jobs.push({ width, height, theme, lang, entry: ENTRIES[jobs.length % ENTRIES.length] });
   // Four pages at a time: each has its own browser context, so they share nothing but the server.
   for (let i = 0; i < jobs.length; i += 4) results.push(...(await Promise.all(jobs.slice(i, i + 4).map(viewport))));
+}
+
+// ---- table ---------------------------------------------------------------------------------------------------
+/**
+ * The map's table view at the end of a run (the review's R-23): both tables inside their panel, no cell's
+ * text cut, and the map measured as in the other states.
+ */
+async function tableView({ width, height, theme, lang, entry }) {
+  const label = `${width}×${height} ${theme} ${lang}`;
+  const { context, page, errors } = await newPage({ width, height, lang, theme });
+  const problems = [];
+  let tables = 0;
+  try {
+    await page.click(`.catalogue-chip[data-entry="${entry}"]`);
+    await page.click("#btn-start");
+    await page.waitForSelector('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await waitState(page, ["awaiting_review"]);
+    await page.click("#btn-review-confirm");
+    await waitState(page, ["awaiting_decision"]);
+    await page.waitForSelector('.lever-card[data-lever="keep"]');
+    await page.click('.lever-card[data-lever="keep"] .lever-id');
+    await page.click("#btn-approve-lever");
+    await waitState(page, TERMINAL);
+    await page.waitForTimeout(400);
+    if (await page.evaluate(() => document.querySelector("#drawer")?.dataset.open === "true")) await page.click("#drawer .drawer-toggle");
+    await page.waitForFunction(() => document.querySelector("#drawer")?.dataset.open === "false");
+    await page.click(".sov-table-btn");
+    await page.waitForSelector(".sov-table:not([hidden]) .map-table");
+    const t = await page.evaluate(() => {
+      const host = document.querySelector(".sov-table");
+      const hb = host.getBoundingClientRect();
+      const out = { tables: 0, cut: [], wide: [] };
+      if (host.scrollWidth > host.clientWidth + 1) out.wide.push(`the panel scrolls sideways (${host.scrollWidth} > ${host.clientWidth})`);
+      for (const tb of host.querySelectorAll(".map-table")) {
+        out.tables += 1;
+        const b = tb.getBoundingClientRect();
+        if (b.right > hb.right + 1 || b.left < hb.left - 1) out.wide.push(`${tb.dataset.table} reaches ${Math.round(b.right - hb.right)} px beyond its panel`);
+        for (const c of tb.querySelectorAll("th, td")) if (c.scrollWidth > c.clientWidth + 1) out.cut.push(`${tb.dataset.table}: "${c.textContent.trim()}"`);
+      }
+      return out;
+    });
+    tables = t.tables;
+    problems.push(...t.wide, ...t.cut.map((x) => `cut cell ${x}`));
+    problems.push(...(await measure(page)).map((x) => `table: ${x}`));
+    if (problems.length) await page.screenshot({ path: path.join(OUT, `table-${entry}-${width}x${height}-${theme}-${lang}.png`) });
+  } catch (e) { problems.push(`exception: ${String(e.message).split("\n")[0]}`); }
+  problems.push(...errors.map((e) => `page error: ${e}`));
+  await context.close();
+  return { name: `table ${label}: ${entry}, ${tables} of 2 tables in their panel, no cell cut`, ok: !problems.length && tables === 2, problems };
+}
+if (wanted("table")) {
+  const jobs = [];
+  for (const [width, height] of [[1280, 720], [1920, 1080]]) for (const lang of ["de", "en"]) jobs.push({ width, height, lang, entry: "bundid", theme: lang === "de" ? "dark" : "light" });
+  results.push(...(await Promise.all(jobs.map(tableView))));
 }
 
 // ---- blocks30 ------------------------------------------------------------------------------------------------

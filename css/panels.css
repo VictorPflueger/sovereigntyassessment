@@ -38,6 +38,10 @@
 /* Review. */
 .review-summary { margin-bottom: 6px; }
 .review-lead { color: var(--vc-text-muted); margin: 4px 0 8px; }
+.review-key { color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); margin: 0 0 8px; }
+/* The line over a tool call's raw record in the console (the review's R-21): in the interface's type, not
+   the record's monospace; here because css/console.css is the sister apps' file. */
+.result-body .result-note { margin: 0 0 6px; font: 400 var(--vc-font-size-sm) / 1.4 var(--vc-font-text); white-space: normal; color: var(--vc-text-muted); }
 .review-done.vc-alert, .levers-done.vc-alert { display: flex; align-items: center; gap: 8px; }
 .review-blocks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .review-block { padding: 4px 8px; border: 1px solid var(--vc-border-subtle); }

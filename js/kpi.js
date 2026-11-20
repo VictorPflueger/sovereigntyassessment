@@ -6,7 +6,7 @@
 
 import { h } from "./dom.js";
 import { tx, retext, attrs } from "./text.js";
-import { onLang } from "./i18n/index.js";
+import { t, onLang } from "./i18n/index.js";
 import { formatFact } from "./facts.js";
 import { noData, fmtInt } from "./format.js";
 import { LAYERS } from "./engine.js";
@@ -50,11 +50,12 @@ export function createKpis(container) {
    */
   function fitWeakest() {
     const tile = tiles.get("weakest");
-    tile.el.removeAttribute("title");
+    // The tooltip says which blocks the tile weighs: the critical ones only (the review's finding R-22).
+    tile.el.setAttribute("title", t("kpi.weakest.title"));
     if (!weakest || !tile.sub.isConnected || !tile.sub.clientHeight) return;
     if (tile.sub.scrollHeight <= tile.sub.clientHeight + 1) return;
     retext(tile.sub.firstChild, weakest.key, { block: weakest.id, n: weakest.ties });
-    tile.el.setAttribute("title", weakest.full);
+    tile.el.setAttribute("title", `${weakest.full}. ${t("kpi.weakest.title")}`);
   }
   if (typeof ResizeObserver === "function") {
     let frame = 0;
