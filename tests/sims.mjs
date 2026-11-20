@@ -186,7 +186,7 @@ if (wanted("play")) {
         [close9(f.overall, f.published) && LAYERS.every((l) => close9(f.layers?.[l], f.publishedLayers?.[l])), `the published figures equal the engine's recomputation (${f.overall} vs ${f.published})`],
         [f.tile === (f.tileExpected ?? (de ? "keine Daten" : "no data")), `the overall tile shows the recomputed score (${f.tile} vs ${f.tileExpected})`],
         // A layer whose blocks have no origin on record says so, not "no evidence found" (R-15).
-        [Array.isArray(checks.heads) && checks.heads.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])).every((g) => g.text === (de ? "keine Belege zu Hersteller oder Betreiber" : "no evidence on maker or operator")), `the layers without a scored block (${JSON.stringify(checks.heads?.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])))})`],
+        [Array.isArray(checks.heads) && checks.heads.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])).every((g) => g.text === (de ? "Herkunft nicht belegt" : "no evidence on maker or operator")), `the layers without a scored block (${JSON.stringify(checks.heads?.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])))})`],
         // The tile says on how many layers the score rests when not on all six (the review's finding R-11).
         [(() => { const n = LAYERS.filter((l) => Number.isFinite(f.layers?.[l])).length; return checks.tileNote === (n === 6 || f.overall === null ? (de ? "indikativ" : "indicative") : de ? `indikativ; ${n} von 6 Ebenen bewertet` : `indicative; ${n} of 6 layers scored`); })(), `the overall tile's note (${checks.tileNote})`],
         [checks.axes?.length === 6 && checks.axes.every((a, i) => a.id === LAYERS[i] && close9(f.layers?.[a.id], a.v)), "the spider diagram's six axes carry the engine's layer scores"],
@@ -248,7 +248,7 @@ async function playNotAService(entry, lang) {
     [checks.htmlLang === lang && Array.isArray(checks.broken) && checks.broken.length === 0, `no unresolved placeholder or broken value (${JSON.stringify(checks.broken)})`],
     [JSON.stringify(checks.rail) === JSON.stringify(["done", "done", "skipped", "skipped", "skipped"]) && checks.railSaid?.slice(2).every((x) => x === (de ? ": nicht nötig" : ": not needed")), `the rail: understood and researched, the rest not needed (${JSON.stringify(checks.rail)}; ${JSON.stringify(checks.railSaid)})`],
     [checks.heads?.length === 6 && checks.heads.every((x) => x === (de ? "nicht bewertet" : "not assessed")) && (de ? /ohne Bewertung beendet/ : /ended without an assessment/).test(checks.meta || "") && !(de ? /indikativ/ : /indicative/).test(checks.meta || ""), `every layer and the map's line say not assessed (${JSON.stringify(checks.heads)}; ${checks.meta})`],
-    [(de ? /Keine Bewertung: Der Lauf endete ohne/ : /No assessment: the run ended without one/).test(checks.report?.text || "") && !(de ? /Jede Zahl wurde im Code berechnet/ : /Every figure was computed in code/).test(checks.report?.text || ""), "the report's footer claims no assessment and no figure"]
+    [(de ? /Keine Bewertung: Der Lauf endete ohne Bewertung, wie der Bericht sagt\./ : /No assessment: the run ended without one, as the report says\./).test(checks.report?.text || "") && !(de ? /Jede Zahl wurde im Code berechnet/ : /Every figure was computed in code/).test(checks.report?.text || ""), "the report's footer claims no assessment and no figure"]
   ]);
 }
 

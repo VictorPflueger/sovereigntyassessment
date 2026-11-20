@@ -159,7 +159,7 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
+     "name": "Governikus GmbH & Co. KG",
      "country": "DE",
      "parent": null
     },
@@ -189,7 +189,11 @@
       "verified": true
      }
     ],
-    "confidence": "high"
+    "confidence": "high",
+    "note": {
+     "en": "Governikus develops the AusweisApp on behalf of the BSI, so the developer runs its development.",
+     "de": "Governikus entwickelt die AusweisApp im Auftrag des BSI; die Entwicklung betreibt also der Entwickler."
+    }
    }
   },
   {
@@ -372,8 +376,8 @@
      "de": "Liest den Personalausweis aus und gibt die Daten an den eID-Server des Dienstes weiter."
     },
     "note": {
-     "en": "The source code is published on GitHub under the EUPL.",
-     "de": "Der Quellcode ist auf GitHub unter der EUPL veröffentlicht."
+     "en": "The source code is published on GitHub under the EUPL. The app runs on each user's own device; no source read says who runs it for the service.",
+     "de": "Der Quellcode ist auf GitHub unter der EUPL veröffentlicht. Die App läuft auf dem eigenen Gerät jeder Nutzerin und jedes Nutzers; keine gelesene Quelle sagt, wer sie für den Dienst betreibt."
     },
     "criticality": "critical",
     "tech": {
@@ -382,8 +386,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -396,8 +400,7 @@
       "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      },
@@ -556,7 +559,7 @@
      }
     },
     "hosting": "UNKNOWN",
-    "licence": "proprietary",
+    "licence": "unknown",
     "exit": "possible",
     "evidence": [
      {
@@ -565,8 +568,7 @@
       "quote": "App Store, iCloud, and iCloud+ are service marks of Apple Inc., registered in the U.S. and other countries and regions.",
       "lang": "en",
       "supports": [
-       "tech",
-       "licence"
+       "tech"
       ],
       "verified": true
      },
@@ -651,7 +653,7 @@
       },
       "rationale": {
        "en": "In the EU, iPhone users can install alternative app marketplaces. If the AusweisApp reached iPhones through a marketplace run in the EU rather than the phone maker's store, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on the phone maker's platform.",
-       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte Die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
+       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
       },
       "changes": [
        {

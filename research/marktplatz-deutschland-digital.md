@@ -1,6 +1,6 @@
 # Marktplatz Deutschland Digital (MDD): research notes
 
-Marktplatz Deutschland Digital (MDD), researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes: the slides of a talk at the IT-Planungsrat's congress, Vergabeblog's news of the start, a page of the dbb magazin, a FITKO handout on the German Administration Cloud, the cloud's website, a t3n article on Shopware, a ChannelPartner report on govdigital and the BMDS paper on the Deutschland-Stack.
+Marktplatz Deutschland Digital (MDD), researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes: the slides of a talk at the IT-Planungsrat's congress, Vergabeblog's news of the start, the IT-Planungsrat's own news of the start, a page of the dbb magazin, a t3n article on Shopware, Shopware's privacy page, a ChannelPartner report on govdigital and the BMDS paper on the Deutschland-Stack. For the independent review of version 1.0.0, the marketplace's operator was read again: the IT-Planungsrat's news names govdigital eG, so a FITKO handout of 2024 on the portal before the marketplace and the cloud's homepage, which the first reading cited for it, are no longer cited (the review's findings R-01 and R-17).
 
 Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/marktplatz-deutschland-digital.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
@@ -18,21 +18,17 @@ Read on 2026-11-20 (German).
 > Technisch basiert er auf dem bisherigen Cloud-Service-Portal (CSP) der Deutschen Verwaltungscloud (DVC).
 > Der Marktplatz Deutschland Digital (MDD) ist am 19.03. offiziell in den Produktivbetrieb gestartet.
 
+### [Marktplatz Deutschland Digital startet Produktivbetrieb](https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb)
+Read on 2026-11-20 (German), for the independent review of version 1.0.0: the IT-Planungsrat's news of 19 March 2026 on the marketplace's start.
+
+> Der Marktplatz Deutschland Digital wird als Produkt des IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.
+> Betreiberin ist die govdigital eG.
+
 ### [dbb magazin 10/2026 – Page 27](https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/)
 Read on 2026-11-20 (German).
 
 > unter der Leitung des IT-Planungsrates – genauso wie der Marktplatz Deutschland Digital.
 > Entwickelt wird die DVC von der Föderalen IT-Kooperation (FITKO) und der Genossenschaft govdigital
-
-### [Deutsche Verwaltungscloud – Startseite](https://www.deutsche-verwaltungscloud.de)
-Read on 2026-11-20 (German).
-
-> wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.
-
-### [Die Deutsche Verwaltungscloud](https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf)
-Read on 2026-11-20 (German).
-
-> Technische Komponente (Betrieb, Weiterentwicklung und Support des CSP)
 
 ### [Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner](https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html)
 Read on 2026-11-20 (German).

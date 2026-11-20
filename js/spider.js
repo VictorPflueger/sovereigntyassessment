@@ -44,18 +44,30 @@ export function hexPoints(x, y, s) {
   return pts.join(" ");
 }
 
-/** Words wrapped into lines of at most `width` characters (a long word keeps its own line). */
-export function wrapWords(text, width, maxLines = 3) {
-  const words = String(text || "").split(/\s+/).filter(Boolean);
+/**
+ * Words wrapped into lines of at most `width` characters (a long word keeps its own line). With
+ * `hyphens`, a word longer than the width may also break after one of its hyphens, so a long German
+ * compound such as "ELSTER-Organisationszertifikaten" wraps too (the review's N1).
+ */
+export function wrapWords(text, width, maxLines = 3, { hyphens = false } = {}) {
+  // Tokens: a word, or a part of a long hyphenated word that follows its previous part without a space.
+  const tokens = [];
+  for (const w of String(text || "").split(/\s+/).filter(Boolean)) {
+    if (!hyphens || w.length <= width || !/[^-]-[^-]/.test(w)) { tokens.push({ t: w, glue: false }); continue; }
+    (w.match(/[^-]+-+|[^-]+$/g) || [w]).forEach((t, k) => tokens.push({ t, glue: k > 0 }));
+  }
   const lines = [];
-  let cur = "";
-  for (const w of words) {
-    if (cur && (cur + " " + w).length > width) { lines.push(cur); cur = w; } else cur = cur ? `${cur} ${w}` : w;
+  let cur = null;
+  const join = (a, b) => (b.glue ? a + b.t : `${a} ${b.t}`);
+  for (const tk of tokens) {
+    if (cur === null) { cur = { text: tk.t, glue: tk.glue }; continue; }
+    if (join(cur.text, tk).length > width) { lines.push(cur); cur = { text: tk.t, glue: tk.glue }; } else cur.text = join(cur.text, tk);
   }
   if (cur) lines.push(cur);
-  if (lines.length <= maxLines) return lines;
+  if (lines.length <= maxLines) return lines.map((l) => l.text);
   // More lines than allowed: the rest joins the last line, so nothing is lost.
-  return [...lines.slice(0, maxLines - 1), lines.slice(maxLines - 1).join(" ")];
+  const rest = lines.slice(maxLines - 1).reduce((acc, l) => (acc === null ? l.text : l.glue ? acc + l.text : `${acc} ${l.text}`), null);
+  return [...lines.slice(0, maxLines - 1).map((l) => l.text), rest];
 }
 
 /**
@@ -73,6 +85,29 @@ export function wrapWords(text, width, maxLines = 3) {
 const CHAR_PX = { layer: 8.2, block: 6.8 };
 
 /**
+ * A label line's width in pixels at a size of the stylesheet's (15 px, or 12 px for the small labels):
+ * measured in the page's text font where there is a page and the font has loaded, so a wide word takes
+ * its real room ("Anwendungen" is about 103 px at 15 px, where eleven average characters make 90; the
+ * review's N1); otherwise, in Node or before the font has loaded, estimated per character.
+ */
+let measurer = null;
+export function lineWidth(text, px, { bold = false, italic = false } = {}) {
+  const s = String(text ?? "");
+  if (!s) return 0;
+  const font = `${italic ? "italic " : ""}${bold ? 700 : 500} ${px}px Inter`;
+  try {
+    if (typeof document !== "undefined" && (!document.fonts || document.fonts.check(font))) {
+      measurer = measurer || document.createElement("canvas").getContext("2d");
+      if (measurer) {
+        measurer.font = `${font}, ui-sans-serif, system-ui, sans-serif`;
+        return measurer.measureText(s).width;
+      }
+    }
+  } catch { /* no canvas: the estimate below */ }
+  return s.length * (px >= 15 ? CHAR_PX.layer : CHAR_PX.block) * (bold ? 1.06 : 1);
+}
+
+/**
  * A label's lines for a narrow box: re-wrapped to at most `width` characters (a long word keeps its own
  * line). In the block view the first line (the id and the codes) stays as it is.
  */
@@ -80,10 +115,11 @@ export function fitLabel(lines, width, kind) {
   const keep = kind === "block" ? lines.slice(0, 1) : [];
   const rest = kind === "block" ? lines.slice(1) : lines;
   if (!rest.length || rest.every((l) => String(l).length <= width)) return lines;
-  return [...keep, ...wrapWords(rest.join(" "), width, kind === "block" ? 3 : 4)];
+  return [...keep, ...wrapWords(rest.join(" "), width, kind === "block" ? 3 : 4, { hyphens: true })];
 }
 
-export function spiderGeometry(kind, n, box = null, longest = 0, labels = null, big = true, extra = 0) {
+/** longestPx: the widest label line the block view's columns show, in pixels. */
+export function spiderGeometry(kind, n, box = null, longestPx = 0, labels = null, big = true, extra = 0) {
   if (!box || !(box.w > 0) || !(box.h > 0)) {
     const W = 760;
     const H = 560;
@@ -91,15 +127,13 @@ export function spiderGeometry(kind, n, box = null, longest = 0, labels = null, 
   }
   const W = Math.max(320, Math.round(box.w));
   const H = Math.max(220, Math.round(box.h));
-  // The small label size (12 px) is about as wide per character in both views.
-  const perChar = big ? CHAR_PX[kind] || CHAR_PX.layer : CHAR_PX.block;
   const gap = kind === "layer" ? 20 : 14;
   const cx = W / 2;
   // The block view sets its labels in columns beside the web (blockLabels): the web leaves room for the
   // longest label line on each side.
   // extra: room the block view's values need beyond the web, so the labels stand clear of them.
   if (kind === "block" || !labels) {
-    const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longest * perChar + 6) + extra;
+    const padX = Math.max(kind === "layer" ? 110 : 120, (kind === "layer" ? 22 : 16) + longestPx + 6) + extra;
     const padY = kind === "layer" ? 50 : 60;
     const fit = Math.min(230, (W - 2 * padX) / 2, (H - 2 * padY) / 2);
     return { W, H, cx, cy: H / 2 + 4, r: Math.max(48, fit), fit };
@@ -117,7 +151,7 @@ export function spiderGeometry(kind, n, box = null, longest = 0, labels = null, 
     const c = Math.cos(a);
     const sn = Math.sin(a);
     const L = Math.max(1, lines.length);
-    const w = Math.max(0, ...lines.map((l) => String(l).length)) * perChar;
+    const w = Math.max(0, ...lines.map((l) => lineWidth(l, font)));
     const anchor = c > 0.3 ? "start" : c < -0.3 ? "end" : "middle";
     const [x0, x1] = anchor === "start" ? [0, w] : anchor === "end" ? [-w, 0] : [-w / 2, w / 2];
     const base = sn < -0.3 ? -(L - 1) * lh : sn > 0.3 ? 0.7 * lh : -((L - 1) * lh) / 2 + 5;
@@ -222,32 +256,50 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
   const shortBox = !!box && kind === "block" && (box.h < 340 || box.w < 520);
   let big = !shortBox && (kind === "layer" || n <= 8);
   // Each label with the status line a dashed axis adds; in a box narrower than the labels need beside a
-  // web of the smallest radius, the labels wrap narrower so they stay inside the drawing.
-  let statusLines = axes.map((ax) => ((ax.value === null || ax.value === undefined) && ax.valueText ? 1 : 0));
-  let labels = axes.map((ax, i) => [...(ax.lines || []), ...(statusLines[i] ? [ax.valueText] : [])].map(String));
-  if (shortBox) labels = labels.map((l, i) => (statusLines[i] ? [l[0], l[l.length - 1]] : [l[0]]));
-  if (box && box.w > 0 && !shortBox) {
-    const room = (Math.max(320, Math.round(box.w)) - 2 * 60) / 2 - (kind === "layer" ? 22 : 16) - 8;
-    // The block view's names wrap at no more than 24 characters: narrower columns leave the web its room.
-    const fit = Math.min(kind === "block" ? 24 : Infinity, Math.max(8, Math.floor(room / (CHAR_PX[kind] || CHAR_PX.layer))));
-    labels = labels.map((l, i) => {
-      // The status line of a dashed axis wraps on its own, after the name.
-      if (!statusLines[i]) return fitLabel(l, fit, kind);
-      const status = wrapWords(l[l.length - 1], fit, 2);
-      statusLines[i] = status.length;
-      return [...fitLabel(l.slice(0, -1), fit, kind), ...status];
-    });
-  }
-  let longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
-  // The block view's web leaves room beside it for the lines its columns will show: with many blocks those
-  // are the ids and the codes only, so the names do not shrink the web.
-  if (kind === "block" && box && box.h > 0) {
-    const mode = blockLabelMode(labels, n, Math.max(220, Math.round(box.h)), big ? 17 : 14);
-    longest = Math.max(0, ...labels.map((l) => Math.max(0, ...blockShown(l, mode).map((x) => String(x).length))));
-  }
+  // web of the smallest radius, the labels wrap narrower so they stay inside the drawing. firstOnly: the
+  // block view's labels keep only their first line (the id and the codes) and a status line.
+  const prepare = (bigSize, firstOnly) => {
+    const st = axes.map((ax) => ((ax.value === null || ax.value === undefined) && ax.valueText ? 1 : 0));
+    let ls = axes.map((ax, i) => [...(ax.lines || []), ...(st[i] ? [ax.valueText] : [])].map(String));
+    if (firstOnly) return { labels: ls.map((l, i) => (st[i] ? [l[0], l[l.length - 1]] : [l[0]])), statusLines: st };
+    if (box && box.w > 0) {
+      const room = (Math.max(320, Math.round(box.w)) - 2 * 60) / 2 - (kind === "layer" ? 22 : 16) - 8;
+      const perChar = bigSize ? CHAR_PX[kind] || CHAR_PX.layer : CHAR_PX.block;
+      // The block view's names wrap at no more than 24 characters: narrower columns leave the web its room.
+      const fit = Math.min(kind === "block" ? 24 : Infinity, Math.max(8, Math.floor(room / perChar)));
+      ls = ls.map((l, i) => {
+        // The status line of a dashed axis wraps on its own, after the name.
+        if (!st[i]) return fitLabel(l, fit, kind);
+        const status = wrapWords(l[l.length - 1], fit, 2);
+        st[i] = status.length;
+        return [...fitLabel(l.slice(0, -1), fit, kind), ...status];
+      });
+    }
+    return { labels: ls, statusLines: st };
+  };
+  let { labels, statusLines } = prepare(big, shortBox);
   // The block view's values, shown up to twelve blocks, need room beyond the web: its labels stand clear.
   const showValues = !(kind === "block" && n > 12);
-  let { W, H, ...geo } = spiderGeometry(kind, n, box, longest, labels, big, kind === "block" && showValues ? 22 : 0);
+  const extra = kind === "block" && showValues ? 22 : 0;
+  // The block view's web leaves room beside it for the lines its columns will show, measured as drawn (the
+  // first line in bold): with many blocks those are the ids and the codes only, so the names do not
+  // shrink the web.
+  const blockLongest = (ls, bigSize) => {
+    const mode = box && box.h > 0 ? blockLabelMode(ls, n, Math.max(220, Math.round(box.h)), bigSize ? 17 : 14) : "full";
+    return Math.max(0, ...ls.map((l) => Math.max(0, ...blockShown(l, mode).map((x, k) => lineWidth(x, bigSize ? 15 : 12, { bold: k === 0 })))));
+  };
+  let { W, H, ...geo } = spiderGeometry(kind, n, box, kind === "block" ? blockLongest(labels, big) : 0, labels, big, extra);
+  // The block view on a narrow map: where its labels at full size would leave the web under 64 px, they
+  // take the small size, and where even that leaves it under 48 px, only their first lines (the review's
+  // N1: a long German name otherwise ran out of the drawing).
+  if (kind === "block" && box && !shortBox) {
+    for (const [bigSize, firstOnly, below] of [[false, false, 64], [false, true, 48]]) {
+      if (geo.fit >= below || (!bigSize && !big && !firstOnly)) continue;
+      const set = prepare(bigSize, firstOnly);
+      const g = spiderGeometry(kind, n, box, blockLongest(set.labels, bigSize), set.labels, bigSize, extra);
+      if (g.fit > geo.fit) { ({ labels, statusLines } = set); big = bigSize; ({ W, H, ...geo } = g); }
+    }
+  }
   // The layer view on a short map (a small screen, German, every layer still with its status): its labels
   // fall back to the layers' short names, and if the web is still small, to the small label size; the
   // status lines are always counted. The full names stay when they leave the web 96 px; otherwise the short
@@ -263,8 +315,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
         st[i] = status.length;
         return [...ax.short.map(String), ...status];
       });
-      const long = Math.max(0, ...ls.map((l) => Math.max(0, ...l.map((x) => x.length))));
-      return { labels: ls, statusLines: st, big: !small, geo: spiderGeometry(kind, n, box, long, ls, !small) };
+      return { labels: ls, statusLines: st, big: !small, geo: spiderGeometry(kind, n, box, 0, ls, !small) };
     };
     const full = { labels, statusLines, big, geo: { W, H, ...geo } };
     const shortBig = layerSet(false);
@@ -275,7 +326,6 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     }
     if (chosen !== full) {
       ({ labels, statusLines, big } = chosen);
-      longest = Math.max(0, ...labels.map((l) => Math.max(0, ...l.map((x) => x.length))));
       ({ W, H, ...geo } = chosen.geo);
     }
   }
@@ -337,30 +387,74 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
    * inward, outward.
    */
   const placeSeries = (values, texts, s, side, taken) => {
-    const out = values.map(() => null);
     const fOf = (i) => Math.max(0, Math.min(100, values[i])) / 100;
     const has = (i) => values[i] !== null && values[i] !== undefined;
+    const isCentre = (i) => fOf(i) * geo.r < 6;
+    const area = (p, q) => Math.max(0, Math.min(p.r, q.r) - Math.max(p.l, q.l)) * Math.max(0, Math.min(p.b, q.b) - Math.max(p.t, q.t));
+    // One placement in a given order: each value takes the first of its places that covers no value
+    // already placed and no other marker (and, in the block view, stays inside the web); where there is
+    // none, the place that covers the least (the review's N2). Returns the places and what they cover.
+    const attempt = (rank) => {
+      const used = [...taken];
+      const out = values.map(() => null);
+      let total = 0;
+      const order = values.map((_, i) => i).filter(has).sort((p, q) => rank(p) - rank(q) || p - q);
+      // Markers at the centre lie on one another; their value is written once (the review's R-29 and N2:
+      // four "0" took the room the values around the centre need). Each axis's name still carries it.
+      const centreTexts = new Set();
+      for (const i of order) {
+        const f = fOf(i);
+        const a = axisAngle(i, n);
+        const atCentre = isCentre(i);
+        if (atCentre && centreTexts.has(String(texts[i]))) continue;
+        if (atCentre) centreTexts.add(String(texts[i]));
+        const across = (sd) => a + sd * (Math.PI / 2);
+        // A value at the centre may stand out along any axis whose marker shares the centre with it.
+        const centreAxes = atCentre ? order.filter((j) => isCentre(j) && String(texts[j]) === String(texts[i])) : [];
+        const tries = atCentre ? centreAxes.flatMap((j) => [[axisAngle(j, n), side < 0 ? 26 : 8], [axisAngle(j, n), side < 0 ? 44 : 26]])
+          : kind === "block" && f >= 0.75 ? [[a + Math.PI, 0], [a + Math.PI, 14], [across(side), 0], [across(-side), 0]]
+            : [[across(side), 0], [across(-side), 0], [a + Math.PI, 0], [a, 0]];
+        // Further places where the preferred ones are taken (a small web, a crowded centre): the diagonals,
+        // and each direction a little further out.
+        const more = [a + side * Math.PI / 4, a - side * Math.PI / 4, a + Math.PI - side * Math.PI / 4, a + Math.PI + side * Math.PI / 4];
+        const all = [...tries, ...more.map((phi) => [phi, 0]), ...[...tries, ...more.map((phi) => [phi, 0])].flatMap(([phi, e]) => [[phi, e + 8], [phi, e + 16]])];
+        // Its own marker is cleared by construction (valueAt); every other marker is checked.
+        const others = markerBoxes.filter((m) => !(m.i === i && m.side === side)).map((m) => m.box);
+        const cost = (v) => [...used, ...others].reduce((sum, t) => sum + area(t, v.box), 0) + (kind === "block" && !insideWeb(v.box) ? 1e6 : 0);
+        const fits = (v) => !used.some((t) => meets(t, v.box)) && !others.some((m) => meets(m, v.box)) && (kind !== "block" || insideWeb(v.box));
+        const candidates = all.map(([phi, extra]) => valueAt(i, f, texts[i], s, phi, extra));
+        const free = candidates.find(fits);
+        const pick = free || candidates.reduce((best, v) => (cost(v) < cost(best) ? v : best), candidates[0]);
+        if (!free) total += cost(pick);
+        used.push(pick.box);
+        out[i] = pick;
+      }
+      return { out, total, used };
+    };
     // The values with the fewest places go first: the block view's outer ones, which must stay inside the
-    // web, then those at the centre, then the rest, which can take either side.
-    const rank = (i) => (kind === "block" && fOf(i) >= 0.75 ? 0 : fOf(i) * geo.r < 6 ? 1 : 2);
-    const order = values.map((_, i) => i).filter(has).sort((p, q) => rank(p) - rank(q) || p - q);
-    for (const i of order) {
-      const f = fOf(i);
-      const a = axisAngle(i, n);
-      const atCentre = f * geo.r < 6;
-      const across = (sd) => a + sd * (Math.PI / 2);
-      const tries = atCentre ? [[a, side < 0 ? 26 : 8], [a, side < 0 ? 44 : 26]]
-        : kind === "block" && f >= 0.75 ? [[a + Math.PI, 0], [a + Math.PI, 14], [across(side), 0], [across(-side), 0]]
-          : [[across(side), 0], [across(-side), 0], [a + Math.PI, 0], [a, 0]];
-      const fits = (v) => !taken.some((t) => meets(t, v.box)) && (kind !== "block" || insideWeb(v.box));
-      const candidates = tries.map(([phi, extra]) => valueAt(i, f, texts[i], s, phi, extra));
-      const pick = candidates.find(fits) || candidates[0];
-      taken.push(pick.box);
-      out[i] = pick;
+    // web, then those at the centre, then the rest, which can take either side. Where that leaves a value
+    // without a free place, the centre's value goes last instead, along whichever of its axes is free.
+    const outer = (i) => kind === "block" && fOf(i) >= 0.75;
+    let best = attempt((i) => (outer(i) ? 0 : isCentre(i) ? 1 : 2));
+    if (best.total > 0) {
+      const other = attempt((i) => (outer(i) ? 0 : isCentre(i) ? 3 : 2));
+      if (other.total < best.total) best = other;
     }
-    return out;
+    taken.splice(0, taken.length, ...best.used);
+    return best.out;
   };
   const takenBoxes = [];
+  // Every marker's box, of both series in Compare, so that no value stands on another axis's marker either
+  // (the review's N2: a "2?" sat on the level-0 markers at the centre).
+  const secondValue = (i) => { const v = second?.values?.[i]; return v === null || v === undefined ? null : Math.max(0, Math.min(100, v)); };
+  const markerBoxes = [];
+  axes.forEach((ax, i) => {
+    for (const [v, s, side] of [[ax.value, big ? 8 : 6.5, 1], [secondValue(i), big ? 7.5 : 6, -1]]) {
+      if (v === null || v === undefined) continue;
+      const [x, y] = axisPoint(i, n, Math.max(0, Math.min(100, v)) / 100, geo);
+      markerBoxes.push({ i, side, box: { l: x - s - 1, r: x + s + 1, t: y - s * 0.87 - 1, b: y + s * 0.87 + 1 } });
+    }
+  });
   const firstValues = showValues ? placeSeries(axes.map((ax) => ax.value), axes.map((ax) => ax.valueText), big ? 8 : 6.5, 1, takenBoxes) : [];
   // The level ticks run up the first axis. The outer ring needs no tick (the top of the scale, where a
   // label or a value stands); a tick that a value's box would cover gives way to the value.
@@ -439,6 +533,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
     marks.append(svg("polygon", { class: "sp-marker", points: hexPoints(x, y, big ? 8 : 6.5), "data-axis": ax.id }));
     if (!showValues) return;
     const v = firstValues[i];
+    if (!v) return;
     marks.append(svg("text", { class: big && !tight ? "sp-value" : "sp-value sp-value--small", x: r2(v.tx), y: r2(v.ty), "text-anchor": "middle", "data-axis": ax.id }, ax.valueText));
   });
   root.append(marks);
@@ -456,6 +551,7 @@ export function spiderSvg({ axes, kind = "layer", ticks = [], title = "", desc =
       if (val(i) === null) return;
       const [x, y] = axisPoint(i, n, val(i) / 100, geo);
       marks2.append(svg("polygon", { class: "sp-marker sp-marker--b", points: hexPoints(x, y, big ? 7.5 : 6), "data-axis": ax.id, "data-value": String(second.values[i]) }));
+      if (!secondValues[i]) return;
       const { tx, ty } = secondValues[i];
       marks2.append(svg("text", { class: big && !tight ? "sp-value sp-value--b" : "sp-value sp-value--b sp-value--small", x: r2(tx), y: r2(ty), "text-anchor": "middle", "data-axis": ax.id }, second.texts?.[i] ?? ""));
     });

@@ -434,8 +434,8 @@
      "de": "Weist die Identität einer Person in der App nach."
     },
     "note": {
-     "en": "The Federal Government names the eID function of the identity card among the ways to sign in; the AusweisApp, which reads the card, is developed by Governikus on behalf of the BSI.",
-     "de": "Die Bundesregierung nennt die eID-Funktion des Personalausweises unter den Wegen der Anmeldung; die AusweisApp, die die Karte ausliest, entwickelt Governikus im Auftrag des BSI."
+     "en": "The Federal Government names the eID function of the identity card among the ways to sign in; the AusweisApp, which reads the card, is developed by Governikus on behalf of the BSI. No source read says who runs the online ID for this app.",
+     "de": "Die Bundesregierung nennt die Online-Ausweisfunktion des Personalausweises unter den Wegen der Anmeldung; die AusweisApp, die den Ausweis liest, entwickelt Governikus im Auftrag des BSI. Keine gelesene Quelle sagt, wer den Online-Ausweis für diese App betreibt."
     },
     "criticality": "critical",
     "tech": {
@@ -444,8 +444,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -458,8 +458,7 @@
       "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      }

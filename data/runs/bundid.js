@@ -380,8 +380,8 @@
      "de": "Weist die Identität nach, wenn sich jemand mit dem Personalausweis anmeldet."
     },
     "note": {
-     "en": "Other sign-in means are the ELSTER certificate and certain EU identities.",
-     "de": "Weitere Zugangsarten sind das ELSTER-Zertifikat und einzelne EU-Identitäten."
+     "en": "Governikus develops the AusweisApp on behalf of the BSI; no source read says who runs the online ID for this service. Other sign-in means are the ELSTER certificate and certain EU identities.",
+     "de": "Governikus entwickelt die AusweisApp im Auftrag des BSI; keine gelesene Quelle sagt, wer den Online-Ausweis für diesen Dienst betreibt. Andere Wege der Anmeldung sind das ELSTER-Zertifikat und bestimmte EU-Identitäten."
     },
     "criticality": "important",
     "tech": {
@@ -390,8 +390,8 @@
      "parent": null
     },
     "operator": {
-     "name": "Bundesamt für Sicherheit in der Informationstechnik (BSI)",
-     "country": "DE",
+     "name": "unknown",
+     "country": "UNKNOWN",
      "parent": null
     },
     "hosting": "UNKNOWN",
@@ -404,8 +404,7 @@
       "quote": "Since 2014, Bremen-based Governikus GmbH & Co. KG is developing the application on behalf of the German Federal Office for Information Security (BSI).",
       "lang": "en",
       "supports": [
-       "tech",
-       "operator"
+       "tech"
       ],
       "verified": true
      },
@@ -621,7 +620,7 @@
      }
     },
     "hosting": "UNKNOWN",
-    "licence": "proprietary",
+    "licence": "unknown",
     "exit": "possible",
     "evidence": [
      {
@@ -630,8 +629,7 @@
       "quote": "App Store, iCloud, and iCloud+ are service marks of Apple Inc., registered in the U.S. and other countries and regions.",
       "lang": "en",
       "supports": [
-       "tech",
-       "licence"
+       "tech"
       ],
       "verified": true
      },
@@ -715,7 +713,7 @@
       },
       "rationale": {
        "en": "In the EU, iPhone users can install alternative app marketplaces. If the AusweisApp reached iPhones through a marketplace run in the EU rather than the phone maker's store, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on the phone maker's platform.",
-       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte Die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
+       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte die AusweisApp iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
       },
       "changes": [
        {

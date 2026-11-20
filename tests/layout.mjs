@@ -14,6 +14,9 @@
 //              with its status line), the review, the end with the drawer hidden and the block view, for
 //              the Marktplatz (three layers without evidence), NOOTS, BundID and the three pre-runs that end
 //              without an assessment: the same measures
+//   sweep      every assessed pre-run in German at 1536×864, 1366×768 and 1280×720: the review with the
+//              drawer open and the end with it hidden, each in the layer and the block view: the same
+//              measures (the verification's N1 and N2)
 //   table      the map's table view at the end of BundID's run, at 1280×720 and 1920×1080 in both languages:
 //              both tables inside their panel and no cell's text cut (the review's R-23)
 //   blocks30   a run of thirty blocks, five per layer, at 1920×1080 and 1280×720 in English and German:
@@ -137,10 +140,14 @@ async function measure(page) {
         for (const k of ticks) for (const o of [...labels, ...values]) if (hit(box(k), box(o))) out.push(`the spider's tick "${name(k)}" and its text "${name(o)}" overlap`);
         // The values stand apart from each other, also where several sit at the centre (the review's R-29).
         values.forEach((v, i) => values.slice(i + 1).forEach((w) => { if (hit(box(v), box(w))) out.push(`the spider's values "${name(v)}" and "${name(w)}" overlap`); }));
-        // Each value stands clear of its own marker.
+        // Each value stands clear of its own marker and of every other (the review's N2: a "2?" sat on the
+        // level-0 markers at the centre).
+        const markers = [...svgEl.querySelectorAll(".sp-markers polygon")];
         for (const v of values) {
-          const m = svgEl.querySelector(`.sp-markers:not(.sp-markers--b) polygon[data-axis="${v.dataset.axis}"]`);
-          if (m && !v.closest(".sp-markers--b") && hit(box(v), box(m))) out.push(`the spider's value "${name(v)}" covers its marker`);
+          for (const m of markers) {
+            if (!hit(box(v), box(m))) continue;
+            out.push(m.dataset.axis === v.dataset.axis ? `the spider's value "${name(v)}" covers its marker` : `the spider's value "${name(v)}" (${v.dataset.axis}) covers the marker of ${m.dataset.axis}`);
+          }
         }
       }
       const groups = [...sov.querySelectorAll(".hc-group")].filter(shown);
@@ -304,6 +311,59 @@ if (wanted("viewports")) {
   for (const [width, height] of SIZES) for (const theme of ["light", "dark"]) for (const lang of ["en", "de"]) jobs.push({ width, height, theme, lang, entry: ENTRIES[jobs.length % ENTRIES.length] });
   // Four pages at a time: each has its own browser context, so they share nothing but the server.
   for (let i = 0; i < jobs.length; i += 4) results.push(...(await Promise.all(jobs.slice(i, i + 4).map(viewport))));
+}
+
+// ---- sweep ---------------------------------------------------------------------------------------------------
+/**
+ * Every assessed pre-run in German at 1536×864, 1366×768 and 1280×720 (the verification's N1 and N2: a
+ * long German name cut at the drawing's edge, "Anwendungen" cut with the drawer open, a value on another
+ * block's marker): the review with the drawer open and the end with it hidden, each in both views.
+ */
+async function sweepPlay({ width, height, lang, entry }) {
+  const label = `${width}×${height} ${lang}`;
+  const { context, page, errors } = await newPage({ width, height, lang, theme: width === 1366 ? "light" : "dark" });
+  const problems = [];
+  const states = [];
+  const take = async (state) => {
+    for (const view of ["layer", "block"]) {
+      await page.click(`.sov-map button[data-view="${view}"]`);
+      await page.waitForSelector(`.sov-spider svg.spider[data-view="${view}"]`);
+      const p = await measure(page);
+      states.push(`${state}-${view}`);
+      problems.push(...p.map((x) => `${state}, ${view} view: ${x}`));
+      if (p.length) await page.screenshot({ path: path.join(OUT, `sweep-${entry}-${width}x${height}-${lang}-${state}-${view}.png`) });
+    }
+    await page.click('.sov-map button[data-view="layer"]');
+  };
+  try {
+    await page.click(`.catalogue-chip[data-entry="${entry}"]`);
+    await page.click("#btn-start");
+    await page.waitForSelector('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await waitState(page, ["awaiting_review"]);
+    await page.waitForSelector("#btn-review-confirm");
+    await take("review");
+    await page.click("#btn-review-confirm");
+    await waitState(page, ["awaiting_decision"]);
+    await page.waitForSelector('.lever-card[data-lever="keep"]');
+    await page.click('.lever-card[data-lever="keep"] .lever-id');
+    await page.click("#btn-approve-lever");
+    await waitState(page, TERMINAL);
+    await page.waitForTimeout(400);
+    if (await page.evaluate(() => document.querySelector("#drawer")?.dataset.open === "true")) await page.click("#drawer .drawer-toggle");
+    await page.waitForFunction(() => document.querySelector("#drawer")?.dataset.open === "false");
+    await take("end");
+  } catch (e) { problems.push(`exception after ${states.join(", ") || "loading"}: ${String(e.message).split("\n")[0]}`); }
+  problems.push(...errors.map((e) => `page error: ${e}`));
+  await context.close();
+  return { name: `sweep ${label}: ${entry}, ${states.length} of 4 states`, ok: !problems.length && states.length === 4, problems };
+}
+if (wanted("sweep")) {
+  const { readdirSync } = await import("node:fs");
+  const assessed = readdirSync(path.join(APP_ROOT, "data/runs")).map((f) => f.replace(/\.js$/, "")).filter((e) => !["zbds", "zapuk", "low-code"].includes(e)).sort();
+  const jobs = [];
+  for (const [width, height] of [[1536, 864], [1366, 768], [1280, 720]]) for (const entry of assessed) jobs.push({ width, height, lang: "de", entry });
+  for (let i = 0; i < jobs.length; i += 4) results.push(...(await Promise.all(jobs.slice(i, i + 4).map(sweepPlay))));
 }
 
 // ---- table ---------------------------------------------------------------------------------------------------

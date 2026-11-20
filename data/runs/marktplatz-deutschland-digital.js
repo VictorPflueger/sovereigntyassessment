@@ -67,16 +67,34 @@
    }
   },
   {
-   "fetch": {
-    "url": "https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf",
-    "title": "Die Deutsche Verwaltungscloud",
-    "pdf": true
+   "search": {
+    "query": "fitko.de aktuelles Marktplatz Deutschland Digital startet Produktivbetrieb govdigital eG Betrieb",
+    "results": [
+     {
+      "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Marktplatz Deutschland Digital startet Produktivbetrieb"
+     },
+     {
+      "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
+      "title": "Marktplatz Deutschland Digital (MDD) startet Produktivbetrieb - Vergabeblog"
+     },
+     {
+      "url": "https://www.fitko.de/presse/pressedetail/ein-marktplatz-fuer-alles-marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Ein Marktplatz für alle(s): Marktplatz Deutschland Digital startet Produktivbetrieb"
+     }
+    ]
    }
   },
   {
    "fetch": {
-    "url": "https://www.deutsche-verwaltungscloud.de",
-    "title": "Deutsche Verwaltungscloud – Startseite"
+    "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+    "title": "Marktplatz Deutschland Digital startet Produktivbetrieb"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
+    "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner"
    }
   },
   {
@@ -101,7 +119,7 @@
      "parent": null
     },
     "operator": {
-     "name": "Koordinierungsstelle der Deutschen Verwaltungscloud (FITKO)",
+     "name": "govdigital eG",
      "country": "DE",
      "parent": null
     },
@@ -171,9 +189,19 @@
       "verified": true
      },
      {
-      "url": "https://www.deutsche-verwaltungscloud.de",
-      "title": "Deutsche Verwaltungscloud – Startseite",
-      "quote": "wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
+      "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
+      "title": "Marktplatz Deutschland Digital (MDD) startet Produktivbetrieb - Vergabeblog",
+      "quote": "Der Marktplatz Deutschland Digital (MDD) ist am 19.03. offiziell in den Produktivbetrieb gestartet.",
+      "lang": "de",
+      "supports": [
+       "status"
+      ],
+      "verified": true
+     },
+     {
+      "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Marktplatz Deutschland Digital startet Produktivbetrieb",
+      "quote": "Der Marktplatz Deutschland Digital wird als Produkt des IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
       "lang": "de",
       "supports": [
        "owner"
@@ -181,9 +209,9 @@
       "verified": true
      },
      {
-      "url": "https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf",
-      "title": "Die Deutsche Verwaltungscloud",
-      "quote": "Technische Komponente (Betrieb, Weiterentwicklung und Support des CSP)",
+      "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Marktplatz Deutschland Digital startet Produktivbetrieb",
+      "quote": "Betreiberin ist die govdigital eG.",
       "lang": "de",
       "supports": [
        "operator"
@@ -191,22 +219,12 @@
       "verified": true
      },
      {
-      "url": "https://www.deutsche-verwaltungscloud.de",
-      "title": "Deutsche Verwaltungscloud – Startseite",
-      "quote": "wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
+      "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
+      "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner",
+      "quote": "Govdigital eG ist das zentrale Kooperationsbündnis öffentlicher IT-Dienstleister in Deutschland.",
       "lang": "de",
       "supports": [
        "operator"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
-      "title": "Marktplatz Deutschland Digital (MDD) startet Produktivbetrieb - Vergabeblog",
-      "quote": "Der Marktplatz Deutschland Digital (MDD) ist am 19.03. offiziell in den Produktivbetrieb gestartet.",
-      "lang": "de",
-      "supports": [
-       "status"
       ],
       "verified": true
      }
@@ -234,12 +252,6 @@
    "say": {
     "en": "Development, security and operations: a magazine of the civil servants' federation says the FITKO and the cooperative govdigital develop it under the IT-Planungsrat.",
     "de": "Entwicklung, Sicherheit und Betrieb: Ein Magazin des Beamtenbunds sagt, dass die FITKO und die Genossenschaft govdigital ihn unter Leitung des IT-Planungsrats entwickeln."
-   }
-  },
-  {
-   "fetch": {
-    "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
-    "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner"
    }
   },
   {
@@ -295,16 +307,6 @@
       "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
       "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner",
       "quote": "Govdigital eG ist das zentrale Kooperationsbündnis öffentlicher IT-Dienstleister in Deutschland.",
-      "lang": "de",
-      "supports": [
-       "tech"
-      ],
-      "verified": true
-     },
-     {
-      "url": "https://www.deutsche-verwaltungscloud.de",
-      "title": "Deutsche Verwaltungscloud – Startseite",
-      "quote": "wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
       "lang": "de",
       "supports": [
        "tech"
@@ -376,8 +378,8 @@
      "de": "Die Shop-Software, auf der der Marktplatz aufbaut."
     },
     "note": {
-     "en": "Shopware's maker, shopware AG, has its address in Schöppingen, Germany; which edition and licence the portal uses is not stated. The FITKO's coordination office runs and develops the portal, according to the FITKO's page and a FITKO handout from before the marketplace started.",
-     "de": "Der Hersteller von Shopware, die shopware AG, hat seine Anschrift in Schöppingen, Deutschland; welche Edition und Lizenz das Portal nutzt, steht nicht in den Quellen. Die Koordinierungsstelle der FITKO betreibt und entwickelt das Portal, laut der Seite der FITKO und einem Handout der FITKO aus der Zeit vor dem Start des Marktplatzes."
+     "en": "Shopware's maker, shopware AG, has its address in Schöppingen, Germany; which edition and licence the portal uses is not stated. The cooperative govdigital runs the marketplace and the FITKO steers it, according to the IT-Planungsrat's news of its start.",
+     "de": "Der Hersteller von Shopware, die shopware AG, hat seine Anschrift in Schöppingen, Deutschland; welche Edition und Lizenz das Portal nutzt, steht nicht in den Quellen. Die Genossenschaft govdigital betreibt den Marktplatz, und die FITKO steuert ihn, laut der Meldung des IT-Planungsrats zu seinem Start."
     },
     "criticality": "critical",
     "tech": {
@@ -386,7 +388,7 @@
      "parent": null
     },
     "operator": {
-     "name": "Koordinierungsstelle der Deutschen Verwaltungscloud (FITKO)",
+     "name": "govdigital eG",
      "country": "DE",
      "parent": null
     },
@@ -425,9 +427,9 @@
       "verified": true
      },
      {
-      "url": "https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf",
-      "title": "Die Deutsche Verwaltungscloud",
-      "quote": "Technische Komponente (Betrieb, Weiterentwicklung und Support des CSP)",
+      "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Marktplatz Deutschland Digital startet Produktivbetrieb",
+      "quote": "Betreiberin ist die govdigital eG.",
       "lang": "de",
       "supports": [
        "operator"
@@ -435,9 +437,9 @@
       "verified": true
      },
      {
-      "url": "https://www.deutsche-verwaltungscloud.de",
-      "title": "Deutsche Verwaltungscloud – Startseite",
-      "quote": "wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
+      "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
+      "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner",
+      "quote": "Govdigital eG ist das zentrale Kooperationsbündnis öffentlicher IT-Dienstleister in Deutschland.",
       "lang": "de",
       "supports": [
        "operator"
@@ -484,7 +486,7 @@
      "parent": null
     },
     "operator": {
-     "name": "Koordinierungsstelle der Deutschen Verwaltungscloud (FITKO)",
+     "name": "govdigital eG",
      "country": "DE",
      "parent": null
     },
@@ -523,9 +525,9 @@
       "verified": true
      },
      {
-      "url": "https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf",
-      "title": "Die Deutsche Verwaltungscloud",
-      "quote": "Technische Komponente (Betrieb, Weiterentwicklung und Support des CSP)",
+      "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
+      "title": "Marktplatz Deutschland Digital startet Produktivbetrieb",
+      "quote": "Betreiberin ist die govdigital eG.",
       "lang": "de",
       "supports": [
        "operator"
@@ -533,9 +535,9 @@
       "verified": true
      },
      {
-      "url": "https://www.deutsche-verwaltungscloud.de",
-      "title": "Deutsche Verwaltungscloud – Startseite",
-      "quote": "wird als Produkt des deutschen IT-Planungsrats von der FITKO (Föderale IT-Kooperation) gesteuert.",
+      "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
+      "title": "Sechs Bundesländer starten Open-Source-Bildungsplattform | ChannelPartner",
+      "quote": "Govdigital eG ist das zentrale Kooperationsbündnis öffentlicher IT-Dienstleister in Deutschland.",
       "lang": "de",
       "supports": [
        "operator"
@@ -640,8 +642,8 @@
   {
    "report": {
     "findings": {
-     "en": "# Marktplatz Deutschland Digital: findings\n\nThe Marktplatz Deutschland Digital brings the federal marketplaces together for public organisations and is in production. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says where the marketplace is hosted, or by whom.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the FITKO and the cooperative govdigital develop it under the IT-Planungsrat.\n- **Platform** ({{fact:score.layer.platform}}): the former Cloud Service Portal of the German Administration Cloud, a configured Shopware, whose maker is based in Schöppingen; the FITKO's coordination office runs and develops the portal.\n- **Base services**: no source read names any.\n- **Applications** ({{fact:score.layer.applications}}): the marketplace itself.\n- **Interface and access**: no source read describes them apart from the portal.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. The high score rests on few blocks: the gaps are in the sources, above all on the hosting.",
-     "de": "# Marktplatz Deutschland Digital: Befunde\n\nDer Marktplatz Deutschland Digital führt die föderalen Marktplätze für öffentliche Organisationen zusammen und ist im Produktivbetrieb. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, wo der Marktplatz gehostet wird und von wem.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO und die Genossenschaft govdigital entwickeln ihn unter Leitung des IT-Planungsrats.\n- **Plattform** ({{fact:score.layer.platform}}): das bisherige Cloud-Service-Portal der Deutschen Verwaltungscloud, eine konfigurierte Shopware, deren Hersteller in Schöppingen sitzt; die Koordinierungsstelle der FITKO betreibt und entwickelt das Portal.\n- **Basisdienste**: Keine gelesene Quelle nennt welche.\n- **Anwendungen** ({{fact:score.layer.applications}}): der Marktplatz selbst.\n- **Oberfläche und Zugang**: Keine gelesene Quelle beschreibt sie neben dem Portal.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Der hohe Wert beruht auf wenigen Bausteinen: Die Lücken liegen in den Quellen, vor allem beim Hosting."
+     "en": "# Marktplatz Deutschland Digital: findings\n\nThe Marktplatz Deutschland Digital brings the federal marketplaces together for public organisations and is in production. Its overall score is {{fact:score.overall}}, indicative, with evidence coverage of {{fact:coverage}}.\n\n- **Infrastructure**: no source read says where the marketplace is hosted, or by whom.\n- **Development, security and operations** ({{fact:score.layer.devsecops}}): the FITKO and the cooperative govdigital develop it under the IT-Planungsrat.\n- **Platform** ({{fact:score.layer.platform}}): the former Cloud Service Portal of the German Administration Cloud, a configured Shopware, whose maker is based in Schöppingen; the cooperative govdigital runs the marketplace, which the FITKO steers for the IT-Planungsrat.\n- **Base services**: no source read names any.\n- **Applications** ({{fact:score.layer.applications}}): the marketplace itself.\n- **Interface and access**: no source read describes them apart from the portal.\n\nThe weakest critical link is {{fact:weakest.block}} at {{fact:weakest.level}}. The high score rests on few blocks: the gaps are in the sources, above all on the hosting.",
+     "de": "# Marktplatz Deutschland Digital: Befunde\n\nDer Marktplatz Deutschland Digital führt die föderalen Marktplätze für öffentliche Organisationen zusammen und ist im Produktivbetrieb. Der Gesamtwert ist {{fact:score.overall}}, indikativ, bei einer Belegabdeckung von {{fact:coverage}}.\n\n- **Infrastruktur**: Keine gelesene Quelle sagt, wo der Marktplatz gehostet wird und von wem.\n- **Entwicklung, Sicherheit und Betrieb** ({{fact:score.layer.devsecops}}): Die FITKO und die Genossenschaft govdigital entwickeln ihn unter Leitung des IT-Planungsrats.\n- **Plattform** ({{fact:score.layer.platform}}): das bisherige Cloud-Service-Portal der Deutschen Verwaltungscloud, eine konfigurierte Shopware, deren Hersteller in Schöppingen sitzt; die Genossenschaft govdigital betreibt den Marktplatz, den die FITKO für den IT-Planungsrat steuert.\n- **Basisdienste**: Keine gelesene Quelle nennt welche.\n- **Anwendungen** ({{fact:score.layer.applications}}): der Marktplatz selbst.\n- **Oberfläche und Zugang**: Keine gelesene Quelle beschreibt sie neben dem Portal.\n\nDas schwächste kritische Glied ist {{fact:weakest.block}} auf {{fact:weakest.level}}. Der hohe Wert beruht auf wenigen Bausteinen: Die Lücken liegen in den Quellen, vor allem beim Hosting."
     }
    }
   }

@@ -379,6 +379,7 @@
       "quote": "SVA betreibt schon jetzt das KIPITZ-System, der Betrieb kann hier nahtlos weitergehen.",
       "lang": "de",
       "supports": [
+       "tech",
        "operator"
       ],
       "verified": true
