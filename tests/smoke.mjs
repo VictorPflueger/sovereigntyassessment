@@ -467,6 +467,7 @@ if (wanted("compare")) {
         axes, bMarks, areas: [svg.querySelectorAll(".sp-area").length, svg.querySelectorAll(".sp-area--b").length],
         tableA: order.map((l) => cell(`score.layer.${l}`, "a")?.dataset.value), tableB: order.map((l) => cell(`score.layer.${l}`, "b")?.dataset.value),
         overall: [cell("score.overall", "a")?.textContent, cell("score.overall", "b")?.textContent, ra.overall, rb.overall],
+        layersRow: [cell("layers", "a")?.textContent, cell("layers", "b")?.textContent, order.filter((l) => ra.layers[l].score !== null).length, order.filter((l) => rb.layers[l].score !== null).length],
         caption: document.querySelector("#cmp-table caption")?.textContent, head: document.querySelector("#cmp-title")?.textContent,
         pressed: document.querySelector('#centre-views button[data-centre="compare"]')?.getAttribute("aria-pressed")
       };
@@ -491,7 +492,9 @@ if (wanted("compare")) {
     [JSON.stringify(checks.en?.areas) === "[2,1]", `two areas, the second dashed (${JSON.stringify(checks.en?.areas)})`],
     [checks.en?.overall?.[0] === String(Math.round(checks.en?.overall?.[2])) && checks.en?.overall?.[1] === String(Math.round(checks.en?.overall?.[3])), `the overall scores (${JSON.stringify(checks.en?.overall)})`],
     [checks.en?.head === "Compare" && /BundID and ePayBL side by side/.test(checks.en?.caption || "") && checks.de?.head === "Vergleich" && /BundID und ePayBL nebeneinander/.test(checks.de?.caption || ""), `the view's words in each language (${checks.en?.caption} / ${checks.de?.caption})`],
-    [checks.en?.pressed === "true", "the switch says Compare"]
+    [checks.en?.pressed === "true", "the switch says Compare"],
+    // How many layers each score rests on (the review's finding R-11).
+    [checks.en?.layersRow?.[0] === `${checks.en.layersRow[2]} of 6` && checks.en.layersRow[1] === `${checks.en.layersRow[3]} of 6` && checks.de?.layersRow?.[0] === `${checks.de.layersRow[2]} von 6`, `the layers scored (${JSON.stringify(checks.en?.layersRow)} / ${JSON.stringify(checks.de?.layersRow)})`]
   ]);
 }
 
@@ -510,6 +513,8 @@ if (wanted("portfolio")) {
     await centre(page, "portfolio");
     await page.waitForSelector("#pf-clear");
     checks.before = await page.$$eval(".pf-row", (els) => els.length);
+    checks.mddNote = await page.$eval('.pf-row[data-key="entry:marktplatz-deutschland-digital"] .pf-layers', (e) => e.textContent).catch(() => null);
+    checks.bundidNote = await page.$eval('.pf-row[data-key="entry:bundid"] .pf-layers', (e) => e.textContent).catch(() => null);
     await page.click("#pf-clear");
     await page.waitForFunction(() => !document.querySelectorAll(".pf-row").length);
     await page.setInputFiles("#pf-file", files);
@@ -520,8 +525,9 @@ if (wanted("portfolio")) {
       const { portfolio } = await import("/js/engine.js");
       const list = await loadedAssessments("en");
       const p = portfolio(list.map(({ item, assessment }) => ({ service: item.key, category: assessment.category, blocks: effectiveBlocks(assessment) })));
-      const rows = [...document.querySelectorAll(".pf-row")].map((r) => ({ key: r.dataset.key, overall: r.dataset.overall, value: r.querySelector(".pf-value").textContent }));
-      const expected = list.filter((x) => x.assessment.category !== "self_assessment").map(({ item, assessment }) => ({ key: item.key, overall: scoreAssessment(assessment).overall })).sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1));
+      const rows = [...document.querySelectorAll(".pf-row")].map((r) => ({ key: r.dataset.key, overall: r.dataset.overall, value: r.querySelector(".pf-value").textContent, layersNote: r.querySelector(".pf-layers")?.textContent || null }));
+      const layersOf = (s) => Object.values(s.layers).filter((L) => L.score !== null).length;
+      const expected = list.filter((x) => x.assessment.category !== "self_assessment").map(({ item, assessment }) => { const s = scoreAssessment(assessment); return { key: item.key, overall: s.overall, layers: layersOf(s) }; }).sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1));
       const share = (cat) => document.querySelector(`.pf-cat[data-category="${cat}"] .pf-share-value`)?.textContent;
       const waffle = (cat) => Object.fromEntries([...document.querySelectorAll(`.pf-cat[data-category="${cat}"] .waffle-group`)].map((g) => [g.dataset.cls, Number(g.dataset.n)]));
       const drawn = (cat) => [...document.querySelectorAll(`.pf-cat[data-category="${cat}"] .waffle-group`)].reduce((n, g) => n + g.querySelectorAll(".waffle-hex").length, 0);
@@ -547,6 +553,10 @@ if (wanted("portfolio")) {
   const sorted = (r) => !!r && r.rows.length === r.expected.length && r.rows.every((row, i) => row.key === r.expected[i].key && row.overall === String(r.expected[i].overall));
   await finish("portfolio: S4 for the loaded set, 33% and 67% (33 % and 67 %), sorted scores and the waffle from the engine, the self-assessment left out", t, checks, [
     [checks.before >= 6, `the pre-runs were loaded first (${checks.before})`],
+    // A score on fewer than six layers says on how many (the review's finding R-11): the Marktplatz's three of
+    // six among the pre-runs, BundID's five; and so does each bar of the loaded files.
+    [checks.mddNote === "3 of 6 layers" && checks.bundidNote === "5 of 6 layers", `the pre-runs' notes (${checks.mddNote}; ${checks.bundidNote})`],
+    [checks.en?.rows?.length === checks.en?.expected?.length && checks.en.rows.every((r) => { const e = checks.en.expected.find((x) => x.key === r.key); return e && (e.overall === null || e.layers === 6 ? r.layersNote === null : r.layersNote === `${e.layers} of 6 layers`); }), `each bar's layers note (${JSON.stringify(checks.en?.rows?.map((r) => r.layersNote))} for ${JSON.stringify(checks.en?.expected?.map((e) => e.layers))})`],
     [checks.en?.rows?.[0]?.key === "file:query:musterdienst:2026-11-20:hand_authored" && checks.en?.rows?.[0]?.value === "72", `Musterdienst is S2: overall 72, the highest (${JSON.stringify(checks.en?.rows?.[0])})`],
     [checks.en?.share?.base === "33%" && checks.en?.share?.platform === "67%", `English shares (${JSON.stringify(checks.en?.share)})`],
     [nbsp(checks.de?.share?.base) === "33 %" && nbsp(checks.de?.share?.platform) === "67 %", `German shares (${JSON.stringify(checks.de?.share)})`],
@@ -600,7 +610,7 @@ if (wanted("exports")) {
   const leftover = (f) => !f ? ["no files"] : [f.md.text, f.html.text].flatMap((x) => [...x.matchAll(/\{\{[^}]*\}\}|\bundefined\b|\bNaN\b/g)].map((m) => m[0]));
   const keyLike = (f) => !!f && Object.values(f).some((x) => /sk-ant-/.test(x.text));
   await finish("exports: the report as Markdown and HTML, the assessment and the audit as JSON, with the stated names, in the active language, valid against the schemas", t, checks, [
-    [names(checks.en, "bundid", "2026-11-19", "en") && names(checks.switched, "bundid", "2026-11-19", "de") && names(checks.de, "epaybl", "2026-11-19", "de"), `the names (${JSON.stringify([checks.en?.md?.name, checks.en?.json?.name, checks.en?.audit?.name, checks.de?.html?.name])})`],
+    [names(checks.en, "bundid", "2026-11-20", "en") && names(checks.switched, "bundid", "2026-11-20", "de") && names(checks.de, "epaybl", "2026-11-19", "de"), `the names (${JSON.stringify([checks.en?.md?.name, checks.en?.json?.name, checks.en?.audit?.name, checks.de?.html?.name])})`],
     [/## Corrections by the reviewer/.test(checks.en?.md?.text || "") && /Lever L1 was approved/.test(checks.en?.md?.text || "") && /Draft\. Nothing is sent\./.test(checks.en?.md?.text || "") && !/The findings above are in/.test(checks.en?.md?.text || ""), "the English report in Markdown"],
     [/<html lang="en">/.test(checks.en?.html?.text || "") && /<h1>Sovereignty assessment: BundID<\/h1>/.test(checks.en?.html?.text || "") && selfContained(checks.en?.html?.text), "the English HTML report, self-contained"],
     [/## Korrekturen/.test(checks.switched?.md?.text || "") && /Entwurf\. Nichts wird versendet\./.test(checks.switched?.md?.text || "") && /# BundID: findings/.test(checks.switched?.md?.text || "") && /Die Befunde oben sind auf Englisch/.test(checks.switched?.md?.text || ""), "after a switch: code's parts in German, the English findings marked as such"],

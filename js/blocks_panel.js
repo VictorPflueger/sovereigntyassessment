@@ -68,7 +68,12 @@ export function createBlocksPanel(panel, { onCount } = {}) {
     for (const b of rows) {
       const open = state.open.has(b.id);
       const toggle = h("button", { class: "row-toggle", type: "button", "aria-expanded": open ? "true" : "false", "aria-controls": `ev-${b.id}`, title: t("blocks.evidence") }, icon("chevronRight", 14), b.id);
-      toggle.addEventListener("click", () => { if (state.open.has(b.id)) state.open.delete(b.id); else state.open.add(b.id); render(); });
+      toggle.addEventListener("click", () => {
+        if (state.open.has(b.id)) state.open.delete(b.id); else state.open.add(b.id);
+        render();
+        // The table is drawn again: the focus goes back to this block's toggle, not to the page (R-13).
+        body.querySelector(`tr[data-block="${CSS.escape(b.id)}"] .row-toggle`)?.focus();
+      });
       const unk = (f) => (b.unknown_fields.includes(f) ? h("span", { class: "unk-mark", title: t("blocks.unknown.title") }, " (" + t("blocks.unknown") + ")") : null);
       const corrected = b.corrections?.length ? h("span", { class: "vc-tag vc-tag--accent corrected-tag" }, t("blocks.corrected")) : null;
       const cell = (i, attrs, ...kids) => h("td", { role: "cell", ...attrs, dataset: { label: label(i), ...(attrs?.dataset || {}) } }, ...kids);

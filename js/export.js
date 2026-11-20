@@ -13,7 +13,7 @@ import { reportParts, markQuoteLangs } from "./drafts.js";
 import { redactSecrets } from "./keystore.js";
 import { spiderSvg, wrapWords } from "./spider.js";
 import { LAYERS } from "./engine.js";
-import { fmtDate, fmtInt, fmtScore } from "./format.js";
+import { fmtDate, fmtInt, fmtScore, layerStatusKey } from "./format.js";
 import { formatFact } from "./facts.js";
 import { weakestText } from "./compare.js";
 
@@ -117,12 +117,12 @@ export function reportHtml(report, { lang = getLang(), result = null, service = 
     ].join("")}</dl>`);
     const axes = LAYERS.map((l) => {
       const L = result.layers?.[l] || { score: null, status: "open" };
-      return { id: l, lines: wrapWords(t(`layer.${l}`, null, lang), 22, 3), value: L.score, valueText: L.score === null ? t(`map.status.${L.status}`, null, lang) : fmtScore(L.score, lang), title: t(`layer.${l}.full`, null, lang) };
+      return { id: l, lines: wrapWords(t(`layer.${l}`, null, lang), 22, 3), value: L.score, valueText: L.score === null ? t(layerStatusKey(L.status, L.blocks), null, lang) : fmtScore(L.score, lang), title: t(`layer.${l}.full`, null, lang) };
     });
     const svg = spiderSvg({ axes, kind: "layer", id: "export-spider", ticks: [25, 50, 75, 100].map((v) => ({ f: v / 100, text: fmtInt(v, lang) })), title: t("map.spider.layer", { service }, lang), desc: t("map.spider.desc", null, lang) });
     const rows = LAYERS.map((l) => {
       const L = result.layers?.[l] || { score: null, status: "open", blocks: 0, scored: 0 };
-      return `<tr><th scope="row">${escapeHtml(t(`layer.${l}`, null, lang))}</th><td class="num">${escapeHtml(L.score === null ? t(`map.status.${L.status}`, null, lang) : fmtScore(L.score, lang))}</td><td class="num">${escapeHtml(t("map.blocksScored", { scored: fmtInt(L.scored ?? 0, lang), all: fmtInt(L.blocks ?? 0, lang) }, lang))}</td></tr>`;
+      return `<tr><th scope="row">${escapeHtml(t(`layer.${l}`, null, lang))}</th><td class="num">${escapeHtml(L.score === null ? t(layerStatusKey(L.status, L.blocks), null, lang) : fmtScore(L.score, lang))}</td><td class="num">${escapeHtml(t("map.blocksScored", { scored: fmtInt(L.scored ?? 0, lang), all: fmtInt(L.blocks ?? 0, lang) }, lang))}</td></tr>`;
     }).join("");
     parts.push(`<figure>${svg.outerHTML}<figcaption>${escapeHtml(t("map.spider.desc", null, lang))}</figcaption></figure>`);
     parts.push(`<table><caption>${escapeHtml(t("map.table.layers", null, lang))}</caption><thead><tr><th scope="col">${escapeHtml(t("map.col.layer", null, lang))}</th><th scope="col" class="num">${escapeHtml(t("map.col.score", null, lang))}</th><th scope="col" class="num">${escapeHtml(t("map.col.blocks", null, lang))}</th></tr></thead><tbody>${rows}</tbody></table>`);

@@ -12,7 +12,7 @@ import { icon } from "./icons.js";
 import { t, tn, onLang, getLang } from "./i18n/index.js";
 import { fmtInt, fmtScore, fmtShare } from "./format.js";
 import { CLASSES } from "./classes.js";
-import { portfolio } from "./engine.js";
+import { portfolio, LAYERS } from "./engine.js";
 import { effectiveBlocks, scoreAssessment, serviceName } from "./assessment.js";
 import { loadedAssessments, onLoaded, addFile, addPreRuns, clearLoaded, removeLoaded } from "./loaded.js";
 import { getWeights, onWeights } from "./weights.js";
@@ -113,7 +113,10 @@ export function createPortfolio(host) {
 
     // The engine's portfolio over the gated blocks, with the weights in force.
     const p = portfolio(list.map(({ item, assessment }) => ({ service: item.key, category: assessment.category, blocks: effectiveBlocks(assessment) })), { layerWeights: weights });
-    const rows = inScope.map(({ item, assessment }) => ({ item, assessment, overall: scoreAssessment(assessment, weights).overall }))
+    const rows = inScope.map(({ item, assessment }) => {
+      const s = scoreAssessment(assessment, weights);
+      return { item, assessment, overall: s.overall, layers: LAYERS.filter((l) => s.layers?.[l]?.score !== null && s.layers?.[l]?.score !== undefined).length };
+    })
       .sort((a, b) => (b.overall ?? -1) - (a.overall ?? -1) || serviceName(a.assessment, lang).localeCompare(serviceName(b.assessment, lang), lang));
     drawScores(rows, lang);
     drawCategories(p);
@@ -126,7 +129,9 @@ export function createPortfolio(host) {
       const bar = h("span", { class: "pf-bar", "aria-hidden": "true" });
       if (r.overall !== null) bar.style.width = `${Math.max(0, Math.min(100, r.overall))}%`;
       ol.append(h("li", { class: "pf-row", dataset: { key: r.item.key, category: r.assessment.category, overall: r.overall === null ? "" : String(r.overall) } },
-        h("span", { class: "pf-name" }, serviceName(r.assessment, lang), h("span", { class: "vc-tag pf-cat-tag" }, t(`portfolio.cat.short.${r.assessment.category}`))),
+        h("span", { class: "pf-name" }, serviceName(r.assessment, lang), h("span", { class: "vc-tag pf-cat-tag" }, t(`portfolio.cat.short.${r.assessment.category}`)),
+          // A score that rests on fewer than six layers says so (the review's finding R-11).
+          r.overall !== null && r.layers < LAYERS.length ? h("span", { class: "pf-layers" }, t("portfolio.layersScored", { scored: fmtInt(r.layers), all: fmtInt(LAYERS.length) })) : null),
         h("span", { class: "pf-track", dataset: { nodata: r.overall === null ? "true" : "false" } }, bar),
         h("span", { class: "pf-value vc-tabular" }, r.overall === null ? t("fact.noData") : fmtScore(r.overall))));
     }

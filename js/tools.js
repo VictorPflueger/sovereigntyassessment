@@ -124,12 +124,24 @@ export const SERVER_TOOL_NAMES = new Set(SERVER_TOOLS.map((t) => t.name));
 
 const SCHEMAS = Object.fromEntries(CLIENT_TOOLS.map((t) => [t.name, t.input_schema]));
 
-/** The texts of each tool that the fact audit reads (rule 4), as [field, text] pairs. */
+/** The parties' names a tool records (maker, operator, owner and their parents), as [field, text] pairs. */
+const partyNames = (o, prefix = "") => ["tech", "operator", "owner"].flatMap((k) => [
+  ...(typeof o?.[k]?.name === "string" ? [[`${prefix}${k}.name`, o[k].name]] : []),
+  ...(typeof o?.[k]?.parent?.name === "string" ? [[`${prefix}${k}.parent.name`, o[k].parent.name]] : [])
+]);
+
+/**
+ * The texts of each tool that the fact audit reads (rule 4), as [field, text] pairs: every text of the
+ * model's that the screen shows, the names of services and parties and the reasons included (the review's
+ * finding R-14).
+ */
 const AUDITED = {
   ui_progress: (i) => [["text", i.text]],
-  rec_profile: (i) => ["what", "how", "status", "legal_basis", "governance"].filter((f) => typeof i[f] === "string").map((f) => [f, i[f]]),
-  rec_block: (i) => ["name", "role", "note"].filter((f) => typeof i[f] === "string").map((f) => [f, i[f]]),
-  rec_block_update: (i) => ["name", "role", "note"].filter((f) => typeof i.changes?.[f] === "string").map((f) => [f, i.changes[f]]),
+  ui_choose_service: (i) => [["question", i.question], ...(i.candidates || []).flatMap((c, k) => [[`candidates[${k}].name`, c.name], [`candidates[${k}].description`, c.description]])].filter(([, v]) => typeof v === "string"),
+  rec_profile: (i) => [...["what", "how", "status", "legal_basis", "governance"].filter((f) => typeof i[f] === "string").map((f) => [f, i[f]]), ...(i.names || []).filter((n) => typeof n === "string").map((n, k) => [`names[${k}]`, n]), ...partyNames(i)],
+  rec_block: (i) => [...["name", "role", "note"].filter((f) => typeof i[f] === "string").map((f) => [f, i[f]]), ...partyNames(i)],
+  rec_block_update: (i) => [...["name", "role", "note"].filter((f) => typeof i.changes?.[f] === "string").map((f) => [f, i.changes[f]]), ...partyNames(i.changes, "changes."), ...(typeof i.reason === "string" ? [["reason", i.reason]] : [])],
+  rec_block_remove: (i) => (typeof i.reason === "string" ? [["reason", i.reason]] : []),
   rec_layer: (i) => [["reason", i.reason]],
   ui_request_review: (i) => [["summary", i.summary]],
   ui_propose_levers: (i) => (i.levers || []).flatMap((l) => [[`${l.lever_id}.title`, l.title], [`${l.lever_id}.rationale`, l.rationale]]),
@@ -462,6 +474,8 @@ export function createToolbox(ctx) {
       phase("researching");
       const b = run.blocks.get(i.block_id);
       if (!b) return { error: `There is no block ${i.block_id}. Recorded blocks: ${[...run.blocks.keys()].join(", ") || "none"}.` };
+      const a = audit("rec_block_remove", i);
+      if (a.reject) return a.reject;
       run.blocks.delete(i.block_id);
       run.scoredFresh = false;
       recompute();
@@ -530,6 +544,8 @@ export function createToolbox(ctx) {
     },
 
     async ui_choose_service(i) {
+      const a = audit("ui_choose_service", i);
+      if (a.reject) return a.reject;
       const request_id = `choice-${++run.requests}`;
       phase("awaiting_choice");
       emit("choice_request", { request_id, question: i.question, candidates: i.candidates, lang });
@@ -630,7 +646,10 @@ export function createToolbox(ctx) {
     },
 
     ui_final_report(i) {
-      phase("drafting");
+      // A run that ends without an assessment stops at its research, if it researched: scoring, the review
+      // and the recommendation were not needed, and the rail says so (the review's finding R-07).
+      if (i.outcome !== "not_a_service") phase("drafting");
+      else if (run.researched) phase("researching");
       const a = audit("ui_final_report", i);
       if (a.reject) return a.reject;
       run.reported = true;
@@ -752,6 +771,7 @@ export function createToolbox(ctx) {
       }
     }
     if (!step.ok) payload.error_code = step.error_code || "unavailable";
+    else run.researched = true;
     emit("research_step", payload);
     if (!step.ok && step.error_code === "max_uses_exceeded") emit("notice", { level: "warn", key: step.kind === "search" ? "notice.searchBudget" : "notice.fetchBudget" });
     return payload;

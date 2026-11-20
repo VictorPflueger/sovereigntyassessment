@@ -164,6 +164,8 @@ if (wanted("play")) {
         await waitState(page, TERMINAL);
         checks.state = await page.evaluate(() => window.__getState().runState);
         checks.fig = await recompute(page);
+        checks.tileNote = await text(page, "#kpi-overall-sub");
+        checks.heads = await page.$$eval(".hc-group", (els) => els.map((g) => ({ layer: g.dataset.layer, text: g.querySelector(".hc-score")?.textContent.trim(), cells: g.querySelectorAll(".hc-cell[data-block]").length })));
         checks.axes = await page.$$eval('.spider[data-view="layer"] .sp-axis-g', (els) => els.map((e) => ({ id: e.dataset.axis, v: e.dataset.value === "" ? null : Number(e.dataset.value) })));
         await page.click("#tab-outbox");
         await page.waitForSelector('.outbox-card[data-draft="report"]');
@@ -180,6 +182,10 @@ if (wanted("play")) {
         [checks.badge === "SIMULATION" && /SIMULATION/.test(checks.tape || ""), `the SIMULATION badge and tape (${checks.badge}; ${checks.tape})`],
         [close9(f.overall, f.published) && LAYERS.every((l) => close9(f.layers?.[l], f.publishedLayers?.[l])), `the published figures equal the engine's recomputation (${f.overall} vs ${f.published})`],
         [f.tile === (f.tileExpected ?? (de ? "keine Daten" : "no data")), `the overall tile shows the recomputed score (${f.tile} vs ${f.tileExpected})`],
+        // A layer whose blocks have no origin on record says so, not "no evidence found" (R-15).
+        [Array.isArray(checks.heads) && checks.heads.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])).every((g) => g.text === (de ? "keine Belege zu Hersteller oder Betreiber" : "no evidence on maker or operator")), `the layers without a scored block (${JSON.stringify(checks.heads?.filter((g) => g.cells > 0 && !Number.isFinite(f.layers?.[g.layer])))})`],
+        // The tile says on how many layers the score rests when not on all six (the review's finding R-11).
+        [(() => { const n = LAYERS.filter((l) => Number.isFinite(f.layers?.[l])).length; return checks.tileNote === (n === 6 || f.overall === null ? (de ? "indikativ" : "indicative") : de ? `indikativ; ${n} von 6 Ebenen bewertet` : `indicative; ${n} of 6 layers scored`); })(), `the overall tile's note (${checks.tileNote})`],
         [checks.axes?.length === 6 && checks.axes.every((a, i) => a.id === LAYERS[i] && close9(f.layers?.[a.id], a.v)), "the spider diagram's six axes carry the engine's layer scores"],
         [checks.memo?.lang === lang && checks.memo.note === (de ? "Entwurf. Nichts wird versendet." : "Draft. Nothing is sent.") && (de ? /Entscheidung: Hebel L1/ : /Decision: lever L1/).test(checks.memo.text), `the memo for L1 in the Outbox, in the run's language (${checks.memo?.lang}; ${checks.memo?.note})`],
         [checks.report?.lang === lang && (checks.report.text || "").length > 400 && (de ? /Befunde/ : /findings/).test(checks.report.text), `the report in the Outbox, in the run's language (${checks.report?.lang}, ${(checks.report?.text || "").length} characters)`],
@@ -214,6 +220,12 @@ async function playNotAService(entry, lang) {
     checks.fig = await recompute(page);
     checks.tile = await text(page, "#kpi-overall-value");
     checks.cells = await page.$$eval(".hc-cell[data-block]", (els) => els.length);
+    // What the screen says of a run without an assessment (the review's finding R-07): the rail's steps
+    // after the research were not needed, every layer reads "not assessed", and so does the map's line.
+    checks.rail = await page.$$eval(".rail .rail-step", (els) => els.map((e) => e.dataset.state));
+    checks.railSaid = await page.$$eval(".rail .rail-step .vc-visually-hidden", (els) => els.map((e) => e.textContent.trim()));
+    checks.heads = await page.$$eval(".hc-group .hc-score", (els) => els.map((e) => e.textContent.trim()));
+    checks.meta = await text(page, ".sov-meta");
     await page.click("#tab-outbox");
     await page.waitForSelector('.outbox-card[data-draft="report"]');
     checks.cards = await page.$$eval(".outbox-card", (els) => els.map((e) => e.dataset.draft));
@@ -230,7 +242,10 @@ async function playNotAService(entry, lang) {
     [Array.isArray(checks.steps) && checks.steps.length === 0 && checks.fig === null && checks.cells === 0 && checks.tile === (de ? "keine Daten" : "no data"), `no block, review, lever or memo, and no figure (${JSON.stringify(checks.steps)}; ${checks.cells} cells; ${checks.tile})`],
     [JSON.stringify(checks.cards) === JSON.stringify(["report"]) && checks.report?.lang === lang && checks.report.text.length > 400 && (de ? /Quellen/ : /Sources/).test(checks.report.text) && checks.report.links >= 1, `only the report in the Outbox, in the run's language, with its sources (${JSON.stringify(checks.cards)}; ${checks.report?.lang}; ${checks.report?.links} links)`],
     [checks.exportAssessment?.disabled === true && (de ? /ohne Bewertung/ : /without an assessment/).test(checks.exportAssessment.why || ""), `the assessment export says why it has nothing to save (${checks.exportAssessment?.why})`],
-    [checks.htmlLang === lang && Array.isArray(checks.broken) && checks.broken.length === 0, `no unresolved placeholder or broken value (${JSON.stringify(checks.broken)})`]
+    [checks.htmlLang === lang && Array.isArray(checks.broken) && checks.broken.length === 0, `no unresolved placeholder or broken value (${JSON.stringify(checks.broken)})`],
+    [JSON.stringify(checks.rail) === JSON.stringify(["done", "done", "skipped", "skipped", "skipped"]) && checks.railSaid?.slice(2).every((x) => x === (de ? ": nicht nötig" : ": not needed")), `the rail: understood and researched, the rest not needed (${JSON.stringify(checks.rail)}; ${JSON.stringify(checks.railSaid)})`],
+    [checks.heads?.length === 6 && checks.heads.every((x) => x === (de ? "nicht bewertet" : "not assessed")) && (de ? /ohne Bewertung beendet/ : /ended without an assessment/).test(checks.meta || "") && !(de ? /indikativ/ : /indicative/).test(checks.meta || ""), `every layer and the map's line say not assessed (${JSON.stringify(checks.heads)}; ${checks.meta})`],
+    [(de ? /Keine Bewertung: Der Lauf endete ohne/ : /No assessment: the run ended without one/).test(checks.report?.text || "") && !(de ? /Jede Zahl wurde im Code berechnet/ : /Every figure was computed in code/).test(checks.report?.text || ""), "the report's footer claims no assessment and no figure"]
   ]);
 }
 

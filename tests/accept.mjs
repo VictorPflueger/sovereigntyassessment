@@ -17,7 +17,8 @@
 //                start with Enter, choose Simulation in the dialog, confirm the review, choose a lever with
 //                the arrow keys or Space and approve it; every control that takes the focus on the way
 //                shows a visible focus ring (an outline or a ring) and is in view; the run ends done
-//                with the memo and the report in the Outbox
+//                with the memo and the report in the Outbox; a block's evidence opens and closes by
+//                keyboard with the focus kept on its toggle
 // Every case fails on a page error, a console error, a policy violation or a request to another host.
 // Usage: node tests/accept.mjs [case…]
 import path from "node:path";
@@ -453,13 +454,25 @@ if (wanted("keyboard")) {
     checks.drafts = await page.$$eval(".outbox-card", (els) => els.map((e) => e.dataset.draft));
     checks.memo = await page.$eval('.outbox-card[data-draft="memo"] .md', (el) => el.innerText).catch(() => "");
     await shot(page, "06-keyboard-done.png");
+    // A block's evidence by keyboard: Enter on its row's toggle opens it, and the focus stays on the toggle
+    // while the table is drawn again (the review's finding R-13); Enter again closes it.
+    await tabTo("#tab-blocks");
+    await page.keyboard.press("Enter");
+    await page.waitForSelector('.blocks-table tr[data-block="B-01"] .row-toggle');
+    await tabTo('.blocks-table tr[data-block="B-01"] .row-toggle');
+    await page.keyboard.press("Enter");
+    await page.waitForSelector("#ev-B-01");
+    checks.rowFocus = await page.evaluate(() => { const a = document.activeElement; return { onToggle: !!a?.matches('.blocks-table tr[data-block="B-01"] .row-toggle'), expanded: a?.getAttribute("aria-expanded") }; });
+    await page.keyboard.press("Enter");
+    checks.rowFocusClosed = await page.evaluate(() => { const a = document.activeElement; return { onToggle: !!a?.matches('.blocks-table tr[data-block="B-01"] .row-toggle'), expanded: a?.getAttribute("aria-expanded"), evidence: !!document.querySelector("#ev-B-01") }; });
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("keyboard: a whole run by keyboard alone, every focused control with a visible focus ring and in view", t, checks, [
     [checks.picked === true, "the keyboard picks the entry from the suggestions"],
     [checks.lever === "L1" && /Decision: lever L1/.test(checks.memo || ""), `the lever chosen by keyboard (${checks.lever})`],
     [checks.state === "done" && JSON.stringify(checks.drafts) === JSON.stringify(["memo", "report"]), `the run ends done with the memo and the report (${checks.state}; ${JSON.stringify(checks.drafts)})`],
     [checks.stops.length >= 5 && checks.noRing.length === 0, `every focused control shows its focus (${checks.stops.length} stops; without a ring: ${JSON.stringify([...new Set(checks.noRing)].slice(0, 8))})`],
-    [checks.outOfView.length === 0, `every focused control is in view (${JSON.stringify([...new Set(checks.outOfView)].slice(0, 8))})`]
+    [checks.outOfView.length === 0, `every focused control is in view (${JSON.stringify([...new Set(checks.outOfView)].slice(0, 8))})`],
+    [checks.rowFocus?.onToggle && checks.rowFocus.expanded === "true" && checks.rowFocusClosed?.onToggle && checks.rowFocusClosed.expanded === "false" && !checks.rowFocusClosed.evidence, `a block's evidence opens and closes by keyboard, the focus kept on its toggle (${JSON.stringify(checks.rowFocus)}; ${JSON.stringify(checks.rowFocusClosed)})`]
   ]);
 }
 

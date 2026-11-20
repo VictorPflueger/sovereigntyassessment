@@ -104,7 +104,7 @@ const FAMILIES = {
   "lang.name.": ["en", "de"],
   "ai.kind.": ["narration", "profile", "block", "review", "levers", "memo", "report"].flatMap((k) => [k, `${k}.text`]),
   "console.end.": ["done", "not_a_service", "stopped", "aborted", "error"],
-  "map.status.": ["scored", "open", "no_evidence", "not_applicable"],
+  "map.status.": ["scored", "open", "no_evidence", "not_applicable", "not_assessed", "no_origin"],
   "tool.rec_layer.": ["no_evidence", "not_applicable"],
   "tool.ui_request_review.": ["confirm", "skip"],
   "outbox.kind.": ["memo", "report"],

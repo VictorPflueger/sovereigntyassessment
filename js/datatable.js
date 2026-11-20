@@ -4,7 +4,7 @@
 
 import { h } from "./dom.js";
 import { t } from "./i18n/index.js";
-import { fmtInt, fmtScore } from "./format.js";
+import { fmtInt, fmtScore, layerStatusKey } from "./format.js";
 import { LAYERS } from "./engine.js";
 
 export function renderTables(root, result, { layerStatus = {}, lang } = {}) {
@@ -19,7 +19,7 @@ export function renderTables(root, result, { layerStatus = {}, lang } = {}) {
       return h("tr", { dataset: { layer: l, value: L.score === null ? "" : String(L.score) } },
         h("th", { scope: "row" }, t(`layer.${l}`)),
         h("td", { class: "vc-tabular num" }, L.score === null ? t("fact.noData") : fmtScore(L.score)),
-        h("td", {}, t(`map.status.${status}`)),
+        h("td", {}, t(layerStatusKey(status, L.blocks))),
         h("td", { class: "vc-tabular num" }, t("map.blocksScored", { scored: fmtInt(L.scored), all: fmtInt(L.blocks) })));
     })));
   const blocks = h("table", { class: "vc-table map-table", dataset: { table: "blocks" } },

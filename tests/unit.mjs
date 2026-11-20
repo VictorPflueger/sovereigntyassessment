@@ -369,6 +369,13 @@ await group("evidence", "evidence (AC-09): provenance, quotes in fetched text or
   // A quote found nowhere does not count; nor does one over the length limit.
   const nowhere = checkEvidence(r, [{ url: "https://example.gov/page", title: "The page", quote: "run by a company in the United States", lang: "en", supports: ["operator"] }]).checks[0];
   check.equal(nowhere.verified, false, "a quote in neither the text nor a citation does not count");
+  // The source is named by the title the run read, not one the model writes (the review's finding R-14);
+  // a page fetched after a search names itself by its own title.
+  const titled = checkEvidence(r, [{ url: "https://example.gov/page", title: "Official ministry statement", quote: "operated by the ITZBund", lang: "en", supports: ["operator"] }]).checks[0];
+  check.equal(titled.title, "The page", "the fetched page's title, not the model's");
+  r.allowUrl("https://example.gov/later", { via: "search", title: "example.gov" });
+  r.addDocument({ url: "https://example.gov/later", title: "The later page", text: "Run by the ITZBund." });
+  check.equal(r.titleOf("https://example.gov/later"), "The later page", "a fetch's title over a search result's");
   check.equal([...clipQuote("x".repeat(400))].length <= MAX_QUOTE, true, "clipped to the limit");
   // A pre-verified quote counts only while its URL is allowed in the run.
   r.addVerifiedQuote("https://unlisted.example/", "A fact.", "ref_facts");

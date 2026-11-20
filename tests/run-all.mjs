@@ -23,7 +23,7 @@ const SUITES = [
   { id: "hexagon", what: "nothing round: the app's files, and the rendered app in both themes", file: "tests/hexagon.mjs", browser: true },
   { id: "live", what: "the live agent against the API stand-in: protocol, nudges, disabled tools, evidence, caps, cost, guardrails, the key", file: "tests/live.mjs", browser: true },
   { id: "sims", what: "every pre-run played in both languages, a correction and Keep as is, the map, review and levers", file: "tests/sims.mjs", browser: true },
-  { id: "layout", what: "five sizes from 1920×1080 to 1280×720, both themes, both languages, six states: no overflow, nothing cut, 40 px targets; thirty blocks", file: "tests/layout.mjs", browser: true },
+  { id: "layout", what: "five sizes from 1920×1080 to 1280×720, both themes, both languages, seven states with the block view: no overflow, nothing cut or covered, 40 px targets; a run's edges; thirty blocks", file: "tests/layout.mjs", browser: true },
   { id: "design", what: "the colour grammar in the running app, reduced motion, projector and colour-blind captures", file: "tests/design.mjs", browser: true }
 ];
 

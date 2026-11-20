@@ -180,6 +180,8 @@ export function reportParts(report, lang = report.lang) {
     }
     out.push("");
   }
-  out.push("*" + t("report.footer", { date: fmtDate(c.as_of, lang), method: c.method_version || "" }, lang) + "*", "", "**" + t("outbox.draftNote", null, lang) + "**");
+  // A run that ended without an assessment has no figure and no assessment to qualify (R-07).
+  const footer = report.outcome === "not_a_service" ? "report.footer.none" : "report.footer";
+  out.push("*" + t(footer, { date: fmtDate(c.as_of, lang), method: c.method_version || "" }, lang) + "*", "", "**" + t("outbox.draftNote", null, lang) + "**");
   return { findings, closing: out.join("\n") };
 }

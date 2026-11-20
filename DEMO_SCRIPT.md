@@ -56,5 +56,5 @@ With a key ready, choose **FIT-Connect** or type a service in your own words, **
 - **The API is unreachable** or the key is refused: stay in Simulation, which needs neither.
 - **Web search or web fetch is switched off** in the organisation's console: the live run stops with a message that offers Simulation.
 - **The audience asks about a service outside the catalogue:** run it live, or explain that the pre-runs show the method on real services, and the live agent does the same for any other.
-- **The audience asks about ZBDS, ZaPuK or low-code:** play it. Their sources describe a component still being designed, a target architecture and a category, so the run reads them, records what the entry is and ends without an assessment, saying why; a live run would do the same.
+- **The audience asks about ZBDS, ZaPuK or low-code:** play it. Their sources describe a component still being designed, a target architecture and a category, so the run reads them, records what the entry is and ends without an assessment, saying why. That ending is the pre-run's own reading; a live run follows the agent's prompt and may record their layers as without evidence instead.
 - **Someone changed the layer weights:** open **Method** from the header and click **Reset**, or reload the page; the weights are never stored.

@@ -8,7 +8,8 @@ import { h } from "./dom.js";
 import { tx, retext, attrs } from "./text.js";
 import { onLang } from "./i18n/index.js";
 import { formatFact } from "./facts.js";
-import { noData } from "./format.js";
+import { noData, fmtInt } from "./format.js";
+import { LAYERS } from "./engine.js";
 
 const TILES = [
   { id: "overall", labelKey: "kpi.overall.label" },
@@ -78,8 +79,11 @@ export function createKpis(container) {
     const r = result;
     const facts = r?.facts || {};
     const has = (k) => facts[k] !== null && facts[k] !== undefined;
-    // The overall score always says "indicative" (brief §4, Honesty).
-    set("overall", has("score.overall") ? formatFact("score.overall", facts["score.overall"]) : noData(), "kpi.overall.note", null, has("score.overall") ? "" : "muted");
+    // The overall score always says "indicative" (brief §4, Honesty), and how many of the six layers it
+    // rests on when not all have a score (the review's finding R-11).
+    const scoredLayers = LAYERS.filter((l) => Number.isFinite(r?.layers?.[l]?.score)).length;
+    const partial = has("score.overall") && scoredLayers < LAYERS.length;
+    set("overall", has("score.overall") ? formatFact("score.overall", facts["score.overall"]) : noData(), partial ? "kpi.overall.partial" : "kpi.overall.note", partial ? { scored: fmtInt(scoredLayers), all: fmtInt(LAYERS.length) } : null, has("score.overall") ? "" : "muted");
     // The weakest critical link names its block, and how many more share its level on a tie.
     const w = r?.weakest;
     if (w && w.block_id) {

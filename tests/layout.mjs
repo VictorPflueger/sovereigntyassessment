@@ -1,13 +1,19 @@
 // Layout for projector use (AC-18; PLAN.md f.1 and f.2):
 //   viewports  at 1920×1080, 1600×900, 1536×864, 1366×768 and 1280×720, in both themes and both languages,
-//              a pre-run played through six states: idle (the catalogue), during research, at the review,
-//              with the levers, finished with the Outbox open, and finished with the drawer hidden. In each:
+//              a pre-run played through seven states: idle (the catalogue), during research, at the review,
+//              with the levers, finished with the Outbox open, finished with the drawer hidden, and its
+//              block view. In each:
 //              no horizontal overflow; the four tiles inside the header, apart from each other and from the
 //              badges, and none of their text cut or ellipsed; on the map, the spider's labels inside the
-//              diagram and apart from each other, the spider, the mix and the honeycomb inside the map
+//              diagram and apart from each other and from the values and level ticks, each value clear of
+//              its marker, the spider, the mix and the honeycomb inside the map
 //              panel, the honeycomb's groups apart and their heads inside them; an open drawer's panel
 //              beside the map, never over it (from 1,101 px wide it takes the console's column); and
 //              every visible target at least 40 px wide and high (text links inside prose excepted)
+//   edges      at 1280×720 and 1366×768, in both languages, the first seconds of a run (every layer still
+//              with its status line), the review, the end with the drawer hidden and the block view, for
+//              the Marktplatz (three layers without evidence), NOOTS, BundID and the three pre-runs that end
+//              without an assessment: the same measures
 //   blocks30   a run of thirty blocks, five per layer, at 1920×1080 and 1280×720 in English and German:
 //              the block view's thirty labels inside the diagram and apart from each other, and the
 //              honeycomb's thirty cells inside the map panel, none cut
@@ -221,10 +227,73 @@ async function viewport({ width, height, theme, lang, entry }) {
     await page.click("#drawer .drawer-toggle");
     await page.waitForFunction(() => document.querySelector("#drawer")?.dataset.open === "false");
     await take("hidden", width === 1280 || width === 1920);
+    // The block view of the same run: a label per block, the values beside the markers (the review's R-05).
+    await page.click('.sov-map button[data-view="block"]');
+    await page.waitForSelector('.sov-spider svg.spider[data-view="block"]');
+    await take("block", width === 1280 || width === 1920);
   } catch (e) { problems.push(`exception after ${states.join(", ") || "loading"}: ${String(e.message).split("\n")[0]}`); }
   problems.push(...errors.map((e) => `page error: ${e}`));
   await context.close();
-  return { name: `${label}: ${entry}, ${states.length} of 6 states`, ok: !problems.length && states.length === 6, problems };
+  return { name: `${label}: ${entry}, ${states.length} of 7 states`, ok: !problems.length && states.length === 7, problems };
+}
+
+/**
+ * The edges of a run (the review's R-06): its first seconds, when every layer still has its status line,
+ * then the review, the end with the drawer hidden and the block view; for the pre-runs that end without
+ * an assessment, the start and the end. Every state measured like the viewports.
+ */
+async function edges({ width, height, theme, lang, entry }) {
+  const label = `${width}×${height} ${theme} ${lang}`;
+  const { context, page, errors } = await newPage({ width, height, lang, theme });
+  const problems = [];
+  const states = [];
+  const take = async (state) => {
+    const p = await measure(page);
+    states.push(state);
+    problems.push(...p.map((x) => `${state}: ${x}`));
+    if (p.length) await page.screenshot({ path: path.join(OUT, `edges-${entry}-${width}x${height}-${theme}-${lang}-${state}.png`) });
+  };
+  const assessed = !["zbds", "zapuk", "low-code"].includes(entry);
+  try {
+    await page.evaluate(async () => { const st = await import("/js/state.js"); st.setState({ speed: 1 }); });
+    await page.click(`.catalogue-chip[data-entry="${entry}"]`);
+    await page.click("#btn-start");
+    await page.waitForSelector('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.click('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.waitForSelector(".sov-spider svg.spider");
+    await page.waitForTimeout(1200);
+    await take("start");
+    await page.evaluate(async () => { const st = await import("/js/state.js"); st.setState({ speed: 40 }); });
+    if (assessed) {
+      await waitState(page, ["awaiting_review"]);
+      await page.waitForSelector("#btn-review-confirm");
+      await take("review");
+      await page.click("#btn-review-confirm");
+      await waitState(page, ["awaiting_decision"]);
+      await page.waitForSelector('.lever-card[data-lever="keep"]');
+      await page.click('.lever-card[data-lever="keep"] .lever-id');
+      await page.click("#btn-approve-lever");
+    }
+    await waitState(page, TERMINAL);
+    await page.waitForTimeout(400);
+    if (await page.evaluate(() => document.querySelector("#drawer")?.dataset.open === "true")) await page.click("#drawer .drawer-toggle");
+    await page.waitForFunction(() => document.querySelector("#drawer")?.dataset.open === "false");
+    await take("done");
+    if (assessed) {
+      await page.click('.sov-map button[data-view="block"]');
+      await page.waitForSelector('.sov-spider svg.spider[data-view="block"]');
+      await take("block");
+    }
+  } catch (e) { problems.push(`exception after ${states.join(", ") || "loading"}: ${String(e.message).split("\n")[0]}`); }
+  problems.push(...errors.map((e) => `page error: ${e}`));
+  await context.close();
+  const want = assessed ? 4 : 2;
+  return { name: `edges ${label}: ${entry}, ${states.length} of ${want} states`, ok: !problems.length && states.length === want, problems };
+}
+if (wanted("edges")) {
+  const jobs = [];
+  for (const [width, height] of [[1280, 720], [1366, 768]]) for (const lang of ["de", "en"]) for (const entry of ["marktplatz-deutschland-digital", "zbds", "zapuk", "low-code", "bundid", "noots"]) jobs.push({ width, height, lang, entry, theme: jobs.length % 2 ? "dark" : "light" });
+  for (let i = 0; i < jobs.length; i += 4) results.push(...(await Promise.all(jobs.slice(i, i + 4).map(edges))));
 }
 if (wanted("viewports")) {
   const jobs = [];

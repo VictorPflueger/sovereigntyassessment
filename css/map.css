@@ -215,6 +215,7 @@
 .pf-row { display: grid; grid-template-columns: minmax(9em, 1.1fr) minmax(0, 1.4fr) 3.6em; align-items: center; gap: 10px; }
 .pf-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-weight: var(--vc-weight-semibold); min-width: 0; }
 .pf-cat-tag.vc-tag { font-size: var(--fs-xs); font-weight: var(--vc-weight-medium); }
+.pf-layers { margin-inline-start: 6px; font-size: var(--fs-xs); color: var(--vc-text-muted); white-space: nowrap; }
 .pf-track { height: 16px; background: var(--vc-bg-subtle); border: 1px solid var(--vc-border-subtle); }
 .pf-track[data-nodata="true"] { background: none; border: 1px dashed var(--vc-border-strong); }
 .pf-bar { display: block; height: 100%; background: var(--vc-data-2); }
