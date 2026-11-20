@@ -95,11 +95,22 @@ After these fixes a sweep of the spider in every assessed pre-run at five sizes 
 
 | Finding | Severity | What the re-check found | Status |
 |---|---|---|---|
-| F-1 | Low | A line of the Deutschland-App's console, "The blocks named so far are made and run in Germany …", was wrong once the sign-in with the online ID had no known operator, and the messenger is made in Switzerland | Fixed in `3af8408`: the line says that most blocks are made and run in Germany, that who runs the sign-in and the messenger is open, and that the messenger comes from Switzerland |
+| F-1 | Low | A line of the Deutschland-App's console, "The blocks named so far are made and run in Germany …", was wrong once the sign-in with the online ID had no known operator | Fixed in `6529720`: the line says that every block is made in Germany and most are run there, and that who runs the sign-in and the messenger is open. A first rewording in `3af8408` also said the messenger comes from Switzerland, which the method does not count (the final pass, O-3) |
 | F-2 | Low | This part marked R-01 and R-20 fixed, and TECH_NOTES §23 and §24 the verification's findings fixed, before the re-check had looked at them | Fixed in `6789077`: §23 and §24 say what the re-check found, and this part's rows for R-01 and R-20 say which commit completed each fix |
 
 Five operator fields rest on a quote that implies the operator rather than stating it: ePayBL's card schemes, MUK's infrastructure and platform, KIPITZ's language models and the Online ID's authorisation certificates. The re-check noted that this reading does not affect any operator's class; they are kept, and this sentence records them.
 
 While the re-check ran, the builder found two more problems, both low, and fixed them in `3af8408`, each with a check that fails on the previous code: the German correction form cut its placeholder "UNBEKANNT" at 1280×720 (the layout suite's new form case), and DATA_SOURCES §7 still counted pages that BundID and the Online ID no longer cite and a quote that ZaPuK does not cite (the docs suite now compares every entry with its pre-run). FIT-Connect's Maven Central block, which the verification noted without counting it, is now made by Sonatype under the rule of R-09; the block's level stays 0, and its lever's indicative what-if is 86 (+10) instead of 96 (+20).
 
-**The final pass.** To come: the same agent checks what changed after the re-check (`3af8408` and `6789077`) and this account of it.
+**The final pass.** The same agent checked what changed after the re-check, at `c7cca52`, read only: each new quote on its page, the figures through the engine and by hand against `f7e790b` (no assessment figure moved; FIT-Connect's lever what-if is 86, +10), the three new checks against the previous code, this part and TECH_NOTES, and the test set twice. Its result: no high or medium finding open, and four low ones:
+
+| Finding | Severity | What the final pass found | Status |
+|---|---|---|---|
+| O-1 | Low | The five operator fields that rest on quotes implying the operator are kept | No change needed: kept by choice and named above; the reading does not affect any operator's class |
+| O-2 | Low | Five research notes listed seven quotes their pre-runs no longer cite, under a header saying the pre-run cites every quote | Fixed in `6529720`: each such quote follows a paragraph that says why it is not cited, the headers say so, and the docs suite fails on an unmarked quote (it fails on the notes of `c7cca52`) |
+| O-3 | Low | The Deutschland-App's new line said the messenger "comes from Switzerland", while the method counts Wire Swiss GmbH by its Berlin parent as made in Germany, as the map shows; the F-1 row credited that clause to the re-check | Fixed in `6529720`: the line says every block is made in Germany and most are run there, and the F-1 row says where the clause came from |
+| O-4 | Low | TECH_NOTES said everything the re-check left was fixed, while this part keeps five fields, and stated a fix's result before this pass had checked it | Fixed in `8b97ca3`: §22 to §24 name the kept fields and log this pass |
+
+Its first run of the test set failed one smoke case, which read Diagnostics' method check on opening before it had finished, while the agent's other checks ran beside it; its second run passed (ALL SUITES PASSED, 18 of 18). The smoke suite now waits until each local check has an outcome (`51829b1`): with the method check slowed by two seconds, the previous test fails as in that run and the new one passes.
+
+**The confirmation.** To come: the same agent looks at `6529720`, `8b97ca3` and `51829b1` and at this section.
