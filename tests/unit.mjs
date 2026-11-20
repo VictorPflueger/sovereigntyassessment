@@ -503,6 +503,14 @@ await group("exports", "the assessment JSON of every pre-run is valid in both la
   check.match(en, /## Corrections by the reviewer/);
   check.doesNotMatch(en, /The findings above are in/);
   check.doesNotMatch(en + de, /\{\{fact:/);
+  // Every export passes through the redaction: a key pasted into a correction's reason stays out of the
+  // Markdown as it does out of the HTML and the JSON (the review's finding R-03).
+  const fake = "sk-ant-test-NOTAREALKEY-0123456789abcdef";
+  const keyed = { ...report, closing: { ...(report.closing || {}), corrections: [{ block_id: "B-01", field: "hosting", from: "EU", to: "NON_EU", reason: `pasted ${fake} by mistake` }] } };
+  for (const l of ["en", "de"]) {
+    const md = reportMarkdownExport(keyed, l);
+    check.ok(md.includes("sk-ant-[REDACTED]") && !md.includes(fake), `the Markdown export in ${l} redacts a key in a correction's reason`);
+  }
 });
 
 // ---- report -----------------------------------------------------------------------------------------------

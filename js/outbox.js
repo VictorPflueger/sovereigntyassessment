@@ -11,6 +11,7 @@ import { t, onLang, getLang } from "./i18n/index.js";
 import { renderMarkdown } from "./md.js";
 import { memoMarkdown, reportMarkdown, markQuoteLangs } from "./drafts.js";
 import { aiLabel, langTag } from "./ai_label.js";
+import { redactSecrets } from "./keystore.js";
 
 export function createOutbox(panel, { onCount } = {}) {
   const state = { memo: null, report: null };
@@ -20,7 +21,10 @@ export function createOutbox(panel, { onCount } = {}) {
   const body = h("div", { class: "panel-body outbox-body" });
   panel.append(emptyEl, body);
 
-  function draftCard(kind, markdown, lang, unchecked, sources = null) {
+  function draftCard(kind, draft, lang, unchecked, sources = null) {
+    // What the card shows and what Copy takes pass through the exports' redaction: a key pasted into a
+    // correction's reason never reaches the screen or the clipboard.
+    const markdown = redactSecrets(draft);
     const copy = h("button", { class: "vc-button vc-button--secondary vc-button--sm", type: "button" }, icon("copy", 16), t("outbox.copy"));
     const done = h("span", { class: "outbox-copied", role: "status" });
     copy.addEventListener("click", async () => { done.textContent = (await copyText(markdown)) ? t("outbox.copied") : t("outbox.copyFailed"); });

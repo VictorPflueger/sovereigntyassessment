@@ -34,11 +34,14 @@ export function exportFileName(kind, { service = "", date = "", lang = getLang()
   return `${EXPORT_PREFIX}${[kind, service ? slugOf(service) : null, date || null, lang].filter(Boolean).join("-")}.${ext}`;
 }
 
-/** The report as Markdown in the active language; findings in another language are marked as such. */
+/**
+ * The report as Markdown in the active language; findings in another language are marked as such. Like
+ * every export, it passes through the redaction (a key pasted into a correction's reason stays out).
+ */
 export function reportMarkdownExport(report, lang = getLang()) {
   const p = reportParts(report, lang);
   const note = findingsNote(report, lang);
-  return `${[p.findings, "", ...(note ? [`*${note}*`, ""] : []), p.closing].join("\n").trim()}\n`;
+  return redactSecrets(`${[p.findings, "", ...(note ? [`*${note}*`, ""] : []), p.closing].join("\n").trim()}\n`);
 }
 
 /** A line saying the findings keep the run's language, when it is not the active one; else null. */

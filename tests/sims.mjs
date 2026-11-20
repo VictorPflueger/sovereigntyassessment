@@ -248,7 +248,8 @@ if (wanted("alternate")) {
     await page.waitForSelector('.review-form[data-block="B-02"]');
     await page.fill('.review-form[data-block="B-02"] input[name="tech.name"]', "Example Software GmbH");
     await page.fill('.review-form[data-block="B-02"] input[name="tech.country"]', "DE");
-    await page.fill('.review-form[data-block="B-02"] textarea[name="reason"]', "The portal team named the platform's maker in a call.");
+    // The reason also carries a key pasted by mistake: the Outbox shows it redacted (R-03).
+    await page.fill('.review-form[data-block="B-02"] textarea[name="reason"]', "The portal team named the platform's maker in a call. sk-ant-test-NOTAREALKEY-0123456789abcdef");
     await page.click('.review-form[data-block="B-02"] .review-apply');
     await page.waitForSelector('.review-block[data-block="B-02"] .corrected-tag');
     checks.after = await recompute(page);
@@ -271,6 +272,7 @@ if (wanted("alternate")) {
     [close9(fin.overall, fin.published) && fin.tile === fin.tileExpected && close9(fin.overall, a.overall), `the tiles show the corrected assessment, unchanged by the decision (${fin.tile})`],
     [/Decision: keep things as they are/.test(checks.memo || "") && new RegExp(`Overall score: ${fin.tileExpected}`).test(checks.memo || ""), "the memo is for keeping things as they are, with the corrected figure"],
     [/Corrections by the reviewer/.test(checks.report || "") && /The portal team named the platform's maker in a call\./.test(checks.report || "") && /The decision is to keep things as they are\./.test(checks.report || ""), "the report lists the correction and the decision"],
+    [/sk-ant-\[REDACTED\]/.test(checks.report || "") && !/NOTAREALKEY/.test(checks.report || ""), "a key pasted into the reason is redacted in the Outbox's report"],
     [Array.isArray(checks.broken) && checks.broken.length === 0, `no unresolved placeholder or broken value (${JSON.stringify(checks.broken)})`]
   ]);
 }
