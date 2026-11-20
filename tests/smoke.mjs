@@ -217,7 +217,7 @@ if (wanted("lang-switch")) {
     [de.start === "Agent starten" && de.placeholder === "Basisdienst oder Plattform eingeben" && de.pill === "Bereit", "the controls"],
     [en.field === "Online ID (eID)" && de.field === "Online-Ausweis (eID)", `the chosen entry's name in the field follows (${en.field} → ${de.field})`],
     [en.chip === "Online ID (eID)" && de.chip === "Online-Ausweis (eID)" && de.catalogueTitle === "Dienst auswählen", "the catalogue's names come from its German texts"],
-    [en.preRun === "pre-run assessment available" && de.preRun === "vorab erstellte Bewertung verfügbar", "the pre-run mark's hidden label follows"],
+    [en.preRun === "pre-run available" && de.preRun === "vorab erstellter Lauf verfügbar", "the pre-run mark's hidden label follows"],
     [en.tab === "Building blocks" && de.tab === "Bausteine" && /Ausblenden/.test(de.drawerToggle || "") && de.drawerNote === "Nur Entwürfe. Nichts wird versendet." && de.builtBy === "Gebaut von" && de.empty === "Noch keine Bausteine", `the drawer: tabs, toggle, note, byline, empty state (${JSON.stringify({ tab: de.tab, toggle: de.drawerToggle })})`],
     [JSON.stringify(en.rail) === JSON.stringify(["Understand", "Research", "Score", "Your review", "Recommend"]) && JSON.stringify(de.rail) === JSON.stringify(["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"]), `the rail (${JSON.stringify(de.rail)})`],
     [de.console === "Agentenkonsole" && /^Geben Sie zuerst/.test(de.notice || "") && /^Enter a base service/.test(en.notice || ""), "the console and a notice written by code"],

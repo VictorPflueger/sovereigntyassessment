@@ -1,20 +1,17 @@
-# ZBDS (central payment component): research notes, no pre-run
+# ZBDS (central payment component): research notes
 
-Surveyed for version 0.3.0 on 20 November 2026 under decision D3 (TECH_NOTES.md): a pre-run is bundled only where public sources name, for the critical building blocks of most layers, who makes and who runs them.
+ZBDS, researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes. Its sources describe no service in operation, so the run ends with the outcome "not_a_service" and records no building blocks; the quotes below are those its profile, narration and report rest on.
 
-## What it is
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/zbds.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
-The ZBDS is the central payment component of the Deutschland-Stack for fees and refunds, integrated with common payment systems such as ePayBL.
+### [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf)
+Read on 2026-11-20 (German).
 
-## Why there is no pre-run
+> Zahlungsabwicklung (ZBDS) und Postfach/Benachrichtigung (ZaPuk) sind Gegenstand einer Konzeptionierung
+> Bezahlkomponente (in Ausgestaltung)
+> inklusive Betriebs- und Finanzierungsmodell bis spätestens zur 52. Sitzung des IT-Planungsrats.
 
-The BMDS's Deutschland-Stack documents name it, but no source found describes it on its own: no maker, no operator, no hosting. The payment system it integrates with, ePayBL, has a pre-run.
+### [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782)
+Read on 2026-11-20 (German).
 
-Live mode accepts this entry like any other service; its run starts from the sources below.
-
-## Sources read
-
-The catalogue's sources, each opened with the web fetch tool on 19 November 2026 for the catalogue (DATA_SOURCES.md):
-
-- [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) (German)
-- [Deutschland-Stack – Wohin geht die Reise?](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) (German)
+> Für die Bezahlkomponente und das Postfach liefen noch Konzeptionsarbeiten, geht aus der Antwort weiter hervor.

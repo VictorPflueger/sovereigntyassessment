@@ -22,7 +22,12 @@ export function keyOf(entryId, query) {
 function bundled() {
   const runs = globalThis.SA_RUNS || {};
   const order = (globalThis.SA_CATALOGUE?.entries || []).map((e) => e.id);
-  return Object.values(runs).sort((a, b) => order.indexOf(a.entry_id) - order.indexOf(b.entry_id));
+  return Object.values(runs).filter((def) => !endsWithoutAssessment(def)).sort((a, b) => order.indexOf(a.entry_id) - order.indexOf(b.entry_id));
+}
+
+/** True for a pre-run that ends "not_a_service": it records no blocks, so it is not an assessment. */
+export function endsWithoutAssessment(def) {
+  return (def?.steps || []).some((s) => s.report?.outcome === "not_a_service");
 }
 
 /** Adds every bundled pre-run that is not loaded yet (and not replaced by this session's assessment). */

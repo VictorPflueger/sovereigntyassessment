@@ -1,9 +1,12 @@
 // The simulation player in the running app (AC-11, AC-13, AC-14, AC-15), offline and without a key:
 //   play       every pre-run in data/runs/ plays to its report in English and in German (two plays per
-//              pre-run file; twenty-four from version 0.3.0): the
+//              pre-run file; thirty-four from version 1.0.0): the
 //              SIMULATION badge and tape, the tiles and the spider diagram equal to the engine's
 //              recomputation of the final blocks, the memo and the report in the Outbox in the run's
-//              language, no unresolved placeholder or broken value anywhere, no request to any host
+//              language, no unresolved placeholder or broken value anywhere, no request to any host. A
+//              pre-run that ends "not_a_service" (ZBDS, ZaPuK, low-code) ends done with that line, no
+//              block, no figure, no memo, its report with its sources in the Outbox, and an assessment
+//              export that says why there is nothing to save
 //   alternate  a reviewer's correction and the choice "Keep as is" (the plays approve L1): the tiles
 //              follow the correction, the memo is for keeping things as they are, the report lists the
 //              correction and the decision
@@ -20,14 +23,20 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { readdirSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, SKIP_INTRO } from "./lib/harness.mjs";
 
 const OUT = await outDir("sims");
 const { base: BASE, close } = await serveStatic(APP_ROOT, 8768);
 const browser = await launchBrowser();
 const results = [];
-// Every bundled pre-run: the brief's six, the five of decision D3 and the self-assessment (0.3.0).
+// Every bundled pre-run: the brief's six, the five of decision D3 and the self-assessment (0.3.0), and the
+// five added in 1.0.0.
 const PRE_RUNS = readdirSync(path.join(APP_ROOT, "data/runs")).filter((f) => f.endsWith(".js")).map((f) => f.slice(0, -3)).sort();
+const { readRunFile } = await import(pathToFileURL(path.join(APP_ROOT, "tools/check-runs.mjs")).href);
+const { endsWithoutAssessment } = await import(pathToFileURL(path.join(APP_ROOT, "js/loaded.js")).href);
+/** The pre-runs that end "not_a_service": no block, no review, no lever. */
+const NOT_A_SERVICE = new Set(PRE_RUNS.filter((id) => endsWithoutAssessment(readRunFile(path.join(APP_ROOT, "data/runs", `${id}.js`)))));
 const LAYERS = ["infrastructure", "devsecops", "platform", "base_service", "applications", "access"];
 const TERMINAL = ["done", "stopped", "aborted", "error"];
 
@@ -140,6 +149,7 @@ if (wanted("play")) {
   for (const entry of PRE_RUNS) {
     for (const lang of ["en", "de"]) {
       total += 1;
+      if (NOT_A_SERVICE.has(entry)) { if (await playNotAService(entry, lang)) passed += 1; continue; }
       const t = await newPage({ lang });
       const { page } = t;
       const checks = {};
@@ -179,8 +189,49 @@ if (wanted("play")) {
     }
   }
   const expected = 2 * PRE_RUNS.length;
-  results.push({ name: `play: ${passed} of ${total} pre-run plays complete (${PRE_RUNS.length} pre-run files)`, ok: passed === total && total === expected, problems: passed === total ? [] : ["see the failed plays above"], summaryOnly: true });
-  if (passed === total && total === expected) console.log(`SIMS PLAY OK (${passed} of ${total}, two per pre-run file)`);
+  const problems = passed === total ? [] : ["see the failed plays above"];
+  if (NOT_A_SERVICE.size !== 3) problems.push(`${NOT_A_SERVICE.size} pre-runs end "not_a_service", not 3 (${[...NOT_A_SERVICE].join(", ")})`);
+  results.push({ name: `play: ${passed} of ${total} pre-run plays complete (${PRE_RUNS.length} pre-run files, ${NOT_A_SERVICE.size} of them ending without an assessment)`, ok: !problems.length && total === expected, problems, summaryOnly: true });
+  if (!problems.length && total === expected) console.log(`SIMS PLAY OK (${passed} of ${total}, two per pre-run file)`);
+}
+
+/** One play of a pre-run that ends "not_a_service": it never reaches the review or the levers. */
+async function playNotAService(entry, lang) {
+  const t = await newPage({ lang });
+  const { page } = t;
+  const checks = {};
+  const de = lang === "de";
+  try {
+    await startSim(page, entry);
+    await page.waitForSelector(".sim-watermark:not([hidden])");
+    checks.badge = await text(page, "#mode-badge");
+    checks.tape = await text(page, ".sim-watermark");
+    await waitState(page, TERMINAL);
+    checks.state = await page.evaluate(() => window.__getState().runState);
+    checks.end = await page.evaluate(() => window.__ev.filter((e) => e.type === "run_end").map((e) => e.payload.status));
+    checks.endLine = await page.$$eval('.entry[data-type="run"] .run-title', (els) => els.map((e) => e.textContent.trim()).pop() || "");
+    checks.steps = await page.evaluate(() => window.__ev.filter((e) => ["review_request", "levers", "action_draft", "block_recorded"].includes(e.type)).map((e) => e.type));
+    checks.fig = await recompute(page);
+    checks.tile = await text(page, "#kpi-overall-value");
+    checks.cells = await page.$$eval(".hc-cell[data-block]", (els) => els.length);
+    await page.click("#tab-outbox");
+    await page.waitForSelector('.outbox-card[data-draft="report"]');
+    checks.cards = await page.$$eval(".outbox-card", (els) => els.map((e) => e.dataset.draft));
+    checks.report = await page.$eval('.outbox-card[data-draft="report"]', (el) => ({ lang: el.querySelector(".md")?.getAttribute("lang"), text: el.querySelector(".md")?.innerText || "", links: el.querySelectorAll(".md a[href^='https://']").length })).catch(() => null);
+    checks.exportAssessment = await page.$eval("#btn-file-assessment", (b) => ({ disabled: b.disabled || b.getAttribute("aria-disabled") === "true", why: b.closest(".export-item")?.querySelector(".export-name")?.textContent.trim() })).catch(() => null);
+    checks.broken = await brokenText(page);
+    checks.htmlLang = await page.getAttribute("html", "lang");
+    if (entry === "zbds") await shot(page, `play-${entry}-${lang}.png`);
+  } catch (err) { checks.FAILED = String(err.message).split("\n").slice(0, 3).join(" "); }
+  return finish(`play ${entry} ${lang} (ends without an assessment)`, t, checks, [
+    [checks.state === "done" && JSON.stringify(checks.end) === JSON.stringify(["not_a_service"]), `the run ends done as not a service (${checks.state}; ${JSON.stringify(checks.end)})`],
+    [(de ? /kein digitaler Dienst in Betrieb/ : /is not a digital service in operation/).test(checks.endLine || ""), `the console's last line says so (${checks.endLine})`],
+    [checks.badge === "SIMULATION" && /SIMULATION/.test(checks.tape || ""), `the SIMULATION badge and tape (${checks.badge}; ${checks.tape})`],
+    [Array.isArray(checks.steps) && checks.steps.length === 0 && checks.fig === null && checks.cells === 0 && checks.tile === (de ? "keine Daten" : "no data"), `no block, review, lever or memo, and no figure (${JSON.stringify(checks.steps)}; ${checks.cells} cells; ${checks.tile})`],
+    [JSON.stringify(checks.cards) === JSON.stringify(["report"]) && checks.report?.lang === lang && checks.report.text.length > 400 && (de ? /Quellen/ : /Sources/).test(checks.report.text) && checks.report.links >= 1, `only the report in the Outbox, in the run's language, with its sources (${JSON.stringify(checks.cards)}; ${checks.report?.lang}; ${checks.report?.links} links)`],
+    [checks.exportAssessment?.disabled === true && (de ? /ohne Bewertung/ : /without an assessment/).test(checks.exportAssessment.why || ""), `the assessment export says why it has nothing to save (${checks.exportAssessment?.why})`],
+    [checks.htmlLang === lang && Array.isArray(checks.broken) && checks.broken.length === 0, `no unresolved placeholder or broken value (${JSON.stringify(checks.broken)})`]
+  ]);
 }
 
 // ---- alternate -----------------------------------------------------------------------------------------------

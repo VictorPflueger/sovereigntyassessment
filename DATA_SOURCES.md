@@ -2,7 +2,7 @@
 
 What the app reads, where each bundled fact comes from, and when it was read. Every source below was opened with this build's web tools on the date given; nothing is from memory. Version 0.3.0, 20 November 2026.
 
-**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services and this prototype with verified starting URLs, a first set of reference facts with verbatim quotes, and twelve pre-run assessments for Simulation with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
+**In one paragraph.** The app bundles three kinds of data: the method (the Deutschland-Stack's layers and criteria, the EU Cloud Sovereignty Framework's SEAL scale), the catalogue of sixteen services and this prototype with verified starting URLs, a first set of reference facts with verbatim quotes, and seventeen pre-runs for Simulation, one for every entry, with their research notes (§7). In Live mode the agent adds what Anthropic's server-side web search and web fetch return during the run; every finding names its source, and an unknown stays unknown. The golden cases of the tests (Musterdienst, Beispieldienst, Probeportal) are fictional.
 
 ---
 
@@ -86,7 +86,7 @@ No client, company or personal data; no tracking; no fonts, scripts or styles fr
 
 ## 7. The pre-run assessments (data/runs/, research/)
 
-Twelve catalogue entries ship with a pre-run assessment for Simulation. The first six were written by hand on 19 November 2026, the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), all in both languages (`source: "hand_authored"`, `as_of: "2026-11-19"`). Each cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built. The five catalogue entries without a pre-run (NOOTS, ZaPuK, ZBDS, low-code and the Marktplatz Deutschland Digital) have a research note in `research/` that lists the catalogue sources read and says why they are not enough.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those of §4, verified when they were built.
 
 ### BundID (`data/runs/bundid.js`)
 
@@ -266,3 +266,57 @@ Twelve catalogue entries ship with a pre-run assessment for Simulation. The firs
 | [Google Terms of Service – Privacy & Terms – Google](https://policies.google.com/terms) | English | 2026-11-20 |
 | [Google Chrome and ChromeOS Additional Terms of Service](https://www.google.com/intl/en/chrome/terms/) | English | 2026-11-20 |
 | [Regional compliance \| Claude by Anthropic](https://claude.com/regional-compliance) | English | 2026-11-20 |
+
+### NOOTS (National Once-Only Technical System) (`data/runs/noots.js`)
+
+5 sources with 16 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Vertrag über die Errichtung, den Betrieb und die Weiterentwicklung des Nationalen Once-Only-Technical-Systems (NOOTS) – NOOTS-Staatsvertrag](https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf) | German | 2026-11-20 |
+| [NOOTS MVP v1.4.0](https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+| [Ziel: PUE-Wert von 1,4: Dataport konsolidiert 5 Rechenzentren \| CIO DE](https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html) | German | 2026-11-20 |
+| [IMPRESSUM - SEITENBAU](https://www.seitenbau.com/impressum) | German | 2026-11-20 |
+
+### Marktplatz Deutschland Digital (MDD) (`data/runs/marktplatz-deutschland-digital.js`)
+
+8 sources with 13 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Crew gesucht: Community-Funktionen für den Marktplatz Deutschland Digital](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Crew_Gesucht_Community-Funtktionen_Marktplatz_Deutschland_Fell.pdf) | German | 2026-11-20 |
+| [Marktplatz Deutschland Digital (MDD) startet Produktivbetrieb - Vergabeblog](https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/) | German | 2026-11-20 |
+| [dbb magazin 10/2026 – Page 27](https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/) | German | 2026-11-20 |
+| [Deutsche Verwaltungscloud – Startseite](https://www.deutsche-verwaltungscloud.de) | German | 2026-11-20 |
+| [Die Deutsche Verwaltungscloud](https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20241002_FSV_DVC_IV_Handout.pdf) | German | 2026-11-20 |
+| [Sechs Bundesländer starten Open-Source-Bildungsplattform \| ChannelPartner](https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html) | German | 2026-11-20 |
+| [Shopware 6: Vom klassischen Shopsystem zur E-Commerce-Plattform](https://t3n.de/news/shopware-6-version-1165877/) | German | 2026-11-20 |
+| [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) | German | 2026-11-20 |
+
+### ZBDS (central payment component) (`data/runs/zbds.js`)
+
+2 sources with 4 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+
+### ZaPuK (target architecture for mailbox and communication solutions) (`data/runs/zapuk.js`)
+
+3 sources with 8 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Föderale Zielarchitektur für Postfach- und Kommunikationslösungen: Überblick und Handlungsempfehlung, Version 1.0](https://www.it-planungsrat.de/fileadmin/beschluesse/2025/Beschluss_2025_28_ZaPuK_%C3%9Cberblick.pdf) | German | 2026-11-20 |
+| [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf) | German | 2026-11-20 |
+| [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782) | German | 2026-11-20 |
+
+### Low-code and workflow automation (`data/runs/low-code.js`)
+
+1 source with 4 quotes.
+
+| Source | Language | Read |
+|---|---|---|
+| [Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat](https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf) | German | 2026-11-20 |

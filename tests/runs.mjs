@@ -1,7 +1,8 @@
 // The pre-run assessments under the rules of section 8 of the brief (AC-12), without a browser:
 //   all        tools/check-runs.mjs passes every pre-run in data/runs/: the brief's six, the five of decision
-//              D3 (0.3.0) and the self-assessment, each played in both languages along every lever choice, with
-//              its verified flags equal to research/; index.html loads every pre-run file
+//              D3 (0.3.0), the self-assessment and the five added in 1.0.0 (three of which end without an
+//              assessment), each played in both languages along every lever choice, with its verified flags
+//              equal to research/; index.html loads every pre-run file
 //   planted    each rule catches its defect, planted in a copy of a passing pre-run: a missing language,
 //              different placeholders, an audit failure, an unknown fact key, a block without evidence, an
 //              unknown URL, a long quote, a quote missing from research/, a key-like string, a thinking
@@ -18,7 +19,10 @@ const results = [];
 const SIX = ["bundesportal", "bundid", "deutschland-app", "epaybl", "fit-connect", "online-ausweis"];
 // D3 (0.3.0): the remaining entries with enough public evidence, and this prototype's self-assessment.
 const D3 = ["dvc", "eudi-wallet", "kipitz", "muk", "opencode", "sovereignty-assessment"];
-const ALL = [...SIX, ...D3].sort();
+// 1.0.0: the five entries that had only a research note. NOOTS and the Marktplatz are assessed; ZBDS, ZaPuK and
+// low-code end "not_a_service" (a concept, a target architecture and a category), with no block.
+const V1 = ["low-code", "marktplatz-deutschland-digital", "noots", "zapuk", "zbds"];
+const ALL = [...SIX, ...D3, ...V1].sort();
 
 // ---- all --------------------------------------------------------------------------------------------------
 if (wanted("all")) {

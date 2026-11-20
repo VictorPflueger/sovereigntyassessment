@@ -13,7 +13,7 @@ Version 0.3.0, 20 November 2026. A five-minute demonstration in Simulation, two 
 
 ## The five minutes, in Simulation
 
-1. **The question (30 seconds).** "How sovereign is a public service, layer by layer? Here are sixteen German base services and platforms, each with its sources, and this prototype itself." Point at the play sign: eleven of the services carry a pre-run, and so does the prototype.
+1. **The question (30 seconds).** "How sovereign is a public service, layer by layer? Here are sixteen German base services and platforms, each with its sources, and this prototype itself." Point at the play sign: every entry carries a pre-run, the prototype too.
 2. **Start (30 seconds).** Choose **BundID**, click **Start agent**, then **Simulation**. "This replays a run recorded from public sources on 19 November 2026; it says so on the tape, and it calls nothing."
 3. **Research (one minute).** The console narrates: the imprint, the data centres, the online ID, the app store. Open one step's details to show a quote and its source. "The model may not write a number. Every figure you see is computed in code; the model can only point at it."
 4. **The map (one minute).** The spider diagram fills in by layer; the dashed axis is a layer without evidence, not a zero. Switch to **By building block** and back, and show the honeycomb: the red cell is the AusweisApp's distribution through the App Store, made and run in the US.
@@ -40,5 +40,6 @@ With a key ready, choose **FIT-Connect** or type a service in your own words, **
 
 - **The API is unreachable** or the key is refused: stay in Simulation, which needs neither.
 - **Web search or web fetch is switched off** in the organisation's console: the live run stops with a message that offers Simulation.
-- **The audience asks about a service without a pre-run:** run it live, or explain that the pre-runs show the method on real services, and the live agent does the same for any other. For the five catalogue entries without a pre-run, `research/` says what was read and why it is not enough.
+- **The audience asks about a service outside the catalogue:** run it live, or explain that the pre-runs show the method on real services, and the live agent does the same for any other.
+- **The audience asks about ZBDS, ZaPuK or low-code:** play it. Their sources describe a component still being designed, a target architecture and a category, so the run reads them, records what the entry is and ends without an assessment, saying why; a live run would do the same.
 - **Someone changed the layer weights:** open **Method** from the header and click **Reset**, or reload the page; the weights are never stored.

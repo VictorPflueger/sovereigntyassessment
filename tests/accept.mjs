@@ -7,7 +7,8 @@
 //                an inline script and a request to another host are refused
 //   mode-dialog  Start agent opens the mode choice: the service, Simulation offered for an entry with a
 //                pre-run and unavailable with its reason for one without and for free text, Live with the
-//                key; Escape cancels
+//                key; Escape cancels. Every catalogue entry has a pre-run from 1.0.0, so the case takes
+//                NOOTS's out of the page's bundle to show an entry without one
 //   key-dialog   a rejected key (401) is not stored; a malformed one is refused before any request; an
 //                accepted key is stored for this tab and starts the live run (two model calls against the
 //                stand-in, which ends the run); "Change or forget key" and Forget key; the dialog in German
@@ -211,7 +212,9 @@ if (wanted("mode-dialog")) {
     checks.simBundidButton = await text(page, '.mode-card[data-mode="simulation"] .mode-cta button');
     await page.keyboard.press("Escape");
     await page.waitForSelector(".mode-card", { state: "detached" });
-    // An entry without one (NOOTS has a research note instead, D3): Simulation unavailable, with its reason.
+    // An entry without one: every entry has a pre-run from 1.0.0, so NOOTS's is taken out of this page's
+    // bundle first (the dialog asks the bundle when it opens). Simulation unavailable, with its reason.
+    checks.nootsHadPreRun = await page.evaluate(() => { const had = Object.hasOwn(window.SA_RUNS || {}, "noots"); delete window.SA_RUNS.noots; return had; });
     await page.click('.catalogue-chip[data-entry="noots"]');
     await page.click("#btn-start");
     await page.waitForSelector(".mode-card");
@@ -252,7 +255,7 @@ if (wanted("mode-dialog")) {
   await finish("mode-dialog: the service, Simulation with its reason, Live, Escape cancels", t, checks, [
     [checks.simBundid !== "true" && !checks.simBundidReason && !!checks.simBundidButton, `an entry with a pre-run offers Simulation (${checks.simBundid}; ${checks.simBundidButton})`],
     [checks.title === "How should the agent run?" && checks.service === "Will assess: NOOTS (National Once-Only Technical System)", `title and service (${checks.service})`],
-    [checks.simDisabled === "true" && checks.simButton === "true" && checks.simReason === "No pre-run assessment exists for this service yet.", "Simulation unavailable, with its reason"],
+    [checks.nootsHadPreRun === true && checks.simDisabled === "true" && checks.simButton === "true" && checks.simReason === "No pre-run assessment exists for this service yet.", `Simulation unavailable, with its reason, once NOOTS's pre-run is out of the bundle (it had one: ${checks.nootsHadPreRun})`],
     [checks.stillOpen === true, "Simulation's button does nothing"],
     [checks.live === "Continue with my API key" && checks.focus === "Continue with my API key", "Live asks for the key, focused"],
     [checks.caps === "At most 40 model calls and €3.00 per run; the cost meter shows the spend live.", `the run's caps (${checks.caps})`],

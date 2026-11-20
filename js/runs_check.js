@@ -192,12 +192,14 @@ export function leverChoices(def) {
  */
 export async function playProblems(def, { lang, choice = "keep", createPlayer }) {
   const problems = [];
+  // A pre-run whose report says "not_a_service" ends that way: no blocks, no review, no levers.
+  const expected = (def?.steps || []).some((s) => s.report?.outcome === "not_a_service") ? "not_a_service" : "done";
   const offs = [
     bus.on("review_request", (ev) => bus.emit("review_decision", { request_id: ev.payload.request_id, action: "confirm", by: "user" })),
     bus.on("levers", (ev) => bus.emit("lever_decision", { options_seq: ev.payload.options_seq, lever_id: choice, by: "user" })),
     bus.on("choice_request", (ev) => bus.emit("choice_decision", { request_id: ev.payload.request_id, chosen: 0, by: "user" })),
     bus.on("notice", (ev) => { if (ev.payload.level === "error") problems.push({ code: "play", where: `${lang} ${choice}`, message: `${ev.payload.key}: ${ev.payload.vars?.message || ""}` }); }),
-    bus.on("run_end", (ev) => { if (ev.payload.status !== "done") problems.push({ code: "play", where: `${lang} ${choice}`, message: `the run ended with ${ev.payload.status}` }); })
+    bus.on("run_end", (ev) => { if (ev.payload.status !== expected) problems.push({ code: "play", where: `${lang} ${choice}`, message: `the run ended with ${ev.payload.status}, not ${expected}` }); })
   ];
   const player = createPlayer({ getSpeed: () => 1e7 });
   let toolbox = null;
