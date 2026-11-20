@@ -1,5 +1,5 @@
-// Smoke tests of the start flow, both languages and the failure modes of loading (version 0.1.0 has no
-// run yet: the agent and the simulation player arrive in 0.2.0):
+// Smoke tests of the start flow, both languages and the failure modes of loading (the runs themselves
+// are tests/live.mjs and tests/sims.mjs):
 //   lang-first-visit  a German browser's first visit opens in English, and nothing is stored
 //   lang-url          ?lang=de opens in German and is stored; a reload keeps it; ?lang=en wins again
 //   lang-switch       the EN and DE switch without a reload: <html lang>, the header, the tiles, the
@@ -139,7 +139,8 @@ if (wanted("lang-switch")) {
       placeholder: document.querySelector("#service-input")?.getAttribute("placeholder"),
       field: document.querySelector("#service-input")?.value,
       pill: q("#status-pill"),
-      chip: q('.catalogue-chip[data-entry="online-ausweis"]'),
+      chip: q('.catalogue-chip[data-entry="online-ausweis"] .chip-name'),
+      preRun: q('.catalogue-chip[data-entry="online-ausweis"] .prerun-mark'),
       catalogueTitle: q("#catalogue-title"),
       tab: q("#tab-blocks .drawer-tab__label"),
       drawerToggle: q(".drawer-toggle"),
@@ -208,6 +209,7 @@ if (wanted("lang-switch")) {
     [de.start === "Agent starten" && de.placeholder === "Basisdienst oder Plattform eingeben" && de.pill === "Bereit", "the controls"],
     [en.field === "Online ID (eID)" && de.field === "Online-Ausweis (eID)", `the chosen entry's name in the field follows (${en.field} → ${de.field})`],
     [en.chip === "Online ID (eID)" && de.chip === "Online-Ausweis (eID)" && de.catalogueTitle === "Dienst auswählen", "the catalogue's names come from its German texts"],
+    [en.preRun === "pre-run assessment available" && de.preRun === "vorab erstellte Bewertung verfügbar", "the pre-run mark's hidden label follows"],
     [en.tab === "Building blocks" && de.tab === "Bausteine" && /Ausblenden/.test(de.drawerToggle || "") && de.drawerNote === "Nur Entwürfe. Nichts wird versendet." && de.builtBy === "Gebaut von" && de.empty === "Noch keine Bausteine", `the drawer: tabs, toggle, note, byline, empty state (${JSON.stringify({ tab: de.tab, toggle: de.drawerToggle })})`],
     [JSON.stringify(en.rail) === JSON.stringify(["Understand", "Research", "Score", "Your review", "Recommend"]) && JSON.stringify(de.rail) === JSON.stringify(["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"]), `the rail (${JSON.stringify(de.rail)})`],
     [de.console === "Agentenkonsole" && /^Geben Sie zuerst/.test(de.notice || "") && /^Enter a base service/.test(en.notice || ""), "the console and a notice written by code"],

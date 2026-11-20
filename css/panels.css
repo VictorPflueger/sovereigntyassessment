@@ -1,0 +1,126 @@
+/* Sovereignty Assessment — the drawer's panels (building blocks, review, levers, outbox, audit) and the
+ * console's additions for this app (narration lines with their tags, the run-facts line). Merlot is the
+ * person in charge (Confirm, Approve, the corrected mark); lilac the AI's voice; state colours always
+ * with a word or a mark. */
+
+.panel-body { padding: 4px 2px 12px; }
+/* A panel's empty state gives way once the panel has content (Vici's empty state sets its own display). */
+.drawer-panel .vc-empty[hidden] { display: none; }
+.panel-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 2px 2px 8px; }
+.panel-filters[hidden] { display: none; }
+.panel-filter { display: inline-flex; align-items: center; gap: 8px; font-size: var(--vc-font-size-sm); }
+.panel-select.vc-select { min-height: 40px; }
+.panel-check input { width: 20px; height: 20px; }
+.panel-subtitle { margin: 14px 0 6px; font-size: var(--vc-font-size-sm); font-weight: var(--vc-weight-semibold); color: var(--vc-text-muted); }
+
+/* Building blocks: a table; each row opens its evidence. */
+.blocks-table { width: 100%; font-size: var(--vc-font-size-sm); }
+.blocks-table th, .blocks-table td { vertical-align: top; }
+.row-toggle { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 6px 0 2px; border: 0; background: none; font: inherit; font-weight: 700; color: var(--vc-text); cursor: pointer; }
+.row-toggle[aria-expanded="true"] .vc-icon { transform: rotate(90deg); }
+.cls-code { font-weight: 700; }
+.party { color: var(--vc-text-muted); }
+.unk-mark { color: var(--vc-warning-text); font-weight: 600; }
+.evidence-row td { background: var(--vc-bg-subtle); }
+.evidence-wrap { display: grid; gap: 8px; padding: 6px 4px; }
+.unknown-why { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--vc-warning-text); }
+.evidence-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.evidence-item { padding: 8px 10px; border-left: 3px solid var(--vc-success-solid); background: var(--vc-surface); }
+.evidence-item[data-verified="false"] { border-left-color: var(--vc-warning-text); border-left-style: dashed; }
+.evidence-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.evidence-source { color: var(--vc-text-link); }
+.evidence-quote { margin: 6px 0 2px; padding: 0 0 0 10px; border-left: 2px solid var(--vc-border); font-style: italic; }
+.evidence-noquote, .evidence-meta { margin: 2px 0 0; color: var(--vc-text-muted); font-size: var(--fs-xs); }
+.ev-tag.vc-tag { font-size: var(--fs-xs); }
+.corrected-tag.vc-tag { margin-left: 6px; font-size: var(--fs-xs); }
+.corrections-list { margin: 0; padding-left: 20px; font-size: var(--vc-font-size-sm); }
+
+/* Review. */
+.review-summary { margin-bottom: 6px; }
+.review-lead { color: var(--vc-text-muted); margin: 4px 0 8px; }
+.review-done.vc-alert, .levers-done.vc-alert { display: flex; align-items: center; gap: 8px; }
+.review-blocks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.review-block { padding: 4px 8px; border: 1px solid var(--vc-border-subtle); }
+.review-block[data-focus="true"] { border-left: 3px solid var(--vc-accent); }
+.review-block-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.review-id { font-weight: 700; min-width: 3.4em; }
+.review-name { flex: 1 1 14em; min-width: 0; }
+.review-codes, .review-level { color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+.review-correct.vc-button { min-height: 40px; }
+.review-form { display: grid; gap: 10px; padding: 10px 2px 6px; }
+.review-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.review-grid label, .review-party label, .review-reason-label { display: grid; gap: 3px; font-size: var(--vc-font-size-sm); }
+.review-parties { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.review-party { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 8px; margin: 0; padding: 6px 10px 10px; border: 1px solid var(--vc-border-subtle); }
+.review-party legend { font-weight: var(--vc-weight-semibold); font-size: var(--vc-font-size-sm); }
+.country-input.vc-input { text-transform: uppercase; }
+.review-msg { margin: 0; color: var(--vc-danger-text); min-height: 1em; font-size: var(--vc-font-size-sm); }
+.review-actions, .review-footer, .levers-footer, .audit-actions, .outbox-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.review-footer { margin-top: 12px; }
+
+/* Levers: one card each, one merlot Approve. */
+.levers-lead { color: var(--vc-text-muted); margin: 4px 0 10px; }
+.lever-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.lever-card.vc-card { display: grid; align-content: start; gap: 6px; padding: 10px 12px; cursor: pointer; border: 1px solid var(--vc-border); }
+.lever-card[data-chosen="true"] { border: 2px solid var(--vc-accent); background: var(--vc-accent-soft); }
+.lever-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.lever-radio { width: 20px; height: 20px; accent-color: var(--vc-accent); }
+.lever-id { font-weight: 800; }
+.lever-title { font-weight: var(--vc-weight-semibold); flex: 1 1 10em; }
+.lever-rationale { margin: 0; font-size: var(--vc-font-size-sm); }
+.lever-figures { display: grid; gap: 2px; margin: 0; font-size: var(--vc-font-size-sm); }
+.lever-figures div { display: flex; justify-content: space-between; gap: 8px; }
+.lever-figures dt { color: var(--vc-text-muted); }
+.lever-figures dd { margin: 0; font-weight: 700; text-align: right; }
+.lever-delta { font-weight: 600; color: var(--vc-text-muted); }
+.lever-changes { margin: 0; padding-left: 18px; font-size: var(--fs-xs); color: var(--vc-text-muted); }
+.lever-evidence { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0; font-size: var(--fs-xs); color: var(--vc-text-muted); }
+.levers-footer { margin-top: 12px; }
+.levers-why { margin: 0; color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+
+/* Outbox: drafts only. */
+.outbox-body { display: grid; gap: 12px; }
+.outbox-card.vc-card { padding: 12px 14px; }
+.outbox-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 6px; }
+.outbox-copied { color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+
+/* Audit. */
+.audit-totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 6px 18px; margin: 0 0 10px; }
+.audit-totals div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--vc-border-subtle); padding: 3px 0; }
+.audit-totals dt { color: var(--vc-text-muted); }
+.audit-totals dd { margin: 0; font-weight: 700; }
+.audit-status { margin: 6px 0 0; color: var(--vc-text-muted); min-height: 1em; }
+.audit-note { color: var(--vc-text-subtle); font-size: var(--fs-xs); max-width: 80ch; }
+
+/* Console additions: narration with the AI label and its tags, code's handover lines, the run facts. */
+.narr-line { display: flex; align-items: flex-start; gap: 8px; }
+.narr-line > p { margin: 0; }
+.narr-tags { display: inline-flex; gap: 4px; vertical-align: 0.1em; }
+.unchecked-tag.vc-tag, .lang-tag.vc-tag { --_h: 20px; font-size: var(--fs-xs); font-weight: 700; }
+.handover-line { color: var(--vc-accent-text); font-weight: var(--vc-weight-semibold); }
+.notice-action { margin-top: 4px; color: var(--vc-text); }
+.entry.discarded { opacity: 0.5; }
+.entry.discarded .entry-body { text-decoration: line-through; text-decoration-color: var(--vc-border-strong); }
+.run-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 6px 18px; border-top: 1px solid var(--vc-border-subtle); background: var(--vc-bg-subtle); font-size: var(--fs-xs); color: var(--vc-text-muted); }
+.run-facts[hidden] { display: none; }
+.run-facts-label { font-weight: 700; color: var(--vc-text); }
+
+@media (max-width: 1400px) {
+  .review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* The person's turn on the progress rail: the merlot tag takes the step label's place, so the rail keeps
+ * its width and never says "Your review" twice (this app's review step is itself called "Your review").
+ * The tag and the visually hidden line still say whose turn it is. */
+.rail-step[data-state="yours"] .rail-label { display: none; }
+
+/* The drawer's bar now carries the tabs' counts, so the byline's label gives way below 1,340 px rather
+ * than the shared stylesheet's 1,180 px, and the bar keeps one row in German too. Below 1,101 px the
+ * shared stylesheet moves the byline to a row of its own, with its label. */
+@media (max-width: 1340px) and (min-width: 1101px) {
+  .drawer-tabs .vc-byline__label { display: none; }
+}
+
+/* A short workspace (a laptop screen with the drawer open): the console keeps to its own area and its
+ * log scrolls inside it, instead of running over the drawer's bar. */
+.console-panel { overflow: hidden; }

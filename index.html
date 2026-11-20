@@ -22,6 +22,8 @@
   <link rel="stylesheet" href="css/console.css">
   <link rel="stylesheet" href="css/drawer.css">
   <link rel="stylesheet" href="css/modals.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/panels.css">
 
   <!-- The theme before the page is drawn (light unless the visitor chose dark), then Vici's script. -->
   <script src="js/theme.js"></script>
@@ -32,6 +34,13 @@
   <script src="data/catalogue.js" defer></script>
   <script src="data/ref_facts.js" defer></script>
   <script src="data/schemas.js" defer></script>
+  <!-- The pre-run assessments the Simulation replays (data/runs/, checked by tools/check-runs.mjs). -->
+  <script src="data/runs/bundid.js" defer></script>
+  <script src="data/runs/online-ausweis.js" defer></script>
+  <script src="data/runs/fit-connect.js" defer></script>
+  <script src="data/runs/epaybl.js" defer></script>
+  <script src="data/runs/bundesportal.js" defer></script>
+  <script src="data/runs/deutschland-app.js" defer></script>
   <script type="module" src="js/main.js"></script>
 </head>
 <body class="app-shell">
@@ -73,8 +82,8 @@
   <nav id="controls" class="controls" data-i18n-attr="aria-label:controls.label" aria-label="Run controls"></nav>
 
   <main class="workspace">
-    <!-- The sovereignty map: before a run, the catalogue to choose from; the spider diagram, the mix and
-         the honeycomb arrive with the agent in version 0.2.0. -->
+    <!-- The sovereignty map: before a run, the catalogue to choose from; during and after a run, the
+         spider diagram, the Made-in and Run-by mix, the honeycomb and the table (js/sovmap.js). -->
     <section class="map-panel" data-i18n-attr="aria-label:map.label" aria-label="Sovereignty map">
       <div id="map" class="map"></div>
     </section>

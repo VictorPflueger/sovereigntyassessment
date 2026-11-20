@@ -15,6 +15,8 @@ const EN = (await mod("js/i18n/en.js")).default;
 const DE = (await mod("js/i18n/de.js")).default;
 const { RUN_STATES } = await mod("js/events.js");
 const { MODELS } = await mod("js/config.js");
+const { LAYERS } = await mod("js/engine.js");
+const { CLASSES } = await mod("js/classes.js");
 const read = (f) => fs.readFileSync(path.join(APP_ROOT, f), "utf8");
 
 const results = [];
@@ -34,7 +36,10 @@ check(!uneven.length, "the same placeholders in both languages", uneven.map((k) 
 const same = en.filter((k) => EN[k] === DE[k] && !/^(app\.title|app\.name)$/.test(k) && /\p{L}{4,}/u.test(EN[k]) && !/^[\p{Lu}\s-]+$/u.test(EN[k]) && !/^\{/.test(EN[k]));
 // A text that reads the same in both languages is fine for names and codes; anything longer than a
 // word is probably untranslated. Words that are the same in German stay allowed by this list.
-const SAME_ALLOWED = new Set(["mode.simulation", "diag.col.status", "diag.col.details", "dialog.key.workspaces", "dialog.key.apiKeys"]);
+const SAME_ALLOWED = new Set(["mode.simulation", "diag.col.status", "diag.col.details", "dialog.key.workspaces", "dialog.key.apiKeys",
+  // Names and words that German uses as they are: a layer's short name, a country, the run's title line.
+  "layer.devsecops.short", "class.CN", "field.hosting", "blocks.col.hosting", "map.col.status", "map.col.name", "review.partyName",
+  "console.run.sim", "outbox.kind.memo", "audit.tokens"]);
 const untranslated = same.filter((k) => !SAME_ALLOWED.has(k));
 check(!untranslated.length, "every text is translated (the same in both only for names and codes)", untranslated.map((k) => `${k}: "${EN[k]}"`).join("; "));
 
@@ -83,7 +88,27 @@ const FAMILIES = {
   "catalogue.cat.": ["base_service", "platform_or_access", "self_assessment"],
   "intro.step.": ["understand", "research", "score", "review", "recommend"],
   "diag.method.": ["s1", "s2", "s3", "s4", "audit", "decisions"],
-  "diag.lang.": ["parity", "empty", "placeholders", "unknown"]
+  "diag.lang.": ["parity", "empty", "placeholders", "unknown"],
+  // Version 0.2.0: the agent, the sovereignty map and the panels.
+  "layer.": [...LAYERS, ...LAYERS.map((l) => `${l}.short`), ...LAYERS.map((l) => `${l}.full`)],
+  "class.": [...CLASSES, ...CLASSES.map((c) => `${c}.short`)],
+  "value.criticality.": ["critical", "important", "supporting"],
+  "value.hosting.": ["EU", "NON_EU", "UNKNOWN"],
+  "value.licence.": ["open_source", "proprietary", "unknown"],
+  "value.exit.": ["easy", "possible", "hard", "unknown"],
+  "field.": ["criticality", "tech", "tech.parent", "operator", "operator.parent", "hosting", "licence", "exit"],
+  "topic.": ["app_distribution", "push_messaging", "mobile_os", "browsers", "federal_it"],
+  "lang.tag.": ["en", "de"],
+  "lang.name.": ["en", "de"],
+  "ai.kind.": ["narration", "profile", "block", "review", "levers", "memo", "report"].flatMap((k) => [k, `${k}.text`]),
+  "console.end.": ["done", "not_a_service", "stopped", "aborted", "error"],
+  "map.status.": ["scored", "open", "no_evidence", "not_applicable"],
+  "tool.rec_layer.": ["no_evidence", "not_applicable"],
+  "tool.ui_request_review.": ["confirm", "skip"],
+  "outbox.kind.": ["memo", "report"],
+  "blocks.ev.verified.": ["fetched_text", "citation", "ref_facts", "recording", "catalogue"],
+  "review.": ["tech", "operator", "tech.name", "tech.country", "operator.name", "operator.country"],
+  "badge.": ["live", "simulation"]
 };
 const families = [];
 for (const [prefix, values] of Object.entries(FAMILIES)) {
@@ -127,12 +152,19 @@ check(!staticWrong.length && staticCount >= 15, `index.html's ${staticCount} sta
 const ALLOWED = [
   ["js/drawer.js", "Victor Pflüger", "a person's name in Vici's byline, the same in every language"],
   ["js/main.js", "Script error.", "the browser's own text for an error in a script from another site, compared, never shown"],
-  ["js/config.js", "Sovereignty Assessment", "the product's name for the developer console and file names; the interface shows app.name"]
+  ["js/config.js", "Sovereignty Assessment", "the product's name for the developer console and file names; the interface shows app.name"],
+  ["js/agent.js", "Continue from where you stopped.", "the agent loop's message to the model after a cut-off response, never shown as interface text"]
 ];
+// Files whose prose is addressed to the model, not the person: the system prompt, the tool definitions and
+// the tools' messages to the agent, and the sequence rules' refusals (tool results are English, like the
+// system prompt; the console shows them only as raw JSON behind Details). And the pre-run checks, whose
+// messages are tools/check-runs.mjs's output for the developer.
+const MODEL_FACING = ["js/prompt.js", "js/tools.js", "js/guards.js", "js/runs_check.js"];
 // Lines that only the developer sees: the browser console, and errors the engine throws at its callers.
 const DEV_ONLY = /\bconsole\.(log|info|warn|error|debug)\(/;
 function strays(file, src) {
   const found = [];
+  if (MODEL_FACING.includes(file)) return found;
   for (const lit of stringLiterals(src)) {
     if (!looksLikeProse(lit.value)) continue;
     if (DEV_ONLY.test(lit.text)) continue;

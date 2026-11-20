@@ -6,7 +6,7 @@
 //
 // Envelope: { id, seq, type, ts (ISO), t (ms since run start or null), run_id, mode, payload }
 //
-// Event types and payloads (the agent and the player arrive in version 0.2.0; version 0.1.0 emits none)
+// Event types and payloads (the live agent and the simulation player emit the same ones)
 //   run_start        { run_id, mode: "live"|"simulation", query, entry_id?, lang, model?, source?: "hand_authored"|"recorded", as_of? }
 //   state_change     { state, note? }   states: see RUN_STATES
 //   narration        { msg_id, text, done, lang, audit: "passed"|"unchecked" }

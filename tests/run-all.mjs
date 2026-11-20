@@ -14,12 +14,15 @@ const SUITES = [
   { id: "unit", what: "streaming client, cost maths, schemas, formats, catalogue matching, API errors, language choice, golden copy, policy, storage", file: "tests/unit.mjs", browser: false },
   { id: "engine", what: "golden cases S1 to S4 in both languages, origin classes, no data is not zero, weights, fact keys", file: "tests/engine.mjs", browser: false },
   { id: "audit", what: "fact audit: F01 to F29, the non-breaking-space variants, decisions D9 and D10", file: "tests/audit.mjs", browser: false },
+  { id: "runs", what: "the six pre-runs under section 8 of the brief, and each rule's planted defect", file: "tests/runs.mjs", browser: false },
   { id: "hygiene", what: "no client, prospect, contact or meeting named in any published file", file: "tests/hygiene.mjs", browser: false },
   { id: "docs", what: "documentation set complete, every path and section it names exists", file: "tests/docs.mjs", browser: false },
   { id: "parity", what: "shared shell identical to the sister app's (needs a Rebate Hunter checkout)", file: "tests/parity.mjs", browser: false, optional: true },
   { id: "smoke", what: "start flow, both languages, the catalogue, Diagnostics, intro, tiles, loading failures", file: "tests/smoke.mjs", browser: true },
   { id: "accept", what: "acceptance: storage keys, the key and its dialog, the security policy, frames", file: "tests/accept.mjs", browser: true },
-  { id: "hexagon", what: "nothing round: the app's files, and the rendered app in both themes", file: "tests/hexagon.mjs", browser: true }
+  { id: "hexagon", what: "nothing round: the app's files, and the rendered app in both themes", file: "tests/hexagon.mjs", browser: true },
+  { id: "live", what: "the live agent against the API stand-in: protocol, nudges, disabled tools, evidence, caps, cost, guardrails, the key", file: "tests/live.mjs", browser: true },
+  { id: "sims", what: "the six pre-runs played in both languages, a correction and Keep as is, the map, review and levers", file: "tests/sims.mjs", browser: true }
 ];
 
 const only = process.argv.slice(2);

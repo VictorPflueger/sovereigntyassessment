@@ -333,6 +333,90 @@ await group("storage", "every storage key the code writes is the app's own (sa.)
   check.ok(read("vici/dist/vici.js").includes("'vc-theme'"));
 });
 
+// ---- M2: evidence verification and the sequence rules -------------------------------------------------------
+await group("evidence", "evidence (AC-09): provenance, quotes in fetched text or citations, the document registry in conversation order, gating and corrections", async () => {
+  const { createEvidenceRegistry, checkEvidence, gateBlock, normaliseUrl, clipQuote, MAX_QUOTE } = await mod("js/evidence.js");
+  const { assessBlock } = await mod("js/engine.js");
+  const r = createEvidenceRegistry();
+  // Provenance: only URLs a search, a fetch, the catalogue, the reference facts or a recording returned.
+  r.allowUrl("https://example.gov/search-hit", { via: "search", title: "Search hit" });
+  check.equal(r.isAllowed("HTTPS://EXAMPLE.gov/search-hit"), true, "scheme and host compare case-insensitively");
+  check.equal(r.isAllowed("https://example.gov/Search-hit"), false, "the path compares exactly");
+  check.equal(normaliseUrl("https://example.gov/a#frag"), normaliseUrl("https://example.gov/a"), "the fragment does not count");
+  const unknownUrl = checkEvidence(r, [{ url: "https://never-returned.example/", title: "x", quote: "anything", lang: "en", supports: ["tech"] }]);
+  check.deepEqual(unknownUrl.refused, ["https://never-returned.example/"], "a URL the run never returned is refused");
+  // Fetched documents in conversation order; a text document's quote counts.
+  const i0 = r.addDocument({ url: "https://example.gov/page", title: "The page", text: "The account is operated by the ITZBund in its data centres." });
+  const i1 = r.addDocument({ url: "https://example.gov/paper.pdf", title: "A paper" });
+  check.deepEqual([i0, i1], [0, 1], "documents are numbered in the order the conversation holds them");
+  const inText = checkEvidence(r, [{ url: "https://example.gov/page", title: "The page", quote: "operated by the ITZBund", lang: "en", supports: ["operator"] }]).checks[0];
+  check.equal(inText.verified, true, "a quote in the fetched text counts");
+  check.equal(inText.via, "fetched_text");
+  // A citation of a fetched PDF is mapped to its URL through document_index; a wrong title is not mapped.
+  check.equal(r.addCitation({ type: "page_location", document_index: 1, document_title: "A paper", cited_text: "Hosting is in Germany only." }).url, normaliseUrl("https://example.gov/paper.pdf"), "document_index maps to the document's URL");
+  check.equal(r.addCitation({ type: "page_location", document_index: 1, document_title: "Another paper", cited_text: "x" }).reason, "title_mismatch", "a title that does not match is not mapped");
+  check.equal(r.addCitation({ type: "char_location", document_index: 7, cited_text: "x" }).reason, "no_document_at_index", "an index without a document is not mapped");
+  const inCitation = checkEvidence(r, [{ url: "https://example.gov/paper.pdf", title: "A paper", quote: "Hosting is in Germany only.", lang: "en", supports: ["hosting"] }]).checks[0];
+  check.equal(inCitation.verified, true, "a quote in a citation of its URL counts");
+  check.equal(inCitation.via, "citation");
+  // A search citation counts for its URL; a quote taken from the run's citation when the item has none.
+  r.addCitation({ type: "web_search_result_location", url: "https://example.gov/search-hit", cited_text: "The service is developed by Example GmbH in Bremen." });
+  const fromCitation = checkEvidence(r, [{ url: "https://example.gov/search-hit", title: "Search hit", lang: "en", supports: ["tech"] }]).checks[0];
+  check.equal(fromCitation.verified, true);
+  check.equal(fromCitation.quote_from, "citation", "an item without a quote takes the run's citation");
+  // A quote found nowhere does not count; nor does one over the length limit.
+  const nowhere = checkEvidence(r, [{ url: "https://example.gov/page", title: "The page", quote: "run by a company in the United States", lang: "en", supports: ["operator"] }]).checks[0];
+  check.equal(nowhere.verified, false, "a quote in neither the text nor a citation does not count");
+  check.equal([...clipQuote("x".repeat(400))].length <= MAX_QUOTE, true, "clipped to the limit");
+  // A pre-verified quote counts only while its URL is allowed in the run.
+  r.addVerifiedQuote("https://unlisted.example/", "A fact.", "ref_facts");
+  check.equal(r.verifyQuote("https://unlisted.example/", "A fact.").verified, false, "a pre-verified quote never makes its URL citable");
+  r.allowUrl("https://unlisted.example/", { via: "ref_facts" });
+  check.equal(r.verifyQuote("https://unlisted.example/", "A fact.").via, "ref_facts");
+  // Gating: an unverified field counts as unknown for scoring; a verified one counts; corrections win.
+  const block = { id: "B-01", layer: "platform", criticality: "critical", tech: { name: "Example Inc.", country: "US", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, hosting: "EU", licence: "proprietary", exit: "hard" };
+  const checks = [inText, nowhere];
+  const gated = gateBlock(block, checks);
+  check.deepEqual(gated.unknown_fields, ["tech", "hosting", "licence", "exit"], "the fields without a verified quote are listed");
+  check.equal(gated.effective.class_override.tech, "UNKNOWN", "an unverified party is unknown for scoring");
+  check.equal(gated.effective.hosting, "UNKNOWN");
+  const scored = assessBlock(gated.effective);
+  check.equal(scored.partly_unknown, true, "the block is marked partly unknown");
+  check.equal(scored.level, 2, "partly unknown is capped at 2");
+  const corrected = gateBlock(block, checks, { tech: { name: "Example GmbH", country: "DE", parent: null } });
+  check.equal(corrected.unknown_fields.includes("tech"), false, "a reviewer's correction overrides the gating");
+  check.equal(assessBlock(corrected.effective).tech_class, "DE");
+});
+
+await group("guards", "sequence rules (brief §7): review after every layer, levers after the review, memo after the choice, assessed reports, not_a_service, frozen findings", async () => {
+  const { guardTool, openLayers } = await mod("js/guards.js");
+  const { LAYERS } = await mod("js/engine.js");
+  const all = (n) => Object.fromEntries(LAYERS.map((l) => [l, n]));
+  const base = { reported: false, blocks: 3, layerBlocks: all(0), layerStatus: {}, scoredFresh: true, review: "none", levers: "none", decision: null, memo: false };
+  check.equal(openLayers(base).length, 6, "six open layers without blocks or a status");
+  check.match(guardTool("ui_request_review", base)?.error || "", /neither a block nor a status/, "no review while a layer is open");
+  const ready = { ...base, layerBlocks: { ...all(1), platform: 0 }, layerStatus: { platform: "no_evidence" } };
+  check.equal(guardTool("ui_request_review", ready), null, "the review may come once every layer has blocks or a status");
+  check.match(guardTool("ui_request_review", { ...ready, scoredFresh: false })?.error || "", /eng_score/, "the review needs a fresh eng_score");
+  check.match(guardTool("ui_request_review", { ...ready, blocks: 0 })?.error || "", /no building blocks/, "no review without blocks");
+  check.match(guardTool("ui_propose_levers", ready)?.error || "", /after the person's review/, "no levers before the review");
+  const reviewed = { ...ready, review: "resolved" };
+  check.equal(guardTool("ui_propose_levers", reviewed), null);
+  check.match(guardTool("rec_block", reviewed)?.error || "", /frozen/, "findings are frozen after the review");
+  check.match(guardTool("ui_draft_memo", reviewed, { lever_id: "L1" })?.error || "", /follows the person's lever decision/, "no memo before the choice");
+  const decided = { ...reviewed, levers: "decided", decision: "L2" };
+  check.match(guardTool("ui_draft_memo", decided, { lever_id: "L1" })?.error || "", /the memo is for "L2"/, "the memo names the chosen lever");
+  check.equal(guardTool("ui_draft_memo", decided, { lever_id: "L2" }), null);
+  check.match(guardTool("ui_final_report", decided, { outcome: "assessed" })?.error || "", /memo/, "no assessed report before the memo");
+  check.equal(guardTool("ui_final_report", { ...decided, memo: true }, { outcome: "assessed" }), null);
+  check.match(guardTool("ui_final_report", ready, { outcome: "assessed" })?.error || "", /review first/, "no assessed report before the review");
+  check.match(guardTool("ui_final_report", ready, { outcome: "not_a_service" })?.error || "", /not_a_service/, "not_a_service only without blocks");
+  check.equal(guardTool("ui_final_report", { ...base, blocks: 0 }, { outcome: "not_a_service" }), null, "not_a_service ends a run without blocks");
+  check.equal(guardTool("ui_final_report", ready, { outcome: "stopped" }), null, "stopped may end a run before a report");
+  check.match(guardTool("rec_block", { ...decided, memo: true, reported: true })?.error || "", /run is over/, "nothing runs after the report");
+  check.match(guardTool("ui_choose_service", ready)?.error || "", /new run/, "a service is chosen only before any block");
+});
+
 // ---- report -----------------------------------------------------------------------------------------------
 for (const r of results) console.log(`${r.ok ? "PASS" : "FAIL"}  ${r.name.padEnd(9)} ${r.what}${r.ok ? "" : `\n      ${r.error}`}`);
 const failed = results.filter((r) => !r.ok).length;
