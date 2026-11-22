@@ -1,14 +1,15 @@
 // The documentation set of version 2.0.0 is lean and consistent with the code:
-//   - README has at most 900 words, DEMO_SCRIPT.md at most 700, DESIGN.md and DATA_SOURCES.md fit a
-//     page (700 and 600); a word is anything between spaces, table bars included, so either way of
-//     counting stays under the limit; each carries its sections and names the version js/config.js does;
+//   - README has at most 900 words, DEMO_SCRIPT.md at most 700, DESIGN.md at most 700 and
+//     DATA_SOURCES.md at most 600, which prints on one A4 page; a word is anything between spaces, table
+//     bars included, so either way of counting stays under the limit; each carries its sections and
+//     names the version js/config.js does;
 //   - PLAN.md and REVIEW.md are only in the git history (at 1.0.0's commit), not in the tree;
 //   - every section the code cites ("TECH_NOTES §3", "DATA_SOURCES.md §4") exists, and every repository
 //     path a document names (in backticks or as a relative link) exists;
 //   - every page a pre-run cites, apart from the reference facts', has its heading in research/<id>.md;
 //     every quote a note lists is cited by its pre-run, unless the paragraph before it begins "Not cited"
-//     and says why; DATA_SOURCES §4 counts each pre-run's pages and quotes and links its note, and
-//     research/sources.md lists exactly the pages each pre-run cites, with its counts.
+//     and says why; research/sources.md counts each pre-run's pages and quotes, links its note, lists
+//     exactly the pages it cites, and lists the reference facts' pages.
 // Usage: node tests/docs.mjs
 import fs from "node:fs";
 import path from "node:path";
@@ -28,7 +29,7 @@ const DOCS = {
   // which parts 2.0.0 removed, so the paths and citations inside it are not held to the 2.0.0 tree.
   "TECH_NOTES.md": { numbered: 24, history: true },
   "tests/README.md": { sections: ["What runs", "Setup for the browser suites", "The private term list"] },
-  "research/sources.md": { sections: ["The catalogue", "The pre-runs"] }
+  "research/sources.md": { sections: ["The catalogue", "The reference facts", "The pre-runs"] }
 };
 const LIVE_URL = "https://victorpflueger.github.io/sovereigntyassessment/";
 
@@ -100,15 +101,18 @@ for (const [f, t] of Object.entries(text)) {
   }
 }
 
-// The pre-runs' sources: research notes, DATA_SOURCES §4 and research/sources.md.
+// The pre-runs' sources: research notes and research/sources.md.
 const { readRunFile, runIds } = await import(pathToFileURL(path.join(APP_ROOT, "tools/check-runs.mjs")).href);
 const sandbox = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(APP_ROOT, "data/ref_facts.js"), "utf8"), sandbox);
 const refUrls = new Set(JSON.stringify(sandbox.window.SA_REF_FACTS).match(/https?:\/\/[^"\s]+/g) || []);
 const table = new Map();
-const s4 = (text["DATA_SOURCES.md"] || "").split(/^## 4\. /m)[1]?.split(/^## /m)[0] || "";
-for (const m of s4.matchAll(/^\| ([^|]+) \| (\d+) \| (\d+) \| \[([\w.-]+)\]\(research\/([\w.-]+)\) \|$/gm)) table.set(m[5].replace(/\.md$/, ""), { pages: +m[2], quotes: +m[3], label: m[4] });
+const runsPart = (text["research/sources.md"] || "").split(/^## The pre-runs/m)[1] || "";
+for (const m of runsPart.split(/^### /m)[0].matchAll(/^\| ([^|]+) \| (\d+) \| (\d+) \| \[([\w.-]+)\]\(([\w.-]+)\) \|$/gm)) table.set(m[5].replace(/\.md$/, ""), { pages: +m[2], quotes: +m[3], label: m[4] });
 const sections = (text["research/sources.md"] || "").split(/^### /m);
+// The reference facts' pages, which the pre-runs cite too.
+const refPart = (text["research/sources.md"] || "").split(/^## The reference facts/m)[1]?.split(/^## /m)[0] || "";
+for (const u of refUrls) if (!refPart.includes(u)) problems.push(`research/sources.md does not list the reference facts' page ${u}`);
 let entries = 0;
 for (const id of runIds()) {
   const def = readRunFile(path.join(APP_ROOT, "data/runs", `${id}.js`));
@@ -126,10 +130,10 @@ for (const id of runIds()) {
   };
   walk(def.steps);
   entries += 1;
-  // DATA_SOURCES §4: the row of this pre-run, with its counts and its note.
+  // research/sources.md: the row of this pre-run, with its counts and its note.
   const row = table.get(id);
-  if (!row) problems.push(`DATA_SOURCES.md §4 has no row for ${id} linking research/${id}.md`);
-  else if (row.pages !== pages.size || row.quotes !== quotes.size) problems.push(`DATA_SOURCES.md §4 says ${id} cites ${row.pages} pages with ${row.quotes} quotes; it cites ${pages.size} with ${quotes.size}`);
+  if (!row) problems.push(`research/sources.md has no row for ${id} linking ${id}.md`);
+  else if (row.pages !== pages.size || row.quotes !== quotes.size) problems.push(`research/sources.md says ${id} cites ${row.pages} pages with ${row.quotes} quotes; it cites ${pages.size} with ${quotes.size}`);
   // research/sources.md: the pages it lists for this pre-run are the pages it cites (and pages it read).
   const sec = sections.find((x) => x.includes(`(\`data/runs/${id}.js\`)`));
   if (!sec) problems.push(`research/sources.md has no entry for data/runs/${id}.js`);
@@ -157,7 +161,7 @@ for (const id of runIds()) {
     if (!cites.has(`${url}\n${q[1].replace(/\s+/g, " ").trim()}`)) problems.push(`research/${id}.md lists a quote its pre-run does not cite, unmarked: "${q[1].slice(0, 70)}"`);
   }
 }
-if (table.size !== entries) problems.push(`DATA_SOURCES.md §4 has ${table.size} rows for ${entries} pre-runs`);
+if (table.size !== entries) problems.push(`research/sources.md counts ${table.size} pre-runs of ${entries}`);
 
 // The talk track: DEMO_SCRIPT.md's five minutes are the English guide's last chapter, step by step.
 const guideSteps = (html) => {

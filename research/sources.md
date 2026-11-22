@@ -1,6 +1,6 @@
 # Sovereignty Assessment: every source, case by case
 
-The full lists behind [DATA_SOURCES.md](../DATA_SOURCES.md), as version 1.0.0 kept them there on 20 November 2026; version 2.0.0 moved them here and changed only two cross-references: the catalogue's starting pages, and for each pre-run every page it read, with its language and the date it was read. The quotes themselves are in the note of each case beside this file (`research/<case>.md`). A § in the text below refers to TECH_NOTES.md.
+The full lists behind [DATA_SOURCES.md](../DATA_SOURCES.md), as version 1.0.0 kept them there on 20 November 2026: the catalogue's starting pages, the reference facts' pages, and for each pre-run its counts and every page it read, with its language and the date it was read. Version 2.0.0 moved them here and changed only their cross-references. The quotes themselves are in the note of each case beside this file (`research/<case>.md`). A § in the text below refers to TECH_NOTES.md.
 
 ## The catalogue (data/catalogue.js)
 
@@ -39,9 +39,42 @@ Seventeen entries, each with names in English and German, category, a one-line d
 
 **Two readings to know.** The BMDS document lists "DVC" among the best practices of federal cooperation without spelling it out; the catalogue reads it as the Deutsche Verwaltungscloud, which the BMI's press release calls "DVC". The document writes "D-APP" where the catalogue says Deutschland-App, and "Onlineausweis" where it says Online-Ausweis. ZBDS has no page of its own that this build found: the entry rests on the BMDS's two Deutschland-Stack documents and says so.
 
+## The reference facts (data/ref_facts.js)
+
+Each fact carries a verbatim quote of at most 150 characters, read on its page with web fetch.
+
+| Fact | Topic | Source | Title | Read |
+|---|---|---|---|---|
+| RF-01, RF-02 | Push messaging | https://developer.apple.com/documentation/usernotifications/setting-up-a-remote-notification-server.md | Setting up a remote notification server | 2026-11-19 |
+| RF-03, RF-04 | App distribution | https://support.apple.com/en-mide/118110 | About alternative app distribution - Apple Support | 2026-11-19 |
+| RF-05 | Federal IT | https://bmds.bund.de/fileadmin/BMDS/Dokumente/AM_Gesamtarchitektur.pdf | Gesamtarchitektur für die Dienstekonsolidierung der IT des Bundes | 2026-11-19 |
+| RF-06 | Federal IT | https://www.bundestag.de/presse/hib/kurzmeldungen-1202030 | Bundesverwaltung nutzt KI als unterstützendes Werkzeug | 2026-11-19 |
+
 ## The pre-runs (data/runs/)
 
-Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3, in the git history at `1dc145e`), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those [DATA_SOURCES.md](../DATA_SOURCES.md) lists, verified when they were built.
+Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3, in the git history at `1dc145e`), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those listed under The reference facts above, verified when they were built.
+
+Pages and quotes count what each run cites besides the reference facts.
+
+| Case | Pages | Quotes | Note |
+|---|---|---|---|
+| BundID | 10 | 19 | [bundid.md](bundid.md) |
+| Online ID | 9 | 16 | [online-ausweis.md](online-ausweis.md) |
+| EUDI Wallet | 7 | 10 | [eudi-wallet.md](eudi-wallet.md) |
+| Business account (MUK) | 9 | 15 | [muk.md](muk.md) |
+| FIT-Connect | 8 | 14 | [fit-connect.md](fit-connect.md) |
+| NOOTS | 5 | 16 | [noots.md](noots.md) |
+| ePayBL | 10 | 17 | [epaybl.md](epaybl.md) |
+| ZBDS | 2 | 4 | [zbds.md](zbds.md) |
+| ZaPuK | 3 | 7 | [zapuk.md](zapuk.md) |
+| KIPITZ | 4 | 11 | [kipitz.md](kipitz.md) |
+| Low-code | 1 | 4 | [low-code.md](low-code.md) |
+| Marktplatz Deutschland Digital | 8 | 14 | [marktplatz-deutschland-digital.md](marktplatz-deutschland-digital.md) |
+| openCode | 7 | 14 | [opencode.md](opencode.md) |
+| German Administration Cloud | 6 | 12 | [dvc.md](dvc.md) |
+| Federal Portal | 5 | 9 | [bundesportal.md](bundesportal.md) |
+| Deutschland-App | 8 | 16 | [deutschland-app.md](deutschland-app.md) |
+| This prototype | 12 | 23 | [sovereignty-assessment.md](sovereignty-assessment.md) |
 
 ### BundID (`data/runs/bundid.js`)
 
