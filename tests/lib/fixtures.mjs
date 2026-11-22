@@ -1,7 +1,7 @@
 // The golden fixtures (tests/fixtures/*.json, the brief's section 11) as the engine and the audit take
 // them: table rows become building blocks of the shape the agent records (brief §10), and the exact
-// fractions become numbers to compare within 1e-9. The helpers live in js/selftest.js, which the
-// browser's Diagnostics runs on the same cases.
+// fractions become numbers to compare within 1e-9. Until 1.0.0 these helpers lived in js/selftest.js
+// for the browser's Diagnostics; 2.0.0 took Diagnostics off the page, so they live here.
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { APP_ROOT } from "./harness.mjs";
@@ -13,11 +13,47 @@ export function fixture(name) {
   return JSON.parse(readFileSync(path.join(FIXTURES, name), "utf8"));
 }
 
-// One implementation for the browser's Diagnostics and the Node suites: js/selftest.js.
-import { blockFromRow } from "../../js/selftest.js";
-export { fraction, near, plain, blockFromRow } from "../../js/selftest.js";
+/** "865/12" → 72.083…, "100" → 100. */
+export function fraction(text) {
+  const [n, d = "1"] = String(text).split("/");
+  return Number(n) / Number(d);
+}
 
-/** Every golden file by name ({ "s1-levels.json": … }), as data/golden.js carries them. */
+/** Within 1e-9 of the exact fraction. */
+export function near(value, exact) {
+  return typeof value === "number" && Math.abs(value - fraction(exact)) <= 1e-9;
+}
+
+/** Display strings compare after non-breaking spaces become normal spaces (brief §6.5). */
+export function plain(text) {
+  return String(text).replace(/[\u00a0\u202f]/g, " ");
+}
+
+/**
+ * A fixture row ({ id, layer?, criticality?, made_in, licence, run_by, hosting }) as a recorded block:
+ * Made in and Run by are countries (or UNKNOWN), so they become the technology provider's and the
+ * operator's country. The names are ids: no golden block is ever shown.
+ */
+export function blockFromRow(row, i = 0) {
+  const id = row.id && /^B-\d{2}$/.test(row.id) ? row.id : `B-${String(i + 1).padStart(2, "0")}`;
+  return {
+    id,
+    layer: row.layer || "platform",
+    name: id,
+    role: "",
+    note: "",
+    criticality: row.criticality || "critical",
+    tech: { name: `${id}.tech`, country: row.made_in, parent: null },
+    operator: { name: `${id}.operator`, country: row.run_by, parent: null },
+    hosting: row.hosting,
+    licence: row.licence,
+    exit: "unknown",
+    evidence: [],
+    confidence: "high"
+  };
+}
+
+/** Every golden file by name ({ "s1-levels.json": … }). */
 export function allFixtures() {
   return Object.fromEntries(readdirSync(FIXTURES).filter((f) => f.endsWith(".json")).sort().map((f) => [f, fixture(f)]));
 }

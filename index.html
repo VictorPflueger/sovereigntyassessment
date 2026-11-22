@@ -1,40 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The browser enforces where this page may connect: the API key can only ever reach api.anthropic.com,
-       the one outside host (web search and web fetch run on Anthropic's servers). Scripts, styles, fonts
-       and images come from this site only: the app loads nothing from a third party. js/config.js holds
-       the same policy, and Diagnostics and tests/accept.mjs compare the two. -->
+  <!-- Everything comes from this site. A live run reaches api.anthropic.com with the visitor's key (web
+       search and web fetch run on Anthropic's servers); nothing else can be reached. js/config.js holds
+       the same policy, and tests/vici.mjs compares the two. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.anthropic.com; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" data-i18n-attr="content:app.description" content="An AI agent that assesses how digitally sovereign a German public service is: who makes and who runs each of its building blocks, scored per layer of the Deutschland-Stack, with a source for every finding. A prototype, not an official service.">
-  <title>Sovereignty Assessment</title>
+  <meta name="description" content="Sovereignty Assessment: an AI agent shows who makes and who runs each building block of a German public service, scored by code per layer of the Deutschland-Stack, with a source for every finding. Indicative, not an official assessment; a prototype, not an official service of the German Federal Government.">
+  <title>Sovereignty Assessment · Agentic AI prototype</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-
-  <!-- The look comes from Victor's design system Vici, copied unchanged into vici/ (vici/README.md).
-       It sits in cascade layers, so the app's own stylesheets below refine it without !important. -->
   <link rel="stylesheet" href="vici/dist/vici.min.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/console.css">
-  <link rel="stylesheet" href="css/drawer.css">
-  <link rel="stylesheet" href="css/modals.css">
-  <link rel="stylesheet" href="css/map.css">
-  <link rel="stylesheet" href="css/panels.css">
-
-  <!-- The theme before the page is drawn (light unless the visitor chose dark), then Vici's script. -->
+  <link rel="stylesheet" href="css/app.css">
   <script src="js/theme.js"></script>
   <script src="vici/dist/vici.js" defer></script>
-
-  <!-- The catalogue, the reference facts and the data contracts: plain scripts that set window globals
-       (the security policy allows no fetch from this site). Every text in English and German. -->
+  <!-- The catalogue, the reference facts and the seventeen pre-runs: plain scripts
+       that set window globals, checked by tools/check-runs.mjs against their research notes. -->
   <script src="data/catalogue.js" defer></script>
   <script src="data/ref_facts.js" defer></script>
-  <script src="data/schemas.js" defer></script>
-  <!-- The pre-run assessments the Simulation replays (data/runs/, checked by tools/check-runs.mjs). -->
   <script src="data/runs/bundid.js" defer></script>
   <script src="data/runs/online-ausweis.js" defer></script>
   <script src="data/runs/fit-connect.js" defer></script>
@@ -55,72 +40,334 @@
   <script type="module" src="js/main.js"></script>
 </head>
 <body class="app-shell">
-  <!-- The texts below are the English defaults: each element names its key in js/i18n/ (data-i18n, or
-       data-i18n-attr for attributes), and the app writes them in the chosen language at start-up. -->
-  <a class="vc-skip-link skip-link" href="#console" data-i18n="app.skip">Skip to the agent console</a>
+  <!-- The texts below are the English defaults: an element that names its key in data-i18n (or
+       data-i18n-attr for attributes) gets its words from js/i18n/, in English or German. -->
+  <a class="vc-skip-link" href="#story" data-i18n="p.skip">Skip to the step</a>
 
   <header class="app-header">
     <div class="brand">
       <span class="vc-cell vc-cell--lilac" aria-hidden="true"><span class="vc-icon vc-icon--honeycomb"></span></span>
-      <div class="brand-text">
-        <span data-i18n="app.name" class="brand-name">Sovereignty Assessment</span>
-        <span data-i18n="app.prototype" class="brand-proto">Prototype – not an official service of the German Federal Government</span>
-      </div>
+      <span data-i18n="app.name" class="brand-name">Sovereignty Assessment</span>
     </div>
 
-    <div class="header-badges">
-      <span id="mode-badge" class="vc-tag mode-badge" data-mode="none" role="status" aria-live="polite" data-i18n-attr="title:badge.none.title" title="Choose a mode with Start agent"><span data-i18n="badge.none">No run active</span></span>
-      <!-- Vici's theme toggle (vici.js switches the theme and remembers the choice); its label is fixed
-           and aria-pressed carries the state. -->
+    <div class="header-actions">
       <span class="vc-tooltip-anchor">
-        <button type="button" class="vc-icon-button theme-toggle" data-vc-theme-toggle aria-labelledby="tip-theme"><span class="vc-icon vc-icon--moon vc-when-light" aria-hidden="true"></span><span class="vc-icon vc-icon--sun vc-when-dark" aria-hidden="true"></span></button>
-        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-theme" data-i18n="header.theme">Dark theme</span>
+        <span class="vc-tag vc-tag--lg mode-tag" id="mode-tag" data-mode="simulation" tabindex="0" aria-describedby="tip-mode"><span id="mode-text">SIMULATION</span></span>
+        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-mode">A replay of the agent's run of 20 November 2026 through its own tools: code computes every figure and no model is called. Start agent offers a live run.</span>
       </span>
-      <!-- The language switch (js/lang_switch.js): each button names its language in that language. -->
-      <div id="lang-switch" class="segmented lang-switch" role="group" data-i18n-attr="aria-label:lang.switch" aria-label="Language">
-        <button type="button" data-lang="en" lang="en" aria-pressed="true" aria-label="English (EN)">EN</button>
-        <button type="button" data-lang="de" lang="de" aria-pressed="false" aria-label="Deutsch (DE)">DE</button>
+      <!-- One guide per language, each with its own button; js/lang.js shows the page's. -->
+      <button type="button" class="vc-button vc-button--secondary guide-open" data-vc-guide-open="guide-en" lang="en"><span class="vc-icon vc-icon--info" aria-hidden="true"></span>How it works</button>
+      <button type="button" class="vc-button vc-button--secondary guide-open" data-vc-guide-open="guide-de" lang="de" hidden><span class="vc-icon vc-icon--info" aria-hidden="true"></span>So funktioniert's</button>
+      <span class="vc-tooltip-anchor">
+        <button type="button" class="vc-icon-button" data-vc-theme-toggle aria-labelledby="tip-theme"><span class="vc-icon vc-icon--moon vc-when-light" aria-hidden="true"></span><span class="vc-icon vc-icon--sun vc-when-dark" aria-hidden="true"></span></button>
+        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-theme" data-i18n="p.theme">Dark or light theme</span>
+      </span>
+      <div class="vc-button-group lang-switch" role="group" aria-label="Language" data-i18n-attr="aria-label:p.lang">
+        <button type="button" class="vc-button vc-button--secondary lang-option" data-lang="en" lang="en" title="English" aria-pressed="true">EN</button>
+        <button type="button" class="vc-button vc-button--secondary lang-option" data-lang="de" lang="de" title="Deutsch" aria-pressed="false">DE</button>
       </div>
-      <span class="vc-tag vc-tag--feature ai-disclosure" data-i18n-attr="title:header.ai.title" title="The Sovereignty Assessment is an AI system. Its findings can be wrong: every finding shows its sources, every score is indicative, and nothing is sent anywhere.">
-        <span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span>
-        <span><span class="long" data-i18n="header.ai.long">You are interacting with an </span><span data-i18n="header.ai.short">AI system</span></span>
-      </span>
     </div>
 
-    <div id="kpis" class="kpis" role="group" data-i18n-attr="aria-label:header.kpis" aria-label="Key figures of the assessment"></div>
+    <!-- The four key figures. data-vc-kpi names each in English, data-vc-kpi-de in German; each guide
+         explains them in a row of its How it works chapter, and the talk track points at them. A figure
+         computed from part of the layers says so in its value; when the decision moves the score, its
+         tile keeps the old value struck through (vc-stat__was). The values below are BundID's. -->
+    <div class="kpis" role="group" aria-label="Key figures" data-i18n-attr="aria-label:p.kpis">
+      <div class="kpi vc-stat" id="kpi-score" data-vc-kpi="Overall score" data-vc-kpi-de="Gesamtwert">
+        <p class="vc-stat__label" data-i18n="p.kpi.score.label">Overall score</p>
+        <p class="vc-stat__value kpi-value"><s class="vc-stat__was" hidden></s><span class="vc-visually-hidden kpi-to" hidden></span><span class="kpi-main">77</span><span class="kpi-of"> on 5 of 6 layers</span></p>
+        <p class="vc-stat__note kpi-note">indicative, out of 100</p>
+      </div>
+      <div class="kpi vc-stat" id="kpi-weakest" data-vc-kpi="Weakest critical link" data-vc-kpi-de="Schwächstes kritisches Glied">
+        <p class="vc-stat__label" data-i18n="p.kpi.weakest.label">Weakest critical link</p>
+        <p class="vc-stat__value kpi-value"><s class="vc-stat__was" hidden></s><span class="vc-visually-hidden kpi-to" hidden></span><span class="kpi-main">Level 3</span><span class="kpi-of"> of 4</span></p>
+        <p class="vc-stat__note kpi-note">Kubernetes platform at the ITZBund</p>
+      </div>
+      <div class="kpi vc-stat" id="kpi-exclusive" data-vc-kpi="Exclusive non-EU control" data-vc-kpi-de="Exklusive Nicht-EU-Kontrolle">
+        <p class="vc-stat__label" data-i18n="p.kpi.exclusive.label">Exclusive non-EU control</p>
+        <p class="vc-stat__value kpi-value"><s class="vc-stat__was" hidden></s><span class="vc-visually-hidden kpi-to" hidden></span><span class="kpi-main">0&nbsp;%</span></p>
+        <p class="vc-stat__note kpi-note">of 4 critical blocks</p>
+      </div>
+      <div class="kpi vc-stat" id="kpi-cost" data-vc-kpi="Session cost" data-vc-kpi-de="Sitzungskosten">
+        <p class="vc-stat__label" data-i18n="p.kpi.cost.label">Session cost</p>
+        <p class="vc-stat__value kpi-value"><span class="kpi-main">≈&nbsp;€0.52</span></p>
+        <p class="vc-stat__note kpi-note">estimated for a live run</p>
+      </div>
+    </div>
   </header>
 
-  <nav id="controls" class="controls" data-i18n-attr="aria-label:controls.label" aria-label="Run controls"></nav>
+  <!-- What the prototype does and how real its data is, in one sentence, with the byline beside it. -->
+  <div class="intro">
+    <p class="intro-text" data-i18n="p.strip">An AI agent finds who makes and who runs each part of a public service, from real sources: indicative, not an official assessment.</p>
+    <p class="vc-byline">
+      <span class="vc-byline__label" data-i18n="p.byline.label">Built by</span>
+      <a class="vc-byline__person" href="https://www.linkedin.com/in/victorpflueger" rel="author noopener" target="_blank">
+        <span class="vc-avatar vc-avatar--xs"><img src="vici/assets/brand/portrait-96.jpg" alt="" width="96" height="96"></span>
+        <span class="vc-byline__name">Victor Pflüger</span>
+        <img class="vc-platform-mark" src="vici/assets/marks/linkedin.png" alt="" width="840" height="779">
+        <span class="vc-visually-hidden" data-i18n="p.byline.linkedin"> on LinkedIn (opens in a new tab)</span>
+      </a>
+      <span class="vc-tooltip-anchor">
+        <a class="vc-byline__icon" href="https://victorpflueger.github.io/VIP/index.html" rel="author noopener" target="_blank" aria-label="Victor Pflüger's website (opens in a new tab)" data-i18n-attr="aria-label:p.byline.website"><span class="vc-icon vc-icon--globe-hex" aria-hidden="true"></span></a>
+        <span class="vc-tooltip vc-tooltip--bottom" aria-hidden="true" data-i18n="p.byline.tip">Website</span>
+      </span>
+    </p>
+  </div>
+
+  <nav class="talk" aria-label="Talk track" data-i18n-attr="aria-label:p.talk">
+    <button type="button" class="vc-button vc-button--secondary play" id="play" data-state="play"><span class="vc-icon vc-icon--play" aria-hidden="true"></span><span id="play-text">Play</span></button>
+    <button type="button" class="vc-button vc-button--danger stop" id="stop" hidden><span class="vc-icon vc-icon--stop" aria-hidden="true"></span><span data-i18n="p.stop">Stop the live run</span></button>
+    <ol class="vc-stepper steps" id="steps">
+      <li class="vc-step" data-step="understand"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">1</span><span class="vc-step__label">Understand</span></button></li>
+      <li class="vc-step" data-step="research"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">2</span><span class="vc-step__label">Research</span></button></li>
+      <li class="vc-step" data-step="score"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">3</span><span class="vc-step__label">Score</span></button></li>
+      <li class="vc-step" data-step="review" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">4</span><span class="vc-step__label">Your review</span></button></li>
+      <li class="vc-step" data-step="recommend" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">5</span><span class="vc-step__label">Recommend</span></button></li>
+    </ol>
+    <button type="button" class="vc-button vc-button--ghost case-button" id="case-button" popovertarget="case-menu" aria-haspopup="menu" aria-expanded="false"><span class="vc-visually-hidden" data-i18n="p.case.label">Case: </span><span class="case-name" id="case-name">BundID</span><span class="vc-icon vc-icon--chevron-down" aria-hidden="true"></span></button>
+    <div class="vc-menu case-menu" id="case-menu" popover role="menu" aria-label="Cases" data-i18n-attr="aria-label:p.cases"></div>
+    <button type="button" class="vc-button vc-button--secondary start" id="start" data-vc-live data-i18n="p.start">Start agent</button>
+    <span class="vc-tag vc-tag--feature ai-notice"><span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span><span data-i18n="p.ai">You are interacting with an AI system</span></span>
+  </nav>
+
+  <p class="vc-visually-hidden" id="announce" aria-live="polite"></p>
 
   <main class="workspace">
-    <!-- The sovereignty map: before a run, the catalogue to choose from; during and after a run, the
-         spider diagram, the Made-in and Run-by mix, the honeycomb and the table (js/sovmap.js). -->
-    <section class="map-panel" data-i18n-attr="aria-label:map.label" aria-label="Sovereignty map">
-      <div id="map" class="map"></div>
+    <section class="stage" aria-labelledby="stage-title">
+      <h2 class="stage-title" id="stage-title">The service</h2>
+      <div class="stage-body" id="stage-body"></div>
+      <p class="stage-foot" data-i18n="p.notOfficial">A prototype, not an official service of the German Federal Government.</p>
     </section>
-    <section id="console" class="console-panel" data-i18n-attr="aria-label:console.title" aria-label="Agent console" tabindex="-1"></section>
+    <section class="story" id="story" aria-labelledby="story-title" tabindex="-1">
+      <h2 class="story-title" id="story-title" tabindex="-1">Understand</h2>
+      <p class="story-lead" id="story-lead"></p>
+      <p class="vc-alert vc-alert--warning story-alert" id="story-alert" role="status" hidden></p>
+      <p class="story-working" id="story-working" hidden><span class="vc-spinner vc-spinner--sm" aria-hidden="true"></span><span id="story-working-text"></span></p>
+      <figure class="agent" id="agent" hidden>
+        <figcaption><span class="vc-tag vc-tag--feature vc-tag--sm"><span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span><span data-i18n="p.agent">Agent</span></span><span class="agent-note" id="agent-note">replayed, not live</span></figcaption>
+        <div class="agent-words" id="agent-text"></div>
+      </figure>
+      <details class="log" id="log" hidden><summary id="log-summary">Decision log</summary><ol id="log-list"></ol></details>
+      <!-- What the page waits for, asked where the eye is (Vici, Presenting step by step): one sentence and
+           the one primary action, right under the step and in view however long it grows. -->
+      <div class="turn-bar" id="turn" data-state="playing">
+        <p class="turn-text"><strong class="turn-lead" id="turn-lead">Your turn:</strong> <span id="turn-what"></span></p>
+        <div class="turn-actions">
+          <button type="button" class="vc-button vc-button--outline" id="turn-second" hidden></button>
+          <button type="button" class="vc-button next" id="turn-primary"><span id="turn-primary-text">Next</span><span class="vc-icon vc-icon--chevron-right" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <section id="drawer" class="drawer" data-i18n-attr="aria-label:drawer.label" aria-label="Building blocks, review, levers, outbox and audit log"></section>
+  <!-- How it works, once in English and once in German: Vici's guide. vici.js builds each chapter rail and
+       opens the guide of the page's language once per browser tab (js/lang.js keeps the other one closed);
+       ?guide=0 keeps it closed, ?guide=present opens the talk track. Every figure in them is BundID's, as
+       the engine computes it; js/app.js writes them in from the same run the tiles show (data-fig). -->
+  <dialog class="vc-dialog vc-guide" id="guide-en" lang="en-GB" aria-labelledby="guide-en-title" data-vc-guide data-vc-guide-auto data-vc-guide-count="{n} of {total}" data-vc-guide-rail="Chapters">
+    <header class="vc-dialog__header">
+      <h2 class="vc-dialog__title" id="guide-en-title">How the prototype works</h2>
+      <button type="button" class="vc-icon-button" data-vc-close aria-label="Close"><span class="vc-icon vc-icon--close" aria-hidden="true"></span></button>
+    </header>
+    <div class="vc-guide__chapters">
+      <section class="vc-guide__chapter" data-vc-chapter="what" data-vc-nav="What it does">
+        <h3>Who makes and who runs BundID, block by block</h3>
+        <p class="vc-guide__lead">Digital sovereignty asks who makes and who runs each part of a public service, and from where. An AI agent finds out for BundID, the federal user account, with a source for every finding.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>The case it opens on</caption>
+          <tbody>
+            <tr><th scope="row">Service</th><td>BundID, the account people sign in with for online services of the administration</td></tr>
+            <tr><th scope="row">Read</th><td><span data-fig="pages">11</span> pages, <span data-fig="quotes">21</span> quotes kept, as of <span data-fig="as-of">20 November 2026</span></td></tr>
+            <tr><th scope="row">Found</th><td><span data-fig="blocks">6</span> building blocks <span data-fig="layers">on 5 of 6 layers</span></td></tr>
+            <tr><th scope="row">Proposed</th><td>One lever, for you to decide; nothing is sent</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="how" data-vc-nav="How it works">
+        <h3>Code scores every block, four figures sum it up</h3>
+        <p class="vc-guide__lead">The agent records who makes and who runs each block; code, not the AI, sets each level from 0 to 4 and computes the four figures.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Key figures</caption>
+          <thead><tr><th scope="col">Figure</th><th scope="col">What it measures</th><th scope="col">BundID</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Overall score</th><td>The mean of the layers' scores, out of 100, on the layers with evidence; indicative</td><td><span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span></td></tr>
+            <tr><th scope="row">Weakest critical link</th><td>The lowest level among the blocks the service cannot run without</td><td><span data-fig="weakest">Level 3 of 4</span>, <span data-fig="weakest-name">Kubernetes platform at the ITZBund</span></td></tr>
+            <tr><th scope="row">Exclusive non-EU control</th><td>The share of critical blocks run from outside the EU</td><td><span data-fig="exclusive">0&nbsp;%</span> of <span data-fig="critical">4</span></td></tr>
+            <tr><th scope="row">Session cost</th><td>What the model calls cost: estimated here, measured in a live run</td><td>about <span data-fig="cost">€0.52</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="levels" data-vc-nav="The levels">
+        <h3>A block's level: who makes it and who runs it</h3>
+        <p class="vc-guide__lead">A block gets the lower of two levels, one for who makes it and one for who runs it. Open source made outside the EU still reaches 3.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>The five levels</caption>
+          <tbody>
+            <tr><th scope="row">4</th><td>Made and run in Germany or another EU state</td></tr>
+            <tr><th scope="row">3</th><td>Made outside the EU as open source, run in the EU</td></tr>
+            <tr><th scope="row">2</th><td>Made outside the EU and not open source; at most 2 when one side is unknown</td></tr>
+            <tr><th scope="row">1</th><td>Run from outside the EU, hosted in the EU</td></tr>
+            <tr><th scope="row">0</th><td>Run from outside the EU, with no sign it is hosted in the EU</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="real" data-vc-nav="What is real">
+        <h3>Real sources, a replayed run, no official verdict</h3>
+        <p class="vc-guide__lead">The pages and quotes are real. The run you see replays the agent's work; Start agent runs Claude live on your own key instead.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Where everything comes from</caption>
+          <tbody>
+            <tr><th scope="row">Real</th><td>The services, the pages, every quote and the date it was read</td></tr>
+            <tr><th scope="row">Replayed</th><td>The agent's run of <span data-fig="as-of">20 November 2026</span>, played offline; no model is called</td></tr>
+            <tr><th scope="row">Indicative</th><td>Every level and score: not an official assessment, and not an official service of the German Federal Government</td></tr>
+            <tr><th scope="row">Live</th><td>With your key, Claude researches the service on the web; its memo stays a draft and nothing is sent</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="present" data-vc-nav="How to present">
+        <h3>Show it in five minutes</h3>
+        <p class="vc-guide__lead">It plays by itself and stops where you act; Space pauses.</p>
+        <ol class="vc-guide__path">
+          <li><strong>Understand: point at the four figures.</strong> <span class="vc-guide__say">“Who makes and who runs BundID, scored by code: <span data-fig="score">77</span> of 100, indicative.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Research: open one block's quotes.</strong> <span class="vc-guide__say">“<span data-fig="blocks">6</span> building blocks, each with a quote, a link and the date it was read.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Score: point at the weakest critical link.</strong> <span class="vc-guide__say">“No critical block runs from outside the EU; weakest: Kubernetes, <span data-fig="weakest">Level 3 of 4</span>.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Your review: press Confirm the findings.</strong> <span class="vc-guide__say">“A person checks first: the AusweisApp for iPhones comes from Apple, level 0.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Recommend: press Approve the lever, then Approve the draft.</strong> <span class="vc-guide__say">“An app marketplace run in the EU lifts the score to <span data-fig="lever">81</span>. Nothing is sent.”</span> <span class="vc-guide__time">1 min</span></li>
+        </ol>
+      </section>
+    </div>
+    <footer class="vc-dialog__footer vc-guide__footer">
+      <span class="vc-guide__count"></span>
+      <button type="button" class="vc-button vc-button--ghost" data-vc-guide-back><span class="vc-icon vc-icon--chevron-left" aria-hidden="true"></span>Back</button>
+      <button type="button" class="vc-button" data-vc-guide-next data-vc-guide-done="Start">Next<span class="vc-icon vc-icon--chevron-right" aria-hidden="true"></span></button>
+    </footer>
+  </dialog>
 
-  <div id="banners" class="banner-stack"></div>
+  <dialog class="vc-dialog vc-guide" id="guide-de" lang="de" aria-labelledby="guide-de-title" data-vc-guide data-vc-guide-auto data-vc-guide-count="{n} von {total}" data-vc-guide-rail="Kapitel">
+    <header class="vc-dialog__header">
+      <h2 class="vc-dialog__title" id="guide-de-title">So funktioniert der Prototyp</h2>
+      <button type="button" class="vc-icon-button" data-vc-close aria-label="Schließen"><span class="vc-icon vc-icon--close" aria-hidden="true"></span></button>
+    </header>
+    <div class="vc-guide__chapters">
+      <section class="vc-guide__chapter" data-vc-chapter="what" data-vc-nav="Was er tut">
+        <h3>Wer die BundID herstellt und betreibt, Baustein für Baustein</h3>
+        <p class="vc-guide__lead">Digitale Souveränität fragt, wer jeden Teil eines öffentlichen Dienstes herstellt und betreibt, und von wo. Ein KI-Agent findet es für die BundID heraus, das Nutzerkonto des Bundes, mit einer Quelle für jeden Befund.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Der Fall, mit dem er startet</caption>
+          <tbody>
+            <tr><th scope="row">Dienst</th><td>BundID, das Konto, mit dem man sich für Onlinedienste der Verwaltung anmeldet</td></tr>
+            <tr><th scope="row">Gelesen</th><td><span data-fig="pages">11</span> Seiten, <span data-fig="quotes">21</span> Zitate belegt, Stand <span data-fig="as-of">20. November 2026</span></td></tr>
+            <tr><th scope="row">Gefunden</th><td><span data-fig="blocks">6</span> Bausteine <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
+            <tr><th scope="row">Vorgeschlagen</th><td>Ein Hebel, über den Sie entscheiden; nichts wird versendet</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="how" data-vc-nav="So funktioniert's">
+        <h3>Code bewertet jeden Baustein, vier Kennzahlen zeigen es</h3>
+        <p class="vc-guide__lead">Der Agent hält fest, wer jeden Baustein herstellt und betreibt; Code, nicht die KI, vergibt die Stufen von 0 bis 4 und rechnet die vier Kennzahlen.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Kennzahlen</caption>
+          <thead><tr><th scope="col">Kennzahl</th><th scope="col">Was sie misst</th><th scope="col">BundID</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Gesamtwert</th><td>Der Mittelwert der Ebenen, von 100, über die Ebenen mit Belegen; indikativ</td><td><span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
+            <tr><th scope="row">Schwächstes kritisches Glied</th><td>Die niedrigste Stufe unter den Bausteinen, ohne die der Dienst nicht läuft</td><td><span data-fig="weakest">Stufe 3 von 4</span>, <span data-fig="weakest-name">Kubernetes-Plattform beim ITZBund</span></td></tr>
+            <tr><th scope="row">Exklusive Nicht-EU-Kontrolle</th><td>Der Anteil kritischer Bausteine, betrieben von außerhalb der EU</td><td><span data-fig="exclusive">0&nbsp;%</span> von <span data-fig="critical">4</span></td></tr>
+            <tr><th scope="row">Sitzungskosten</th><td>Was die Modellaufrufe kosten: hier geschätzt, in einem Live-Lauf gemessen</td><td>etwa <span data-fig="cost">0,52&nbsp;€</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="levels" data-vc-nav="Die Stufen">
+        <h3>Stufe: wer einen Baustein herstellt und wer ihn betreibt</h3>
+        <p class="vc-guide__lead">Ein Baustein bekommt die niedrigere von zwei Stufen, eine für den Hersteller und eine für den Betreiber. Quelloffenes von außerhalb der EU erreicht noch 3.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Die fünf Stufen</caption>
+          <tbody>
+            <tr><th scope="row">4</th><td>In Deutschland oder einem anderen EU-Staat hergestellt und betrieben</td></tr>
+            <tr><th scope="row">3</th><td>Außerhalb der EU hergestellt, quelloffen, in der EU betrieben</td></tr>
+            <tr><th scope="row">2</th><td>Außerhalb der EU hergestellt und nicht quelloffen; höchstens 2, wenn eine Seite unbekannt ist</td></tr>
+            <tr><th scope="row">1</th><td>Von außerhalb der EU betrieben, in der EU gehostet</td></tr>
+            <tr><th scope="row">0</th><td>Von außerhalb der EU betrieben, ohne Beleg für ein Hosting in der EU</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="real" data-vc-nav="Was echt ist">
+        <h3>Echte Quellen, nachgespielter Lauf, kein amtliches Urteil</h3>
+        <p class="vc-guide__lead">Die Seiten und Zitate sind echt. Der Lauf spielt die Arbeit des Agenten nach; „Agent starten“ lässt Claude stattdessen live mit Ihrem eigenen Schlüssel laufen.</p>
+        <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
+          <caption>Woher alles kommt</caption>
+          <tbody>
+            <tr><th scope="row">Echt</th><td>Die Dienste, die Seiten, jedes Zitat und das Datum, an dem es gelesen wurde</td></tr>
+            <tr><th scope="row">Nachgespielt</th><td>Der Lauf des Agenten vom <span data-fig="as-of">20. November 2026</span>, offline abgespielt; kein Modell wird aufgerufen</td></tr>
+            <tr><th scope="row">Indikativ</th><td>Jede Stufe und jeder Wert: keine amtliche Bewertung und kein offizielles Angebot der Bundesregierung</td></tr>
+            <tr><th scope="row">Live</th><td>Mit Ihrem Schlüssel recherchiert Claude den Dienst im Netz; sein Memo bleibt ein Entwurf, nichts wird versendet</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section class="vc-guide__chapter" data-vc-chapter="present" data-vc-nav="So führen Sie vor">
+        <h3>In fünf Minuten vorführen</h3>
+        <p class="vc-guide__lead">Er spielt von selbst und hält, wo Sie handeln; die Leertaste hält an.</p>
+        <ol class="vc-guide__path">
+          <li><strong>Verstehen: auf die vier Kennzahlen zeigen.</strong> <span class="vc-guide__say">„Wer die BundID herstellt und betreibt, vom Code bewertet: <span data-fig="score">77</span> von 100, indikativ.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Recherchieren: die Zitate eines Bausteins öffnen.</strong> <span class="vc-guide__say">„<span data-fig="blocks">6</span> Bausteine, jeder mit Zitat, Link und Lesedatum.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Bewerten: auf das schwächste kritische Glied zeigen.</strong> <span class="vc-guide__say">„Schwächster: Kubernetes, <span data-fig="weakest">Stufe 3 von 4</span>; keiner läuft von außerhalb der EU.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Ihre Prüfung: Befunde bestätigen drücken.</strong> <span class="vc-guide__say">„Erst prüft ein Mensch: Die AusweisApp fürs iPhone kommt von Apple, Stufe 0.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Empfehlen: Hebel freigeben, dann Entwurf freigeben drücken.</strong> <span class="vc-guide__say">„Ein App-Marktplatz in der EU hebt den Wert auf <span data-fig="lever">81</span>. Nichts wird versendet.“</span> <span class="vc-guide__time">1 min</span></li>
+        </ol>
+      </section>
+    </div>
+    <footer class="vc-dialog__footer vc-guide__footer">
+      <span class="vc-guide__count"></span>
+      <button type="button" class="vc-button vc-button--ghost" data-vc-guide-back><span class="vc-icon vc-icon--chevron-left" aria-hidden="true"></span>Zurück</button>
+      <button type="button" class="vc-button" data-vc-guide-next data-vc-guide-done="Starten">Weiter<span class="vc-icon vc-icon--chevron-right" aria-hidden="true"></span></button>
+    </footer>
+  </dialog>
 
-  <!-- Boot screen: removed by js/main.js once the workspace is running. Without JavaScript modules
-       (for example when opened from disk via file://) it stays and explains what to do, in English. -->
+  <!-- Start agent: the free simulation first, or a live run on the visitor's own key. js/app.js loads the
+       live agent only when a live run starts. -->
+  <dialog class="vc-dialog start-dialog" id="start-dialog" aria-labelledby="start-title">
+    <header class="vc-dialog__header">
+      <h2 class="vc-dialog__title" id="start-title" data-i18n="p.start.title">Start the agent</h2>
+      <button type="button" class="vc-icon-button" data-vc-close aria-label="Close" data-i18n-attr="aria-label:p.close"><span class="vc-icon vc-icon--close" aria-hidden="true"></span></button>
+    </header>
+    <div class="vc-dialog__body start-choices">
+      <section class="start-card" aria-labelledby="start-sim-title">
+        <h3 id="start-sim-title"><span class="vc-icon vc-icon--cube" aria-hidden="true"></span><span data-i18n="p.start.sim">Simulation</span></h3>
+        <p id="start-sim-text">The agent's run on BundID of 20 November 2026, replayed through its own tools. It is free, needs no key and works offline.</p>
+        <button type="button" class="vc-button" id="start-sim"><span class="vc-icon vc-icon--play" aria-hidden="true"></span><span data-i18n="p.start.simGo">Play the simulation</span></button>
+      </section>
+      <section class="start-card start-card--live" aria-labelledby="start-live-title">
+        <h3 id="start-live-title"><span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span><span data-i18n="p.start.live">Live run</span></h3>
+        <p class="vc-tag vc-tag--feature ai-notice-full"><span class="vc-icon vc-icon--sparkle" aria-hidden="true"></span><span data-i18n="p.ai">You are interacting with an AI system</span></p>
+        <p id="live-text">Claude researches BundID on the public web with the same tools and rules, on your own Anthropic API key.</p>
+        <p class="live-facts" data-i18n="p.start.facts">The key stays in this tab and goes only to api.anthropic.com. A run stops at 40 model calls or €3. The memo stays a draft; nothing is sent.</p>
+        <form class="key-form" id="key-form" novalidate>
+          <label class="vc-label" for="live-model" data-i18n="p.start.modelLabel">Model</label>
+          <select class="vc-select" id="live-model"></select>
+          <label class="vc-label" for="live-key" data-i18n="p.start.keyLabel">Your API key</label>
+          <input class="vc-input" id="live-key" name="sa-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" aria-describedby="live-msg" data-1p-ignore data-lpignore="true" data-bwignore="true">
+          <p class="vc-help vc-help--error" id="live-msg" role="status"></p>
+          <div class="key-actions">
+            <button type="submit" class="vc-button vc-button--secondary" id="live-start" data-vc-live><span class="vc-icon vc-icon--key" aria-hidden="true"></span><span data-i18n="p.start.liveGo">Check key and start</span></button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </dialog>
+
+  <!-- Boot screen: removed by js/main.js once the case has played to its first decision. Opened from disk
+       (file://), where browsers block program modules, it stays and says what to do. -->
   <div id="boot" class="boot" data-state="loading">
     <div class="boot-card">
-      <div class="boot-brand">
-        <span class="vc-cell vc-cell--lilac vc-cell--xl" aria-hidden="true"><span class="vc-icon vc-icon--honeycomb"></span></span>
-        <span data-i18n="app.name" class="brand-name">Sovereignty Assessment</span>
-      </div>
-      <p class="boot-status" role="status" aria-live="polite"><span class="vc-spinner" aria-hidden="true"></span><span id="boot-status" data-i18n="boot.status">Starting the Sovereignty Assessment…</span></p>
+      <p class="boot-brand"><span class="vc-cell vc-cell--lilac vc-cell--xl" aria-hidden="true"><span class="vc-icon vc-icon--honeycomb"></span></span>Sovereignty Assessment</p>
+      <p class="boot-status" role="status"><span class="vc-spinner" aria-hidden="true"></span><span id="boot-status"><span data-boot-lang="en">Starting the Sovereignty Assessment…</span><span data-boot-lang="de" lang="de" hidden>Die Souveränitätsbewertung startet…</span></span></p>
       <p id="boot-detail" class="vc-alert vc-alert--danger boot-detail" hidden></p>
-      <div class="boot-help">
-        <p>Still on this screen? The Sovereignty Assessment has to be served over http or https. Browsers block its program modules when <code>index.html</code> is opened straight from disk, at an address starting with <code>file://</code>.</p>
-        <p>To run it on your computer, open a terminal in this folder, run <code>python -m http.server 8000</code>, then open <code>http://localhost:8000</code>. Published on GitHub Pages, it works as is. Use a current Chrome or Edge.</p>
-      </div>
-      <noscript><p class="boot-detail">The Sovereignty Assessment needs JavaScript. Allow it for this site and reload the page.</p></noscript>
+      <p class="boot-help" data-boot-lang="en">Still on this screen? Serve the folder over http, for example with <code>python -m http.server 8000</code>, and open <code>http://localhost:8000</code>. Browsers don't run its modules from a file.</p>
+      <p class="boot-help" data-boot-lang="de" lang="de" hidden>Hängt es hier? Liefern Sie den Ordner über http aus, etwa mit <code>python -m http.server 8000</code>, und öffnen Sie <code>http://localhost:8000</code>. Aus einer Datei führen Browser die Module nicht aus.</p>
+      <noscript><p class="boot-detail">The Sovereignty Assessment needs JavaScript. Allow it for this site and reload the page.</p><p class="boot-detail" lang="de">Die Souveränitätsbewertung braucht JavaScript. Erlauben Sie es für diese Seite und laden Sie sie neu.</p></noscript>
     </div>
   </div>
+
+  <!-- Runs here, before vici.js, so the guide that opens by itself is the one in the page's language. -->
+  <script src="js/lang.js"></script>
 </body>
 </html>

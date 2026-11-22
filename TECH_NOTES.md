@@ -1,6 +1,6 @@
 # Sovereignty Assessment: technical notes
 
-Version 1.0.0 (milestone M4: hardening and release), 20 November 2026. What the code relies on, where each fact comes from and when it was checked, the decisions in force and the deviations from the brief. The build plan with the full probe log is [PLAN.md](PLAN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md); the shared shell and the adapted modules are in [REVIEW.md](REVIEW.md).
+These notes were written for version 1.0.0 (20 November 2026), and the code that did not change in 2.0.0 still cites them by section: the models and prices (§1), the API from the browser (§2, §3), the security policy (§4), the origin classes (§7), the engine (§8), the fact audit (§9), the live agent (§13), the evidence check (§14), the guardrails (§15) and the pre-runs (§17 to §19) hold as written. Version 2.0.0 replaced the screen: the recorder (§16), the exports (§20), the method view (§21), the 1.0 layout (§22) and Diagnostics are gone, and the storage keys of §5 are down to the key and the language. PLAN.md and REVIEW.md, which these notes link to, are in the git history at 1dc145e. What 2.0.0 changed is in [DESIGN.md](DESIGN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md).
 
 ## 1. Models, prices and the cost meter
 

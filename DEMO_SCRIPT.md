@@ -1,60 +1,53 @@
-# Sovereignty Assessment: demo script
+# Sovereignty Assessment: the five-minute demo
 
-Version 1.0.0, 20 November 2026. A five-minute demonstration in Simulation, two more minutes for Compare and the Portfolio, which needs no key and no network to the API, then four questions that come up in most rooms, each answered in English and in German, with an optional live run at the end. The talk tracks are written in English; in German, switch the interface with DE before you start, and every word on screen follows (brief §5 and §8).
+Version 2.0.0. **For** a CIO, a head of digitalisation or an IT strategist in government. **Goal:** after five minutes they can repeat one sentence: *"An AI agent found who makes and who runs every part of BundID, from real sources; code scored it 77 out of 100, indicative; no critical block is controlled from outside the EU, and a person decided what to recommend. Nothing was sent."*
 
-## Pre-flight
+## The four figures at the top
 
-1. Open the live site in a current Chrome or Edge on the presentation laptop, on the room's network: https://victorpflueger.github.io/sovereigntyassessment/
-2. Choose the language of the audience with EN or DE in the header, or open the address with `?lang=de`.
-3. Open **Diagnostics** and click **Run all tests**. Every row should pass: the Anthropic API reachable from this network, the method's golden cases recomputed here, both languages, the key and privacy rules, the catalogue and the reference facts.
-4. For Live mode, have a dedicated API key ready in a workspace with a low monthly spend limit. Paste it only when Start agent asks for it; click **Forget key** when you finish on a shared computer.
-5. Close the intro window once on the presentation laptop, so it does not open by itself during the talk ("How it works" brings it back).
-6. Leave the replay speed at ×1. BundID reaches the review in 44 seconds at ×1 (measured in three plays on 20 November 2026 at 1920×1080), which leaves time to talk over the console in the minute the research takes; ×2 halves that, ×4 suits a three-minute slot.
+| Figure | What it shows | In the demo |
+|---|---|---|
+| Overall score | The layers' mean, out of 100, and on how many of the six it rests | 77 on 5 of 6 layers, then 81 with the lever |
+| Weakest critical link | The lowest level among the blocks the service can't run without | Level 3 of 4, the Kubernetes platform |
+| Exclusive non-EU control | The share of critical blocks run from outside the EU | 0 % of 4 |
+| Session cost | What the agent's run costs in model fees | ≈ €0.52 for a live run |
 
-## The five minutes, in Simulation
+## Before the call
 
-1. **The question (30 seconds).** "How sovereign is a public service, layer by layer? Here are sixteen German base services and platforms, each with its sources, and this prototype itself." Point at the play sign: every entry carries a pre-run, the prototype too.
-2. **Start (30 seconds).** Choose **BundID**, click **Start agent**, then **Simulation**. "This replays a run recorded from public sources on 20 November 2026; it says so on the tape, and it calls nothing."
-3. **Research (one minute).** The console narrates: the imprint, the data centres, the online ID, the app store. Open the **Building blocks** tab and a block's evidence to show a quote, its source and the day it was read, in the audience's language. A step's details in the console hold the call's raw record, in the tools' English field names, for the technical questions. "The model may not write a number. Every figure you see is computed in code; the model can only point at it."
-4. **The map (one minute).** The spider diagram fills in by layer; the dashed axis is a layer without evidence, not a zero. Switch to **By building block** and back, and show the honeycomb: the red cell is the AusweisApp's distribution through the App Store, made and run in the US.
-5. **Your review (one minute).** The Review tab opens by itself, beside the map, so the room sees the blocks you are judging. Correct a block to show that a person can overrule the agent with a reason, and that the score follows at once; or confirm.
-6. **The lever (one minute).** The levers are priced on a copy: "Distribute the AusweisApp on iPhones through an app marketplace run in the EU" lifts the score, while the app still runs on the phone maker's platform, and the assessment itself does not change. Choose it, **Approve**, and the **Outbox** opens: the memo and the report are drafts, and nothing is sent. **Hide** brings the console back.
+1. Chrome or Edge, full screen (F11), standard zoom; other tabs closed, notifications off.
+2. Walk the five steps once. The simulation needs no key and no network.
+3. Let the guide open, or start at `?guide=0` if you explain it yourself. `?step=score` opens a step paused; `?lang=de` opens in German, and EN | DE switches without losing the step.
+4. For a live run, bring your own Anthropic API key from a workspace with a spend limit.
 
-## Two more minutes: Compare and the Portfolio
+## The five minutes
 
-1. **Compare (one minute).** Click **Compare** above the map. Choose BundID first and the EUDI Wallet second: the two spider diagrams lie on top of each other, teal and solid against apricot and dashed, and the table beside them gives the same numbers with the difference. "Same method, same engine, two services."
-2. **The Portfolio (one minute).** Click **Portfolio**: every loaded assessment as a sorted bar chart, exclusive non-EU control per category, and the Made-in mix as a waffle of hexagons. Point out that the prototype's self-assessment is not in it: it is not a public service. If time allows, save an assessment from the Outbox and load it back with **Load assessment files**.
+The guide's last chapter, *Show it in five minutes*. Closing the guide starts Play: each step stays 7 to 14 seconds and Play stops wherever you act, at **Your turn**. Press Space to give a step its minute; → or a clicker moves on, ← goes back.
 
-## "A sovereignty tool on a US model?"
+1. **Understand: point at the four figures.** (1 min)
+   “Who makes and who runs BundID, scored by code: 77 of 100, indicative.”
+2. **Research: open one block's quotes.** (1 min)
+   “6 building blocks, each with a quote, a link and the date it was read.”
+3. **Score: point at the weakest critical link.** (1 min)
+   “No critical block runs from outside the EU; weakest: Kubernetes, Level 3 of 4.”
+4. **Your review: press Confirm the findings.** (1 min)
+   “A person checks first: the AusweisApp for iPhones comes from Apple, level 0.”
+5. **Recommend: press Approve the lever, then Approve the draft.** The score tile turns green: ~~77~~ 81. (1 min)
+   “An app marketplace run in the EU lifts the score to 81. Nothing is sent.”
 
-The question comes in most rooms, and the prototype answers it with its own method. Choose **Sovereignty Assessment (this prototype)**, the last entry in the catalogue, and play it.
+## Questions you will get
 
-- **English.** "Yes, and it says so itself. The site is on GitHub Pages, the code on GitHub, both US companies; Live mode runs on Anthropic's Claude API, whose data is stored in the United States, with web search and web fetch on Anthropic's servers. So the score is low, although the code and the design system are made in Germany, and the weakest critical link is the hosting. What matters for the method: the engine and the Simulation run in your browser without calling the model, every figure is computed in code, and every finding has a source you can check. The lever it proposes is honest too: an EU region of a cloud platform changes where the model runs, not who runs it. And where its sources are silent, it says so instead of guessing: even its own maker's country counted as unknown until the README stated it, and who runs its code still does."
-- **Deutsch.** „Ja, und er sagt es selbst. Die Website liegt auf GitHub Pages, der Code auf GitHub, beides US-Unternehmen; der Live-Modus läuft auf der Claude-API von Anthropic, deren Daten in den Vereinigten Staaten gespeichert werden, mit Websuche und Web-Abruf auf den Servern von Anthropic. Deshalb ist der Wert niedrig, obwohl Code und Designsystem in Deutschland hergestellt sind, und das schwächste kritische Glied ist das Hosting. Für die Methode zählt: Engine und Simulation laufen in Ihrem Browser, ohne das Modell aufzurufen, jede Zahl wird im Code berechnet, und jeder Befund hat eine Quelle, die Sie prüfen können. Auch der vorgeschlagene Hebel ist ehrlich: Eine EU-Region einer Cloud-Plattform ändert, wo das Modell läuft, nicht, wer es betreibt. Und wo seine Quellen schweigen, sagt er das, statt zu raten: Selbst das Land seines eigenen Urhebers galt als unbekannt, bis die README es nannte, und wer seinen Code betreibt, gilt weiter als unbekannt.“
+**Is this an official assessment?** No. It is indicative: a method from public criteria (the Deutschland-Stack's layers, the EU's Cloud Sovereignty Framework) applied to public sources, and not an official service of the German Federal Government.
 
-## "Where do the scores come from?"
+**Where do the findings come from?** From the service's own pages and public documents, read on 20 November 2026. Every finding shows its quote, link and date read.
 
-- **English.** "Not from the model. The agent only records building blocks with their sources: who makes each block, who runs it, where it is hosted and under which licence, each backed by a verbatim quote from a page the run read. Code does the rest: it derives the maker's and the operator's origin from the countries the sources name, gives each block a level from 0 to 4 by fixed rules, made in Germany or another EU state gives 4, run by an operator from outside the EU gives 1 at best, takes the lower of the two, and averages the levels of each layer, weighted by criticality, into a score from 0 to 100. The overall score is the mean of the layer scores. The model may cite a figure only as a placeholder that code fills in; a number it writes itself is blocked. The Method button shows every rule."
-- **Deutsch.** „Nicht vom Modell. Der Agent erfasst nur Bausteine mit ihren Quellen: wer jeden Baustein herstellt, wer ihn betreibt, wo er gehostet wird und unter welcher Lizenz, jeweils belegt mit einem wörtlichen Zitat von einer Seite, die der Lauf gelesen hat. Den Rest macht der Code: Er leitet die Herkunft von Hersteller und Betreiber aus den Ländern ab, die die Quellen nennen, gibt jedem Baustein nach festen Regeln eine Stufe von 0 bis 4, hergestellt in Deutschland oder einem anderen EU-Staat ergibt 4, betrieben von außerhalb der EU höchstens 1, nimmt die niedrigere der beiden und mittelt die Stufen jeder Ebene, nach Kritikalität gewichtet, zu einem Wert von 0 bis 100. Der Gesamtwert ist der Mittelwert der Ebenenwerte. Das Modell darf eine Zahl nur als Platzhalter zitieren, den der Code füllt; eine selbst geschriebene Zahl wird blockiert. Die Schaltfläche Methode zeigt jede Regel.“
+**Why is Kubernetes level 3, not 4?** It is open source made outside the EU and run by the ITZBund in Germany. Open source from outside reaches 3; the weaker of maker and operator sets the level.
 
-## "What does SEAL mean here?"
+**What does the AI decide?** Nothing. The agent reads and drafts, code computes every figure, and a person confirms the findings and chooses the lever.
 
-- **English.** "SEAL is the scale of levels in the EU Cloud Sovereignty Framework, version 1.2.1: from SEAL-0, under exclusive control of non-EU third parties, to SEAL-4, full digital sovereignty under complete EU control. This prototype borrows that scale for its block levels and applies it through fixed rules to who makes and who runs each building block. That is all it borrows: the result is not an official SEAL assessment, not a certification and not a statement of the Federal Government, and every score says 'indicative'. The Method view lists the five levels with the framework's own names."
-- **Deutsch.** „SEAL ist die Stufenskala des EU Cloud Sovereignty Framework, Version 1.2.1: von SEAL-0, unter ausschließlicher Kontrolle von Dritten außerhalb der EU, bis SEAL-4, volle digitale Souveränität unter vollständiger Kontrolle der EU. Der Prototyp übernimmt diese Skala für die Stufen seiner Bausteine und wendet sie über feste Regeln darauf an, wer jeden Baustein herstellt und betreibt. Mehr übernimmt er nicht: Das Ergebnis ist keine amtliche SEAL-Bewertung, keine Zertifizierung und keine Aussage der Bundesregierung, und jeder Wert sagt ‚indikativ‘. Die Methodenansicht führt die fünf Stufen mit den Namen des Frameworks auf.“
-
-## "Why is unknown not a verdict?"
-
-- **English.** "Because it says something about the sources, not about the provider. When no public source names who makes or runs a block, the block shows as unknown: it is scored conservatively, at most level 2 when only one side is known and with no level at all when neither is, and the dashed axes and the evidence-coverage tile show the gap. It is never presented as a finding against anyone. A reviewer who knows the answer corrects the block with a reason, and the score follows at once. Three catalogue entries, ZBDS, ZaPuK and low-code, show the same honesty one step further: their sources describe no service in operation, so the run ends without an assessment and says why."
-- **Deutsch.** „Weil es etwas über die Quellen sagt, nicht über den Anbieter. Nennt keine öffentliche Quelle, wer einen Baustein herstellt oder betreibt, erscheint er als unbekannt: Er wird vorsichtig bewertet, mit höchstens Stufe 2, wenn nur eine Seite bekannt ist, und ohne Stufe, wenn keine bekannt ist, und gestrichelte Achsen und die Kachel zur Belegabdeckung zeigen die Lücke. Als Befund gegen jemanden wird es nie dargestellt. Wer die Antwort kennt, korrigiert den Baustein in der Prüfung mit einer Begründung, und der Wert folgt sofort. Drei Katalogeinträge, ZBDS, ZaPuK und Low-Code, zeigen dieselbe Ehrlichkeit einen Schritt weiter: Ihre Quellen beschreiben keinen Dienst in Betrieb, also endet der Lauf ohne Bewertung und sagt, warum.“
-
-## Optional: a live run
-
-With a key ready, choose **FIT-Connect** or type a service in your own words, **Start agent**, **Live**, paste the key. Point at the run facts under the console: the model calls against the cap of 40 and the cost so far, capped at €3.00. A live run takes a few minutes; the review and the lever wait for you as in the simulation.
+**Can it assess our own service?** Not from this screen yet. Start agent runs Claude live on your key on the case on screen, with today's pages. A new service needs its entry in the catalogue first.
 
 ## If something goes wrong
 
-- **The API is unreachable** or the key is refused: stay in Simulation, which needs neither.
-- **Web search or web fetch is switched off** in the organisation's console: the live run stops with a message that offers Simulation.
-- **The audience asks about a service outside the catalogue:** run it live, or explain that the pre-runs show the method on real services, and the live agent does the same for any other.
-- **The audience asks about ZBDS, ZaPuK or low-code:** play it. Their sources describe a component still being designed, a target architecture and a category, so the run reads them, records what the entry is and ends without an assessment, saying why. That ending is the pre-run's own reading; a live run follows the agent's prompt and may record their layers as without evidence instead.
-- **Someone changed the layer weights:** open **Method** from the header and click **Reset**, or reload the page; the weights are never stored.
+- **The page stays on its loading screen.** It was opened from a file; serve the folder over http.
+- **A live run stops early.** The story says why. Start agent, then Play the simulation.
+- **The page moved on while you talked.** Press ← to go back; Space pauses.
+- **Someone asks for a weaker case.** Open This prototype from the case menu: it runs on US platforms and scores 17.

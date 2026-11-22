@@ -1,5 +1,7 @@
-# Runs the test suites on every push and pull request. The app itself has no build step and no
-# dependencies; Playwright is installed here only for the browser suites (tests/README.md).
+# Runs every suite on every push and pull request. The app has no build step and no dependencies;
+# Playwright is installed here only for the browser suites (tests/README.md). ViciDesign is checked out
+# next to the app at the commit vici/ was copied from, so the suites run Vici's own checks and compare
+# vici/ with it byte for byte.
 name: tests
 
 on:
@@ -15,32 +17,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  node:
-    name: Colour system, page icon, Vici's files, languages, client, engine, fact audit, pre-runs, hygiene, docs and parity (Node.js only)
+  tests:
+    name: Case, engine, Vici's checks, lean, docs, and the presenter in Chromium
     # Pinned image: Playwright 1.56's system dependencies are known to install on Ubuntu 24.04.
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      # The hygiene check reads its private term list from the HYGIENE_TERMS secret if the repository
-      # has one; without it only the generic checks run and say so (tests/hygiene.mjs, TECH_NOTES §12).
-      - run: node tests/run-all.mjs tokens page-icon vici-files i18n unit engine audit runs hygiene docs
-        env:
-          HYGIENE_TERMS: ${{ secrets.HYGIENE_TERMS }}
-      # The shared shell is compared with the sister app's (public) repository.
-      - run: git clone --depth 1 https://github.com/VictorPflueger/PROC-Rebate-Hunter "$RUNNER_TEMP/PROC-Rebate-Hunter"
-      - run: node tests/parity.mjs "$RUNNER_TEMP/PROC-Rebate-Hunter"
-
-  browser:
-    name: Browser suites (Playwright, Chromium)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    needs: node
-    steps:
+          path: app
       - uses: actions/checkout@v4
+        with:
+          repository: VictorPflueger/ViciDesign
+          ref: d8bb304b4c25ce7f8725ec3520da25c14bf8fe99
+          path: ViciDesign
+          fetch-depth: 0
+      # Victor's website, next to the app, so tests/page-icon.mjs compares the page icon with its card.
+      - run: git clone -q --depth 1 https://github.com/VictorPflueger/VIP "$GITHUB_WORKSPACE/VIP"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -50,8 +43,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-1.56.0-chromium-${{ runner.os }}
       - run: npm install -g playwright@1.56.0 && npx playwright install --with-deps chromium
-      - run: NODE_PATH="$(npm root -g)" node tests/run-all.mjs smoke accept hexagon live sims layout design
+      # The hygiene check reads its private term list from the HYGIENE_TERMS secret if the repository
+      # has one; without it only the generic checks run (tests/hygiene.mjs).
+      - name: All suites
+        working-directory: app
+        run: NODE_PATH="$(npm root -g)" node tests/run-all.mjs --require-vici
         env:
+          HYGIENE_TERMS: ${{ secrets.HYGIENE_TERMS }}
           SA_TEST_OUT: ${{ runner.temp }}/sovereignty-assessment-tests
       - if: failure()
         uses: actions/upload-artifact@v4

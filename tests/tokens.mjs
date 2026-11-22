@@ -75,7 +75,7 @@ const SHELL_PAIRS = [
   ["The simulation's word on the tape's wash", "text", "bg-subtle", "text"]
 ];
 
-// The shared meanings that must stay apart (DESIGN.md §3): the states, the states against the
+// The shared meanings that must stay apart (DESIGN.md, Colour): the states, the states against the
 // network at rest and against checking, the comparison bars, and merlot against danger.
 const SHELL_SEPARATIONS = [
   ["Affected (danger) vs at risk (warning)", "danger-solid", "warning-text"],
