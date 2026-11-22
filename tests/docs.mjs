@@ -1,8 +1,8 @@
 // The documentation set of version 2.0.0 is lean and consistent with the code:
 //   - README has at most 900 words, DEMO_SCRIPT.md at most 700, DESIGN.md at most 700 and
-//     DATA_SOURCES.md at most 600, which prints on one A4 page; a word is anything between spaces, table
-//     bars included, so either way of counting stays under the limit; each carries its sections and
-//     names the version js/config.js does;
+//     DATA_SOURCES.md at most 600 (the last two print on one A4 page each); a word is anything between
+//     spaces, table bars included, so either way of counting stays under the limit; each carries its
+//     sections and names the version js/config.js does;
 //   - PLAN.md and REVIEW.md are only in the git history (at 1.0.0's commit), not in the tree;
 //   - every section the code cites ("TECH_NOTES §3", "DATA_SOURCES.md §4") exists, and every repository
 //     path a document names (in backticks or as a relative link) exists;
@@ -23,7 +23,7 @@ const RELEASE_1 = "1dc145e";
 const DOCS = {
   "README.md": { max: 900, sections: ["The four figures", "The talk track", "Start agent", "What is real", "How it works", "Run it", "Tests", "History", "Author"], version: `version ${APP.version}` },
   "DEMO_SCRIPT.md": { max: 700, sections: ["The four figures at the top", "Before the call", "The five minutes", "Questions you will get", "If something goes wrong"], version: `Version ${APP.version}` },
-  "DESIGN.md": { max: 700, sections: ["The screen", "Colour", "Play and Your turn", "Plain words", "The figures", "Two languages", "What stayed and what went"], version: `Version ${APP.version}` },
+  "DESIGN.md": { max: 700, sections: ["The screen", "Colour", "Play, words and languages", "The figures", "What stayed and what went"], version: `Version ${APP.version}` },
   "DATA_SOURCES.md": { max: 600, numbered: 5, version: `Version ${APP.version}` },
   // Version 1.0.0's record: the code that stayed still cites its sections, and its first paragraph says
   // which parts 2.0.0 removed, so the paths and citations inside it are not held to the 2.0.0 tree.
