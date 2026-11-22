@@ -1,7 +1,7 @@
 // Vici's own rules, checked with Vici's own functions (Build a prototype, "Check it"): the How it works
 // guides and their key figures (guideProblems), the byline (bylineProblems), the Writing guideline's
-// checkable patterns (writingProblems) and the AI notice of a page that can start a live run
-// (aiNoticeProblems). They run on the page as served, on the page as rendered in English and in German,
+// checkable patterns (writingProblems), the AI notice of a page that can start a live run
+// (aiNoticeProblems) and names, not record ids (recordIdProblems). They run on the page as served, on the page as rendered in English and in German,
 // on every text the presenter writes for the seventeen cases along every decision path in both
 // languages, on the dictionaries and on the docs. ViciDesign's check-guide-render.mjs drives the guide
 // over http. vici/ holds Vici's files byte for byte, at the commit vici/README.md and the workflow name.
@@ -27,6 +27,7 @@ const { guideProblems } = await lib("guide.mjs");
 const { bylineProblems } = await lib("byline.mjs");
 const { writingProblems } = await lib("writing.mjs");
 const { aiNoticeProblems, canRunLive, AI_NOTICE } = await lib("ai.mjs");
+const { recordIdProblems } = await lib("ids.mjs");
 const mod = (p) => import(pathToFileURL(path.join(APP_ROOT, p)).href);
 
 const read = (f) => readFileSync(path.join(APP_ROOT, f), "utf8");
@@ -43,6 +44,7 @@ control(guideProblems(html.replace(/<dialog\b[^>]*vc-guide[\s\S]*?<\/dialog>/g, 
 control(guideProblems(html.replace('<div class="kpis"', '<p class="vc-stat" data-vc-kpi="Blocks checked" data-vc-kpi-de="Geprüfte Bausteine">6</p><div class="kpis"')).some((p) => /Blocks checked|Geprüfte Bausteine/.test(p)), "control: guideProblems catches a key figure no How it works chapter explains");
 control(bylineProblems(html.replace(/href="https:\/\/victorpflueger\.github\.io\/VIP\/index\.html"/, 'href="#"')).length > 0, "control: bylineProblems catches a byline without the website link");
 control(writingProblems(page(["BundID scores 77 — much more."])).length > 0 && writingProblems(page(["A seamless assessment."])).length > 0, "control: writingProblems catches an em dash and a stock word");
+control(recordIdProblems("<p>The weakest block is B-03, see RF-05.</p>", ["B-03", "RF-05"]).length === 2 && !recordIdProblems("<p>The weakest block is the Kubernetes platform.</p>", ["B-03", "RF-05"]).length, "control: recordIdProblems catches a block id and a fact id on a screen, and passes names");
 control(aiNoticeProblems(html.split(AI_NOTICE.en).join("An assistant")).length > 0 && !aiNoticeProblems('<meta http-equiv="Content-Security-Policy" content="connect-src \'none\'"><p>Replay</p>').length, "control: aiNoticeProblems catches a live page that never says it is an AI, and leaves a page that cannot run live alone");
 
 // ---- the page as served -------------------------------------------------------------------------------
@@ -67,6 +69,16 @@ check(/>SIMULATION</.test(header) && /"LIVE"/.test(read("js/app.js")), "the head
 const strip = (html.match(/<\/header>(?:\s*<!--[\s\S]*?-->)?\s*<div class="intro"[^>]*>([\s\S]*?)<\/div>\s*(?:<!--[\s\S]*?-->\s*)?<nav/) || [])[1] || "";
 check(/<p class="intro-text"[^>]*>[^<]{40,200}<\/p>/.test(strip) && /real sources/.test(strip) && /indicative, not an official assessment/.test(strip) && /class="vc-byline"/.test(strip), "one sentence under the header says what the prototype does, that its sources are real and its scores indicative, beside the byline");
 check((html.match(/class="vc-byline"/g) || []).length === 1, "the page carries one byline");
+
+// The ids of the prototype's data: the catalogue's entries, the reference facts and every block the
+// pre-runs record (B-01 and on). Vici's names-not-ids rule: none of them may reach a screen.
+// A catalogue id that is only the service's own name or domain in other letters ("low-code", "opencode"
+// for opencode.de) is a word on screen, not an id, and stays out.
+const DATA = loadData();
+const ownWord = (e) => JSON.stringify([e.names, e.urls, e.aliases]).toLowerCase().includes(e.id.toLowerCase());
+const IDS = new Set([...DATA.SA_CATALOGUE.entries.filter((e) => !ownWord(e)).map((e) => e.id), ...DATA.SA_REF_FACTS.facts.map((f) => f.id)]);
+for (const def of Object.values(DATA.SA_RUNS)) for (const m of JSON.stringify(def).matchAll(/"(B-\d{2})"/g)) IDS.add(m[1]);
+check(IDS.size >= 12 && [...IDS].some((id) => /^B-\d{2}$/.test(id)) && [...IDS].some((id) => /^RF-/.test(id)), `the data's ids are known (${IDS.size}: ${[...IDS].join(", ")})`);
 
 // ---- the page as rendered, in English and in German ---------------------------------------------------
 const browser = await launchBrowser();
@@ -101,6 +113,8 @@ try {
     const ra = aiNoticeProblems(views[0]);
     check(!rg.length && !rb.length && !rw.length && !ra.length && !errors.length, `rendered in ${lang === "en" ? "English" : "German"}: the guides, the byline, the writing and the AI notice pass, at the start and at the end of the case${[...rg, ...rb, ...rw, ...ra, ...errors].length ? `: ${[...rg, ...rb, ...rw, ...ra, ...errors].join("; ")}` : ""}`);
     check(new RegExp(`<html[^>]*lang="${lang === "de" ? "de" : "en-GB"}"`).test(views[0]) && doc.includes(lang === "de" ? AI_NOTICE.de : AI_NOTICE.en), `rendered in ${lang === "en" ? "English" : "German"}: the page says its language and carries the AI notice in it`);
+    const ri = views.flatMap((v) => recordIdProblems(v, IDS));
+    check(!ri.length, `rendered in ${lang === "en" ? "English" : "German"}: names, not record ids, at the start and at the end of the case${ri.length ? `: ${ri.join("; ")}` : ""}`);
     await context.close();
   }
   // ViciDesign's own drive of the guide, over http.
@@ -119,7 +133,7 @@ try {
 }
 
 // ---- every text the presenter writes, for the seventeen cases along every decision path ---------------
-const win = loadData();
+const win = DATA;
 const { digest } = await mod("js/run.js");
 const { story } = await mod("js/story.js");
 const entries = win.SA_CATALOGUE.entries;
@@ -161,6 +175,8 @@ for (const lang of ["en", "de"]) {
     const hit = sentences.find((x) => re.test(x));
     check(!hit, `${lang === "en" ? "English" : "German"}: no text on any path shows ${what}${hit ? `: "${hit.slice(0, 120)}"` : ""}`);
   }
+  const ids = recordIdProblems(sentences.join("\n"), IDS);
+  check(!ids.length, `${lang === "en" ? "English" : "German"}: names, not record ids, in every text on every path (Vici's recordIdProblems)${ids.length ? `: ${ids.join("; ")}` : ""}`);
 }
 // Every text in the dictionaries the presenter uses.
 const EN = (await mod("js/i18n/en.js")).default;
