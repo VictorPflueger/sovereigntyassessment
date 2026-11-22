@@ -1,33 +1,32 @@
 // The live agent in the browser against a scripted stand-in for the Claude API (tests/lib/fake-claude.mjs),
-// with web search and web fetch: no test calls the real API or spends anything (brief §15).
-//   key             AC-07: the key, checked with GET /v1/models, lives only under sa.anthropic.key in session
-//                   storage; it never appears in local storage, the audit export, a recording ("Save run as
-//                   simulation"), the page or the console; Forget key removes it
-//   protocol        AC-08: search and fetch blocks echoed unchanged with encrypted_content and citations;
-//                   pause_turn resent unchanged; a mixed turn answered with tool_result blocks only; in-result
-//                   errors (max_uses_exceeded, url_not_accessible) handled; searches and fetches counted
-//                   across turns; the tools array the same in every request; a whole assessment with review,
-//                   lever choice, memo and report
-//   nudges          AC-08: at most two nudges, each saying what is left of the budgets; then the run stops
-//   disabled-search AC-08: a 400 for a switched-off web search stops Live cleanly and offers Simulation
+// with web search and web fetch: no test calls the real API or spends anything. Each run starts the way a
+// presenter starts it (Start agent, the key, Check key and start) and is answered at the Your turn bar.
+//   protocol        search and fetch blocks echoed unchanged; pause_turn resent unchanged; a mixed turn
+//                   answered with tool_result blocks only; in-result errors handled; a whole assessment with
+//                   review, lever, memo and report. On the page: LIVE in the header, the agent's words
+//                   marked live, the tiles partial while layers are open (the score says on how many of six
+//                   it rests, the weakest link and the share wait), the session cost measured, EN | DE in
+//                   place while the agent works with its words kept in the run's language, Stop shown while
+//                   it works, the memo a draft and nothing sent
+//   nudges          at most two nudges, each saying what is left of the budgets; then the run stops
+//   disabled-search a 400 for a switched-off web search stops the run cleanly and says why
 //   disabled-fetch  the same for web fetch
-//   evidence        AC-09: a quote in the fetched text counts; a quote found nowhere leaves its fields
-//                   unknown and marks the block; a PDF's quote counts through a page_location citation
-//                   mapped by the document registry; an unmapped citation counts for nothing; an evidence URL
-//                   the run never returned is refused with is_error and the URLs the run may use
-//   caps            AC-10: no 41st model call; none once €3 is spent
-//   cost            AC-10: the cost meter equals usage × price plus searches × $0.01, to within 1e-9
-//   guardrails      the sequence rules (no memo before a decision, no assessed report before the review, no
-//                   review before every layer has blocks or a status) and the fact audit's two retries,
-//                   then the Unchecked tag
-//   not-a-service   rule 7: a person's name ends with not_a_service and no blocks
+//   evidence        a quote in the fetched text counts; a quote found nowhere leaves its fields unknown;
+//                   a PDF's quote counts through a mapped citation; an unreturned URL is refused
+//   caps            no 41st model call; none once €3 is spent
+//   cost            the measured cost equals usage × price plus searches × $0.01, to within 1e-9, and the
+//                   Session cost tile shows it as measured
+//   guardrails      the sequence rules and the fact audit's two retries; the accepted text is marked unchecked
+//   not-a-service   a run that finds no service ends without blocks and says so
+//   key             checked with GET /v1/models first; session storage only, under sa.anthropic.key; never in
+//                   the page or the console; a rejected key is forgotten and the dialog says why
 // Every case fails on a page error, an unexpected console error, a policy violation, a request to any host
 // but the stand-in, or a protocol violation the stand-in found.
 // Usage: node tests/live.mjs [case…]
 import path from "node:path";
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
-import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, MOCK_KEY, SKIP_INTRO, KEYS } from "./lib/harness.mjs";
+import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, MOCK_KEY, KEYS } from "./lib/harness.mjs";
 import { createFakeClaude, text, tool, search, searchError, fetchText, fetchPdf, fetchError, resultFor } from "./lib/fake-claude.mjs";
 
 const { MODELS, FX_USD_EUR, ANTHROPIC } = await import(pathToFileURL(path.join(APP_ROOT, "js/config.js")).href);
@@ -39,14 +38,17 @@ const CORS = { "access-control-allow-origin": "*", "access-control-allow-headers
 const MODELS_LIST = { data: MODELS.map((m) => ({ id: m.id, type: "model", display_name: m.label, capabilities: { server_tools: { web_search: { supported: true } } } })), has_more: false };
 
 async function newPage(fake, { viewport = { width: 1600, height: 900 }, lang = "en" } = {}) {
-  const context = await browser.newContext({ viewport, acceptDownloads: true });
-  await context.addInitScript(SKIP_INTRO);
+  const context = await browser.newContext({ viewport });
   await context.addInitScript(() => {
     window.__csp = [];
     document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(`${e.violatedDirective} ${e.blockedURI}`.trim()));
   });
   const external = [];
   const api = [];
+  // A request can be held at its index until the test releases it, to look at the page mid-run.
+  const holds = new Map();
+  const arrived = new Map();
+  let posts = 0;
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async (route) => {
     const req = route.request();
     const u = new URL(req.url());
@@ -57,16 +59,21 @@ async function newPage(fake, { viewport = { width: 1600, height: 900 }, lang = "
     if (u.pathname === "/v1/models") {
       return route.fulfill({ status: key === MOCK_KEY ? 200 : 401, headers: { ...CORS, "content-type": "application/json" }, body: JSON.stringify(key === MOCK_KEY ? MODELS_LIST : { type: "error", error: { type: "authentication_error", message: "invalid x-api-key" } }) });
     }
+    const index = posts++;
+    arrived.get(index)?.();
+    if (holds.has(index)) await holds.get(index).promise;
     const out = fake.handle(req.postData() || "{}", req.headers());
     return route.fulfill({ status: out.status, headers: { ...CORS, ...out.headers }, body: out.body });
   });
+  const holdAt = (index) => { let release; const promise = new Promise((r) => { release = r; }); holds.set(index, { promise }); return release; };
+  const held = (index) => new Promise((resolve) => { if (posts > index) resolve(); else arrived.set(index, resolve); });
   const page = await context.newPage();
   const log = { pageErrors: [], consoleErrors: [], console: [] };
   page.on("pageerror", (e) => log.pageErrors.push(String(e.message || e)));
   page.on("console", (m) => { log.console.push(m.text()); if (m.type() === "error") log.consoleErrors.push(m.text()); });
-  await page.goto(`${BASE}?lang=${lang}`);
+  await page.goto(`${BASE}?lang=${lang}&guide=0&step=understand`);
   await page.waitForSelector('html[data-boot="ready"]', { timeout: 20000 });
-  return { context, page, log, external, api, fake };
+  return { context, page, log, external, api, fake, holdAt, held };
 }
 
 async function finish(name, t, checks, expectations, { allowConsole = null } = {}) {
@@ -83,38 +90,36 @@ async function finish(name, t, checks, expectations, { allowConsole = null } = {
 
 const shot = (page, file) => page.screenshot({ path: path.join(OUT, file) });
 const textOf = (page, sel) => page.$eval(sel, (el) => el.textContent.replace(/\s+/g, " ").trim()).catch(() => null);
-const allText = (page, sel) => page.$$eval(sel, (els) => els.map((el) => el.textContent.replace(/\s+/g, " ").trim())).catch(() => []);
+/** The run as the presenter digests it (js/run.js), read from the page. */
+const run = (page) => page.evaluate(() => {
+  const r = window.sovereignty.S.run;
+  return { end: r.end?.status || null, notices: (r.notices || []).map((n) => ({ level: n.level, key: n.key })), memo: r.memo?.status || null, cost: r.cost || null, blocks: r.blockList?.length || 0, narration: r.narration.map((m) => ({ text: m.text, audit: m.audit })), mode: window.sovereignty.S.mode };
+});
+/** The run's end, as a word: Done or Stopped. */
+const PILL = { done: "Done", not_a_service: "Done", stopped: "Stopped", aborted: "Aborted", error: "Error" };
+const pill = async (page) => PILL[(await run(page)).end] || null;
 
-/** From a catalogue entry (or a typed text) to a running live run, with the mock key. */
-async function startLive(page, { entry = null, typed = null } = {}) {
-  if (entry) await page.click(`.catalogue-chip[data-entry="${entry}"]`);
-  else { await page.fill("#service-input", typed); await page.keyboard.press("Escape"); }
-  await page.click("#btn-start");
-  await page.waitForSelector(".mode-card");
-  await page.click('.mode-card[data-mode="live"] .mode-cta button');
-  const keyDialog = await page.waitForSelector("#api-key-input", { timeout: 3000 }).catch(() => null);
-  if (keyDialog) {
-    await page.fill("#api-key-input", MOCK_KEY);
-    await page.click("#btn-check-key");
-    await page.waitForSelector("#api-key-input", { state: "detached" });
-  }
+/** From a case to a running live run, the way a presenter starts it: Start agent, the key, start. */
+async function startLive(page, { entry = "bundid", key = MOCK_KEY } = {}) {
+  if (entry !== "bundid") await page.evaluate((id) => window.sovereignty.openCase(window.SA_CATALOGUE.entries.find((e) => e.id === id), 0), entry);
+  await page.click("#start");
+  await page.waitForSelector("#start-dialog[open]");
+  await page.fill("#live-key", key);
+  await page.click("#live-start");
+  if (key === MOCK_KEY) await page.waitForFunction(() => window.sovereignty.S.mode === "live", null, { timeout: 10000 });
 }
-const ended = (page, timeout = 60000) => page.waitForFunction(() => /^(Done|Stopped|Aborted|Error)$/.test(document.querySelector("#status-pill")?.textContent.trim() || ""), null, { timeout });
-async function download(page, selector) {
-  // The buttons live in the drawer's Audit tab.
-  if (!(await page.isVisible(selector))) await page.click("#tab-audit");
-  const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 10000 }), page.click(selector)]);
-  return readFile(await dl.path(), "utf8");
+const ended = (page, timeout = 60000) => page.waitForFunction(() => !!window.sovereignty.S.run?.end && !window.sovereignty.S.live?.isActive(), null, { timeout });
+/** The person's turn at the bar: waits until the page asks for `act`, then presses the primary action. */
+async function turn(page, act, timeout = 30000) {
+  await page.waitForFunction((a) => { const s = window.sovereignty.S; const st = s.view.steps.find((x) => x.waits && x.turn?.act === a); if (st) s.view && window.sovereignty.go(s.view.steps.indexOf(st), { focus: false }); return !!st; }, act, { timeout });
+  await page.waitForFunction((a) => document.getElementById("turn-primary").dataset.act === a, act, { timeout: 5000 });
+  await page.click("#turn-primary");
 }
-async function reviewConfirm(page) {
-  await page.waitForSelector("#btn-review-confirm", { timeout: 30000 });
-  await page.click("#btn-review-confirm");
-}
-async function chooseLever(page, id) {
-  await page.waitForSelector(`.lever-card[data-lever="${id}"]`, { timeout: 30000 });
-  await page.click(`.lever-card[data-lever="${id}"] .lever-id`);
-  await page.click("#btn-approve-lever");
-}
+const reviewConfirm = (page) => turn(page, "confirm");
+const chooseLever = (page) => turn(page, "approve");
+const approveMemo = (page) => turn(page, "memo-approve");
+/** The notices of the run whose key matches. */
+const noticed = async (page, re) => (await run(page)).notices.filter((n) => re.test(n.key));
 
 const FACTS_PROFILE = (url, quote) => ({ names: ["BundID"], category: "base_service", what: "The federal user account for online services.", how: "People sign in with the account and prove who they are.", owner: { name: "BMDS", country: "DE", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, status: "In operation.", evidence: [{ url, title: "BundID", quote, lang: "en", supports: ["operator", "status"] }] });
 const ID_URL = "https://id.bund.de/en/";
@@ -133,6 +138,7 @@ if (wanted("protocol")) {
   const errF = fetchError("https://example.org/missing", "url_not_accessible");
   const b1 = tool("rec_block", { layer: "infrastructure", name: "Data centres of the ITZBund", role: "Hosts the account", criticality: "critical", tech: { name: "ITZBund", country: "DE", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, hosting: "EU", licence: "unknown", exit: "possible", confidence: "high", evidence: [{ url: ID_URL, title: "BundID", quote: "operated by the ITZBund in its data centres in Germany", lang: "en", supports: ["tech", "operator", "hosting"] }] });
   const b2 = tool("rec_block", { layer: "devsecops", name: "Container platform software", role: "Runs the account's services", criticality: "critical", tech: { name: "Vendor Inc.", country: "US", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, hosting: "EU", licence: "proprietary", exit: "hard", confidence: "medium", evidence: [{ url: AKDB.url, title: AKDB.title, lang: "en", supports: ["tech", "licence"] }, { url: ID_URL, title: "BundID", quote: "operated by the ITZBund", lang: "en", supports: ["operator", "hosting"] }] });
+  const say = tool("ui_progress", { text: "Two layers have blocks; I look at the other four now." });
   const layers = ["platform", "base_service", "applications", "access"].map((layer) => tool("rec_layer", { layer, status: "no_evidence", reason: "No public source was found for this layer." }));
   const score = tool("eng_score", {});
   const review = tool("ui_request_review", { summary: "Please review the findings. The weakest critical link is {{fact:weakest.block}}." });
@@ -147,7 +153,7 @@ if (wanted("protocol")) {
       expect: (req, { check }) => check(resultFor(req, cat.id)?.parsed?.entries?.[0]?.id === "bundid", "cat_lookup answered with the catalogue entry") },
     // A server tool paused the turn: the agent resends the conversation unchanged.
     { blocks: [...s2], stop: "pause_turn", usage: { input_tokens: 9500, output_tokens: 100, web_search_requests: 1 } },
-    { blocks: [...errS, ...errF, text("The AKDB developed the account software.", [{ type: "web_search_result_location", url: AKDB.url, title: AKDB.title, cited_text: "The AKDB developed the BundID account software for the federal government.", encrypted_index: "eidx" }]), b1, b2], stop: "tool_use", usage: { input_tokens: 10000, output_tokens: 900 } },
+    { blocks: [...errS, ...errF, text("The AKDB developed the account software.", [{ type: "web_search_result_location", url: AKDB.url, title: AKDB.title, cited_text: "The AKDB developed the BundID account software for the federal government.", encrypted_index: "eidx" }]), b1, b2, say], stop: "tool_use", usage: { input_tokens: 10000, output_tokens: 900 } },
     { blocks: [...layers], stop: "tool_use", usage: { input_tokens: 11000, output_tokens: 400 } },
     { blocks: [score], stop: "tool_use", usage: { input_tokens: 11500, output_tokens: 100 } },
     { blocks: [review], stop: "tool_use", usage: { input_tokens: 12000, output_tokens: 200 } },
@@ -160,14 +166,36 @@ if (wanted("protocol")) {
   const t = await newPage(fake);
   const { page } = t;
   const checks = {};
+  // The fifth request carries the results of the first two blocks: held there, the run has two of six layers.
+  const release = t.holdAt(4);
   try {
-    await startLive(page, { entry: "bundid" });
+    await startLive(page);
+    await t.held(4);
+    await page.waitForFunction(() => window.sovereignty.S.run?.blockList?.length === 2, null, { timeout: 10000 });
+    await page.waitForTimeout(300);
+    checks.header = await textOf(page, "#mode-text");
+    checks.note = await textOf(page, "#agent-note");
+    checks.stop = await page.isVisible("#stop");
+    checks.partial = await page.evaluate(() => ["score", "weakest", "exclusive"].map((k) => document.querySelector(`#kpi-${k} .vc-stat__value`).innerText.replace(/\s+/g, " ").trim()));
+    checks.partialNotes = await page.evaluate(() => ["weakest", "exclusive"].map((k) => document.querySelector(`#kpi-${k} .vc-stat__note`).innerText.trim()));
+    checks.working = await page.evaluate(() => document.getElementById("turn").dataset.state);
+    // EN | DE while the agent works: the page switches in place, the agent's words stay in the run's language.
+    await page.evaluate(() => { window.__same = true; });
+    await page.click('.lang-option[data-lang="de"]');
+    await page.waitForFunction(() => document.documentElement.lang === "de");
+    await page.waitForTimeout(300);
+    checks.de = await page.evaluate(() => ({ same: window.__same === true, mode: window.sovereignty.S.mode, active: window.sovereignty.S.live?.isActive(), steps: [...document.querySelectorAll("#steps .vc-step__label")].map((e) => e.textContent).join("|"), words: [...document.querySelectorAll("#agent-text p")].map((p) => p.getAttribute("lang")), score: document.querySelector("#kpi-score .vc-stat__value").innerText.replace(/\s+/g, " ").trim() }));
+    await page.click('.lang-option[data-lang="en"]');
+    await page.waitForFunction(() => document.documentElement.lang === "en-GB");
+    release();
     await reviewConfirm(page);
-    checks.tilesBefore = await allText(page, ".kpi-value");
-    await chooseLever(page, "L1");
+    await chooseLever(page);
+    await approveMemo(page);
     await ended(page);
-    checks.pill = await textOf(page, "#status-pill");
-    checks.tilesAfter = await allText(page, ".kpi-value");
+    await page.waitForTimeout(300);
+    const r = await run(page);
+    checks.pill = PILL[r.end];
+    checks.memo = r.memo;
     checks.requests = fake.requests.length;
     const last = fake.requests[fake.requests.length - 1].req;
     const r4 = fake.requests[4].req;
@@ -175,29 +203,26 @@ if (wanted("protocol")) {
     checks.b2 = resultFor(r4, b2.id)?.parsed?.evidence?.map((e) => e.via);
     checks.b2level = resultFor(r4, b2.id)?.parsed?.level;
     checks.lastHasReport = !!resultFor(last, report.id)?.parsed?.published;
-    checks.facts = await textOf(page, ".run-facts");
-    checks.failed = await allText(page, '.entry[data-tool="web_search"] .result-summary, .entry[data-tool="web_fetch"] .result-summary');
-    checks.budgetNotice = (await allText(page, '.entry[data-type="notice"]')).filter((x) => /searches of this turn are used up/.test(x)).length;
-    checks.outbox = await allText(page, ".outbox-card");
-    checks.memoDraft = (checks.outbox[0] || "").includes("Draft. Nothing is sent.");
-    const audit = JSON.parse(await download(page, "#btn-export-audit"));
-    checks.audit = audit.totals;
-    checks.auditPageText = JSON.stringify(audit).includes("in its data centres in Germany. Imprint");
-    checks.auditEncrypted = JSON.stringify(audit).includes("enc:");
+    checks.complete = await page.evaluate(() => ["score", "weakest", "exclusive"].map((k) => document.querySelector(`#kpi-${k} .vc-stat__value`).innerText.replace(/\s+/g, " ").trim()));
+    checks.cost = await page.evaluate(() => ({ value: document.querySelector("#kpi-cost .vc-stat__value").innerText.trim(), note: document.querySelector("#kpi-cost .vc-stat__note").innerText.trim(), eur: window.sovereignty.S.run.cost?.eur }));
+    checks.memoText = await page.evaluate(() => [document.querySelector(".memo")?.innerText || "", document.querySelector("#stage-body .outcome")?.innerText || ""].join(" | "));
+    checks.log = await page.$$eval("#log-list li", (els) => els.map((e) => e.textContent.trim()));
     await shot(page, "protocol.png");
-  } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("protocol: server-tool blocks echoed, pause_turn, a mixed turn, in-result errors, counts, a whole assessment", t, checks, [
+  } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; release(); }
+  const eur = (x) => `€${Number(x).toFixed(2)}`;
+  await finish("protocol: server-tool blocks echoed, pause_turn, a mixed turn, in-result errors, a whole assessment at the Your turn bar", t, checks, [
     [checks.requests === 12, `twelve model calls (${checks.requests})`],
     [checks.pill === "Done", `the run is done (${checks.pill})`],
+    [checks.header === "LIVE" && /^live, Claude Sonnet 5\.5$/.test(checks.note || "") && checks.stop && checks.working === "working", `LIVE in the header, the agent's words marked live, Stop shown, the bar says it works (${checks.header}, ${checks.note}, ${checks.stop}, ${checks.working})`],
+    [/^(…|\d+ on 2 of 6 layers)$/.test(checks.partial?.[0] || "") && checks.partial?.[1] === "…" && checks.partial?.[2] === "…" && checks.partialNotes?.every((n) => n.length > 5), `on two of six layers the score says so and the other two wait (${JSON.stringify(checks.partial)} ${JSON.stringify(checks.partialNotes)})`],
+    [checks.de?.same && checks.de.mode === "live" && checks.de.active && checks.de.steps === "Verstehen|Recherchieren|Bewerten|Ihre Prüfung|Empfehlen" && checks.de.words.length > 0 && checks.de.words.every((l) => l === "en") && /^(…|\d+ auf 2 von 6 Ebenen)$/.test(checks.de.score), `EN | DE switches in place while the agent works; its words stay English (${JSON.stringify(checks.de)})`],
     [JSON.stringify(checks.b1) === JSON.stringify(["fetched_text"]), `a quote in the fetched page counts (${JSON.stringify(checks.b1)})`],
     [JSON.stringify(checks.b2) === JSON.stringify(["citation", "fetched_text"]) && checks.b2level === 2, `a search-result quote counts through its citation (${JSON.stringify(checks.b2)}, level ${checks.b2level})`],
     [checks.lastHasReport, "the report was published"],
-    [/3 web searches/.test(checks.facts || "") && /2 pages read/.test(checks.facts || "") && /Model calls 12 of 40/.test(checks.facts || ""), `searches and fetches counted across turns (${checks.facts})`],
-    [checks.failed.some((x) => /max_uses_exceeded/.test(x)) && checks.failed.some((x) => /url_not_accessible/.test(x)) && checks.budgetNotice === 1, `in-result errors shown (${JSON.stringify(checks.failed)})`],
-    [JSON.stringify(checks.tilesBefore) === JSON.stringify(checks.tilesAfter), `a what-if never changes the tiles (${JSON.stringify(checks.tilesBefore)} → ${JSON.stringify(checks.tilesAfter)})`],
-    [checks.memoDraft && checks.outbox.length === 2, "the memo and the report are in the Outbox as drafts"],
-    [checks.audit?.model_calls === 12 && checks.audit?.web_searches === 3 && checks.audit?.web_fetches === 2 && checks.audit?.web_searches_billed === 2 && checks.audit?.model === "claude-sonnet-5-5", `the audit export shows model, calls, searches and fetches (${JSON.stringify(checks.audit)})`],
-    [checks.auditPageText === false && checks.auditEncrypted === false, "the audit export holds no page text and no encrypted content"]
+    [/ of 6 layers$/.test(checks.complete?.[0] || "") && !checks.complete?.slice(1).includes("…"), `at the end every figure is in (${JSON.stringify(checks.complete)})`],
+    [checks.cost?.value === eur(checks.cost?.eur) && /^measured, Sonnet 5\.5$/.test(checks.cost?.note || ""), `the session cost is measured (${JSON.stringify(checks.cost)})`],
+    [checks.memo === "approved" && /Draft/.test(checks.memoText || "") && /nothing leaves this page/i.test(checks.memoText || ""), `the memo is a draft, approved, and nothing is sent (${(checks.memoText || "").slice(0, 120)})`],
+    [checks.log?.length >= 3 && checks.log.every((l) => /^\d\d:\d\d:\d\d /.test(l)), `the decision log has every decision with its time (${JSON.stringify(checks.log)})`]
   ]);
 }
 
@@ -215,15 +240,16 @@ if (wanted("nudges")) {
     await startLive(page, { entry: "fit-connect" });
     await ended(page);
     await page.waitForTimeout(800);
-    checks.pill = await textOf(page, "#status-pill");
+    checks.pill = await pill(page);
     checks.requests = fake.requests.length;
     checks.nudges = fake.nudges().map((m) => (Array.isArray(m.content) ? m.content.filter((b) => b.type === "text").map((b) => b.text).join(" ") : m.content));
-    checks.notices = (await allText(page, '.entry[data-type="notice"]')).filter((x) => /asked to continue|ended its turn twice/.test(x)).length;
+    checks.notices = (await noticed(page, /^notice\.(nudge|ended)$/)).length;
+    checks.alert = await textOf(page, "#story-alert");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("nudges: at most two, each with the budgets left, then the run stops", t, checks, [
     [checks.requests === 3, `three model calls (${checks.requests})`],
     [checks.nudges?.length === 2 && checks.nudges.every((n) => /Budgets left in this run: \d+ model calls and €\d+\.\d\d/.test(n) && /this new turn allows up to 12 searches and 10 fetches/.test(n)), `two nudges with the budgets left (${JSON.stringify(checks.nudges)})`],
-    [checks.pill === "Stopped" && checks.notices === 3, `the run stops after the second nudge (${checks.pill}, ${checks.notices} notices)`]
+    [checks.pill === "Stopped" && checks.notices === 3 && /The agent ended its turn twice more/.test(checks.alert || ""), `the run stops after the second nudge and the page says why (${checks.pill}, ${checks.notices} notices, ${checks.alert})`]
   ]);
 }
 
@@ -235,18 +261,19 @@ for (const [name, message, says] of [["disabled-search", "web search is not enab
   const { page } = t;
   const checks = {};
   try {
-    await startLive(page, { entry: "bundid" });
+    await startLive(page);
     await ended(page);
-    await page.waitForTimeout(1500);
-    checks.pill = await textOf(page, "#status-pill");
+    await page.waitForTimeout(1200);
+    checks.pill = await pill(page);
     checks.requests = fake.requests.length;
-    checks.notice = (await allText(page, '.entry[data-type="notice"][data-level="error"]')).join(" | ");
+    checks.alert = await textOf(page, "#story-alert");
     checks.key = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
+    checks.start = await page.isVisible("#start");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish(`${name}: a 400 stops Live cleanly and offers Simulation`, t, checks, [
+  await finish(`${name}: a 400 stops the live run cleanly and says why`, t, checks, [
     [checks.requests === 1, `one request, no retry and nothing after it (${checks.requests})`],
     [checks.pill === "Stopped", `the run stops (${checks.pill})`],
-    [says.test(checks.notice || "") && /Simulation mode replays the pre-run assessments without a key/.test(checks.notice || ""), `the message says why and offers Simulation (${checks.notice})`],
+    [says.test(checks.alert || "") && checks.start, `the page says why, and Start agent offers the simulation again (${checks.alert})`],
     [checks.key === MOCK_KEY, "the key stays: it was not rejected"]
   ]);
 }
@@ -270,25 +297,24 @@ if (wanted("evidence")) {
   const { page } = t;
   const checks = {};
   try {
-    await startLive(page, { typed: "Example platform" });
+    await startLive(page, { entry: "kipitz" });
     await ended(page);
     const r2 = fake.requests[1].req;
     const g = resultFor(r2, good.id);
     const s = resultFor(r2, stray.id);
     checks.good = { error: !!g?.is_error, unknown: (g?.parsed?.unknown_fields || []).map((u) => u.field), via: (g?.parsed?.evidence || []).map((e) => `${e.via}${e.verified ? "" : ":unverified"}`), made: g?.parsed?.made_in, level: g?.parsed?.level, partly: g?.parsed?.partly_unknown };
     checks.stray = { error: !!s?.is_error, allowed: s?.parsed?.allowed_urls, refused: s?.parsed?.refused_urls };
-    await page.click("#tab-blocks");
-    await page.click('tr[data-block="B-01"] .row-toggle');
-    checks.row = await textOf(page, 'tr[data-block="B-01"]');
-    checks.evidence = await allText(page, ".evidence-item .ev-tag");
-    checks.cell = await page.getAttribute('.hc-cell[data-block="B-01"]', "data-partly");
+    // On the page: the research table names the block; the maker without a checked quote is not named.
+    await page.evaluate(() => window.sovereignty.go(1, { focus: false }));
+    await page.waitForTimeout(200);
+    checks.row = await page.evaluate(() => [...document.querySelectorAll(".research tbody tr")].map((r) => r.innerText.replace(/\s+/g, " ").trim()).find((x) => /Integration platform/.test(x)) || null);
     await shot(page, "evidence.png");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("evidence: verified quotes count, a quote found nowhere leaves its fields unknown, an unreturned URL is refused", t, checks, [
     [checks.good && !checks.good.error && JSON.stringify(checks.good.via) === JSON.stringify(["fetched_text", "none:unverified", "citation"]), `fetched text, nowhere, and a PDF through its mapped citation (${JSON.stringify(checks.good?.via)})`],
     [JSON.stringify(checks.good?.unknown) === JSON.stringify(["tech", "licence", "exit"]) && checks.good?.made === "UNKNOWN" && checks.good?.level === 2 && checks.good?.partly === true, `the fields without a verified quote count as unknown and mark the block (${JSON.stringify(checks.good)})`],
     [checks.stray?.error && JSON.stringify(checks.stray.refused) === JSON.stringify(["https://never-returned.example/page"]) && Array.isArray(checks.stray.allowed) && checks.stray.allowed.length >= 2 && !checks.stray.allowed.includes("https://never-returned.example/page"), `an unreturned URL is refused with is_error and the allowed URLs (${JSON.stringify(checks.stray)})`],
-    [/unverified/.test(checks.row || "") && checks.evidence.filter((x) => /quote not verified/.test(x)).length === 1 && checks.cell === "true", `the block shows its unknowns (${checks.row}; ${JSON.stringify(checks.evidence)})`]
+    [/Integration platform/.test(checks.row || "") && /Nobody Corp\.\s*·?\s*country unknown/.test(checks.row || "") && /Example GmbH\s*·?\s*Germany/.test(checks.row || ""), `the table gives the operator its country from the quote and the maker none without one (${checks.row})`]
   ]);
 }
 
@@ -296,15 +322,15 @@ if (wanted("evidence")) {
 if (wanted("caps")) {
   const checks = {};
   // Forty calls, then the run stops: the stand-in answers every call with another tool call.
-  const looping = createFakeClaude((n) => ({ blocks: [tool("ui_progress", { text: "Still researching." })], stop: "tool_use", usage: { input_tokens: 100, output_tokens: 10 } }));
+  const looping = createFakeClaude(() => ({ blocks: [tool("ui_progress", { text: "Still researching." })], stop: "tool_use", usage: { input_tokens: 100, output_tokens: 10 } }));
   const t = await newPage(looping);
   try {
-    await startLive(t.page, { entry: "bundid" });
+    await startLive(t.page);
     await ended(t.page, 120000);
     await t.page.waitForTimeout(1000);
     checks.calls = looping.requests.length;
-    checks.pill = await textOf(t.page, "#status-pill");
-    checks.notice = (await allText(t.page, '.entry[data-type="notice"]')).find((x) => /model calls/.test(x)) || null;
+    checks.pill = await pill(t.page);
+    checks.notice = (await noticed(t.page, /^notice\.stepLimit$/)).length;
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   // The cost cap: one expensive call (400,000 output tokens on Sonnet 5.5 is $4.00, €3.58) and nothing after it.
   const costly = createFakeClaude([
@@ -313,18 +339,18 @@ if (wanted("caps")) {
   ]);
   const t2 = await newPage(costly);
   try {
-    await startLive(t2.page, { entry: "bundid" });
+    await startLive(t2.page);
     await ended(t2.page);
     await t2.page.waitForTimeout(1000);
     checks.costCalls = costly.requests.length;
-    checks.costPill = await textOf(t2.page, "#status-pill");
-    checks.costNotice = (await allText(t2.page, '.entry[data-type="notice"]')).find((x) => /cost cap/.test(x)) || null;
+    checks.costPill = await pill(t2.page);
+    checks.costNotice = (await noticed(t2.page, /^notice\.costCap$/)).length;
   } catch (err) { checks.FAILED = checks.FAILED || String(err.message).split("\n")[0]; }
   await t2.context.close();
   t.fake.violations.push(...costly.violations);
   await finish("caps: no 41st model call, and none once €3 is spent", t, checks, [
-    [checks.calls === 40 && checks.pill === "Stopped" && !!checks.notice, `forty calls, then the run stops (${checks.calls}, ${checks.pill}, ${checks.notice})`],
-    [checks.costCalls === 1 && checks.costPill === "Stopped" && !!checks.costNotice, `no call after €3 is spent (${checks.costCalls}, ${checks.costPill}, ${checks.costNotice})`]
+    [checks.calls === 40 && checks.pill === "Stopped" && checks.notice === 1, `forty calls, then the run stops (${checks.calls}, ${checks.pill}, ${checks.notice})`],
+    [checks.costCalls === 1 && checks.costPill === "Stopped" && checks.costNotice === 1, `no call after €3 is spent (${checks.costCalls}, ${checks.costPill}, ${checks.costNotice})`]
   ]);
 }
 
@@ -344,20 +370,21 @@ if (wanted("cost")) {
   const { page } = t;
   const checks = {};
   try {
-    await startLive(page, { entry: "bundid" });
+    await startLive(page);
     await ended(page);
-    const audit = JSON.parse(await download(page, "#btn-export-audit"));
-    checks.eur = audit.totals.cost_eur;
-    checks.usd = audit.totals.cost_usd;
+    await page.waitForTimeout(300);
+    const r = await run(page);
+    checks.eur = r.cost?.eur;
+    checks.usd = r.cost?.usd;
     const p = MODELS.find((m) => m.id === "claude-sonnet-5-5").price;
     const usd = usages.reduce((s, u) => s + (u.input_tokens * p.input + u.output_tokens * p.output + u.cache_creation_input_tokens * p.cacheWrite + u.cache_read_input_tokens * p.cacheRead) / 1e6 + u.web_search_requests * (ANTHROPIC.webSearchUsdPer1000 / 1000), 0);
     checks.expectedUsd = usd;
     checks.expectedEur = usd * FX_USD_EUR;
-    checks.facts = await textOf(page, ".run-facts");
+    checks.tile = await page.evaluate(() => [document.querySelector("#kpi-cost .vc-stat__value").innerText.trim(), document.querySelector("#kpi-cost .vc-stat__note").innerText.trim()]);
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("cost: the meter equals usage × price plus searches × $0.01, to within 1e-9", t, checks, [
+  await finish("cost: the measured cost equals usage × price plus searches × $0.01, to within 1e-9, on the Session cost tile", t, checks, [
     [Math.abs(checks.usd - checks.expectedUsd) < 1e-9 && Math.abs(checks.eur - checks.expectedEur) < 1e-9, `cost ${checks.eur} EUR = ${checks.expectedEur} EUR (${checks.usd} = ${checks.expectedUsd} USD)`],
-    [/Cost €0\.\d\d/.test(checks.facts || ""), `the run facts show the cost (${checks.facts})`]
+    [checks.tile?.[0] === `€${Number(checks.expectedEur).toFixed(2)}` && /^measured/.test(checks.tile?.[1] || ""), `the tile shows the measured cost (${JSON.stringify(checks.tile)})`]
   ]);
 }
 
@@ -394,81 +421,81 @@ if (wanted("guardrails")) {
     checks.s1 = R(4, s1.id);
     checks.s2 = R(5, s2.id);
     checks.s3 = R(6, s3.id);
-    checks.unchecked = await allText(page, '.entry[data-type="narration"] .unchecked-tag');
-    checks.narration = await allText(page, '.entry[data-type="narration"][data-audit="unchecked"] .narr-text');
+    checks.unchecked = (await run(page)).narration.filter((m) => m.audit === "unchecked").map((m) => m.text);
+    // The step that shows the words: the one the run stopped on.
+    checks.tag = [];
+    for (let i = 0; i < 5 && !checks.tag.length; i++) {
+      await page.evaluate((n) => window.sovereignty.go(n, { focus: false }), i);
+      await page.waitForTimeout(150);
+      checks.tag = await page.$$eval("#agent-text .unchecked", (els) => els.map((e) => [e.textContent, e.parentElement.textContent]));
+    }
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("guardrails: the sequence rules and the fact audit's two retries, then Unchecked", t, checks, [
+  await finish("guardrails: the sequence rules and the fact audit's two retries, then the text marked unchecked", t, checks, [
     [checks.memo?.is_error && /follows the person's lever decision/.test(checks.memo.parsed?.error || ""), "no memo before a lever decision"],
     [checks.early?.is_error && /needs the person's review first/.test(checks.early.parsed?.error || ""), "no assessed report before the review"],
     [checks.review?.is_error && /no building blocks to review/.test(checks.review.parsed?.error || ""), "no review before blocks and layer statuses"],
     [checks.s1?.is_error && checks.s2?.is_error && /outside a placeholder: 75, %/.test(checks.s1.parsed?.error || "") && !checks.s3?.is_error, `the audit refuses a figure twice, then accepts the text (${checks.s1?.parsed?.error?.slice(0, 90)})`],
-    [checks.unchecked?.length === 1 && /75%/.test(checks.narration?.[0] || ""), `the accepted text carries the Unchecked tag (${JSON.stringify(checks.unchecked)})`]
+    [checks.unchecked?.length === 1 && /75%/.test(checks.unchecked[0]) && checks.tag?.length === 1 && checks.tag[0][0] === "Unchecked" && /75%/.test(checks.tag[0][1]), `the accepted text shows with its Unchecked tag (${JSON.stringify(checks.tag)})`]
   ]);
 }
 
 // ---- not-a-service -----------------------------------------------------------------------------------------------------------
-async function notAService(fake) {
-  return [
-    { blocks: [tool("ui_progress", { text: "This names a person, not a digital service or platform." }), tool("ui_final_report", { outcome: "not_a_service", markdown: "The text names a person, not a digital service, so there is nothing to assess." })], stop: "tool_use" },
-    { blocks: [text("Nothing to assess.")], stop: "end_turn" }
-  ];
-}
+const notAService = () => [
+  { blocks: [tool("ui_progress", { text: "This names a person, not a digital service or platform." }), tool("ui_final_report", { outcome: "not_a_service", markdown: "The text names a person, not a digital service, so there is nothing to assess." })], stop: "tool_use" },
+  { blocks: [text("Nothing to assess.")], stop: "end_turn" }
+];
 if (wanted("not-a-service")) {
-  const fake = createFakeClaude(await notAService());
+  const fake = createFakeClaude(notAService());
   const t = await newPage(fake);
   const { page } = t;
   const checks = {};
   try {
-    await startLive(page, { typed: "Angela Merkel" });
+    await startLive(page, { entry: "zapuk" });
     await ended(page);
-    checks.pill = await textOf(page, "#status-pill");
-    checks.end = (await allText(page, '.entry[data-type="run"] .run-title')).pop();
-    checks.blocks = await page.$$eval(".hc-cell[data-block]", (els) => els.length);
-    checks.overall = await textOf(page, "#kpi-overall-value");
+    await page.waitForTimeout(300);
+    const r = await run(page);
+    checks.end = r.end;
+    checks.blocks = r.blocks;
+    checks.overall = await page.evaluate(() => document.querySelector("#kpi-score .vc-stat__value").innerText.trim());
+    checks.title = await page.evaluate(() => { window.sovereignty.go(1, { focus: false }); return document.getElementById("story-title").textContent; });
     checks.requests = fake.requests.length;
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("not-a-service: a person's name ends the run without blocks", t, checks, [
-    [checks.pill === "Done" && /is not a digital service in operation/.test(checks.end || ""), `the run ends as not a service (${checks.pill}; ${checks.end})`],
-    [checks.blocks === 0 && checks.overall === "no data" && checks.requests === 2, `no blocks, no figures (${checks.blocks}, ${checks.overall}, ${checks.requests} calls)`]
+  await finish("not-a-service: a run that finds no service ends without blocks and says so", t, checks, [
+    [checks.end === "not_a_service" && /No building blocks/.test(checks.title || ""), `the run ends as not a service (${checks.end}; ${checks.title})`],
+    [checks.blocks === 0 && checks.overall === "Not scored" && checks.requests === 2, `no blocks, no figures (${checks.blocks}, ${checks.overall}, ${checks.requests} calls)`]
   ]);
 }
 
 // ---- key -------------------------------------------------------------------------------------------------------------------
 if (wanted("key")) {
-  const fake = createFakeClaude(await notAService());
+  const fake = createFakeClaude(notAService());
   const t = await newPage(fake);
   const { page } = t;
   const checks = {};
   try {
-    await startLive(page, { typed: "Angela Merkel" });
+    // A wrong key: the free check rejects it, the dialog says why, nothing is stored.
+    await startLive(page, { key: "sk-ant-test-WRONGKEY-0123456789abcdefghijklmnopqrstuvwxyz0123456789" });
+    await page.waitForFunction(() => /rejected this key/.test(document.getElementById("live-msg").textContent), null, { timeout: 10000 });
+    checks.rejected = await textOf(page, "#live-msg");
+    checks.afterWrong = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
+    await page.fill("#live-key", MOCK_KEY);
+    await page.click("#live-start");
+    await page.waitForFunction(() => window.sovereignty.S.mode === "live", null, { timeout: 10000 });
     await ended(page);
     checks.api = t.api.filter((x) => !x.startsWith("OPTIONS"));
     checks.session = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
     checks.localHasKey = await page.evaluate((key) => Object.keys(localStorage).some((k) => (localStorage.getItem(k) || "").includes(key) || k.includes(key)), MOCK_KEY);
     checks.keys = await page.evaluate(() => [...Object.keys(localStorage), ...Object.keys(sessionStorage)]);
-    const audit = await download(page, "#btn-export-audit");
-    checks.auditHasKey = audit.includes(MOCK_KEY) || audit.includes("sk-ant-test");
-    const recording = await download(page, "#btn-save-simulation");
-    checks.recordingHasKey = recording.includes(MOCK_KEY) || recording.includes("sk-ant-test");
-    checks.recordingSource = /"source": "recorded"/.test(recording);
     checks.pageHasKey = (await page.content()).includes(MOCK_KEY);
     checks.consoleHasKey = t.log.console.some((x) => x.includes(MOCK_KEY));
-    // Forget key: from the mode dialog's "Change or forget key".
-    await page.click("#btn-start");
-    await page.waitForSelector(".mode-card");
-    await page.click("#btn-manage-key");
-    await page.waitForSelector("#btn-forget-key:not([hidden])");
-    await page.click("#btn-forget-key");
-    checks.afterForget = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
-    await page.keyboard.press("Escape");
+    checks.field = await page.inputValue("#live-key");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("key: checked with GET /v1/models, session storage only, never in an export, a recording, the page or the console; Forget key", t, checks, [
-    [checks.api?.[0] === "GET /v1/models" && checks.api.slice(1).every((x) => x === "POST /v1/messages"), `the key is checked with the free models call first (${JSON.stringify(checks.api)})`],
+  await finish("key: checked with GET /v1/models first, kept in this tab's session storage only, never on the page or in the console", t, checks, [
+    [/Anthropic rejected this key \(401\)/.test(checks.rejected || "") && checks.afterWrong === null, `a rejected key is not kept, and the dialog says why (${checks.rejected})`],
+    [checks.api?.[0] === "GET /v1/models" && checks.api.filter((x) => x === "GET /v1/models").length === 2 && checks.api.slice(2).every((x) => x === "POST /v1/messages"), `each key is checked with the free models call first (${JSON.stringify(checks.api)})`],
     [checks.session === MOCK_KEY && checks.localHasKey === false, "the key lives in this tab's session storage only"],
-    [checks.keys?.every((k) => k.startsWith("sa.") || k === "vc-theme"), `storage keys sa.* and vc-theme only (${JSON.stringify(checks.keys)})`],
-    [checks.auditHasKey === false && checks.recordingHasKey === false && checks.recordingSource === true, "neither the audit export nor the recording holds the key"],
-    [checks.pageHasKey === false && checks.consoleHasKey === false, "neither the page nor the console shows the key"],
-    [checks.afterForget === null, "Forget key removes it"]
+    [checks.keys?.every((k) => k.startsWith("sa.") || k === "vc-theme" || k.startsWith("vc-guide:")), `storage keys sa.*, vc-theme and Vici's guide note only (${JSON.stringify(checks.keys)})`],
+    [checks.pageHasKey === false && checks.consoleHasKey === false && checks.field === "", "neither the page nor the console shows the key, and the field is emptied"]
   ]);
 }
 

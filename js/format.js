@@ -13,15 +13,6 @@ function nf(lang, opts) {
 }
 const has = (v) => v !== null && v !== undefined && Number.isFinite(Number(v));
 
-/**
- * The text key of a layer's status. A layer "no evidence found" (brief §6.5) whose blocks are recorded but
- * none scored has evidence, only none on who makes or runs them: it says so (the review's finding R-15).
- * blocks: the number of blocks the layer holds.
- */
-export function layerStatusKey(status, blocks = 0) {
-  return status === "no_evidence" && blocks > 0 ? "map.status.no_origin" : `map.status.${status}`;
-}
-
 /** "no data" for a figure without a basis: never shown as 0 (brief §6.5). */
 export function noData(lang = getLang()) {
   return t("fact.noData", null, lang);
@@ -42,19 +33,9 @@ export function fmtDelta(value, lang = getLang()) {
   return has(value) ? nf(lang, { maximumFractionDigits: 0, signDisplay: "exceptZero" }).format(Number(value)) : noData(lang);
 }
 
-/** A layer weight, with at most one decimal: 1.5 or 1,5. */
-export function fmtWeight(value, lang = getLang()) {
-  return has(value) ? nf(lang, { maximumFractionDigits: 1 }).format(Number(value)) : noData(lang);
-}
-
 /** A whole number with the language's grouping: 1,122 or 1.122. */
 export function fmtInt(value, lang = getLang()) {
   return has(value) ? nf(lang, { maximumFractionDigits: 0 }).format(Math.round(Number(value))) : noData(lang);
-}
-
-/** Small euro amounts with cents, for the cost meter: "€0.38" or "0,38 €". */
-export function fmtEur(value, lang = getLang()) {
-  return nf(lang, { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value) || 0);
 }
 
 /**
@@ -66,19 +47,4 @@ export function fmtDate(iso, lang = getLang()) {
   const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T12:00:00` : text);
   if (Number.isNaN(d.getTime())) return noData(lang);
   return d.toLocaleDateString(locale(lang), { day: "numeric", month: "long", year: "numeric" });
-}
-
-/** "15:56:03" local time from an ISO timestamp. */
-export function fmtTime(iso, lang = getLang()) {
-  return new Date(iso).toLocaleTimeString(locale(lang), { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-}
-
-/** mm:ss (or h:mm:ss) for the stopwatch. */
-export function clock(ms) {
-  const total = Math.max(0, Math.floor((ms || 0) / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  const p = (x) => String(x).padStart(2, "0");
-  return h ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
 }

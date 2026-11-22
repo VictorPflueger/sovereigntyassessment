@@ -1,7 +1,7 @@
-// What differs between the prototypes in the shared Vici tests (tests/tokens.mjs, tests/hexagon.mjs,
-// tests/page-icon.mjs and tests/vici-files.mjs). Those four files are the same in Rebate Hunter,
-// Navigator, the Timetable Translator, Repack Pilot and this app; this file is the one place that is
-// not. Everything here is Sovereignty Assessment's.
+// What differs between the prototypes in the shared Vici tests (tests/tokens.mjs, tests/hexagon.mjs
+// and tests/page-icon.mjs). Those files are the same in Rebate Hunter, Navigator, the Timetable
+// Translator, Repack Pilot and this app; this file is the one place that is not. Everything here is
+// Sovereignty Assessment's.
 
 /** The prototype's name, as on its page and on its card on Victor's website. */
 export const NAME = "Sovereignty Assessment";
@@ -10,84 +10,86 @@ export const NAME = "Sovereignty Assessment";
  * Colour pairs only this prototype draws (the shared shell's pairs are in tests/tokens.mjs):
  * [what, foreground token, background token, kind]. kind "text" needs 4.5:1, "mark" (a line, an icon,
  * a control's border, a bar) 3:1 (WCAG 2.2, 1.4.3 and 1.4.11). Tokens are Vici's, without "--vc-".
- * The honeycomb's fills and text tokens are the brief's (§9), measured in PLAN.md f.3; the sovereignty
- * map draws them from version 0.2.0, and these pairs hold its colours to that contrast from the start.
  */
 export const COLOUR_PAIRS = [
-  // The honeycomb: one hexagon cell per building block, filled by level on Vici's diverging scale, with
-  // the level and the Made-in and Run-by codes written in the cell, so nothing reads by colour alone.
-  ["Honeycomb: level 0, its number and codes on the fill", "text-inverse", "div-1", "text"],
-  ["Honeycomb: level 1, its number and codes on the fill", "text", "div-3", "text"],
-  ["Honeycomb: level 2, its number and codes on the fill", "text", "div-4", "text"],
-  ["Honeycomb: level 3, its number and codes on the fill", "text", "div-5", "text"],
-  ["Honeycomb: level 4, its number and codes on the fill", "text-inverse", "div-7", "text"],
-  // The spider diagram: the assessed service in teal (merlot means the person in charge), a compared
-  // service in apricot, both on the map's panel and on the canvas.
-  ["Spider: the assessed service's line and markers, on panels", "data-2", "surface", "mark"],
-  ["Spider: the assessed service's line and markers, on the canvas", "data-2", "bg-sunken", "mark"],
-  ["Spider: the assessed service's line on its own pastel fill", "data-2", "data-pastel-2", "mark"],
-  ["Spider: a compared service's line and markers, on panels", "data-3", "surface", "mark"],
-  ["Spider: a dashed axis without a score, on panels", "border-strong", "surface", "mark"],
-  ["Spider: the value beside a marker and the axis labels, on panels", "text", "surface", "text"]
+  // Step 3 and Your review: each block's level in a hexagon on Vici's diverging scale, with its number,
+  // so nothing reads by colour alone.
+  ["Levels: level 0, its number on the fill", "text-inverse", "div-1", "text"],
+  ["Levels: level 1, its number on the fill", "text", "div-3", "text"],
+  ["Levels: level 2, its number on the fill", "text", "div-4", "text"],
+  ["Levels: level 3, its number on the fill", "text", "div-5", "text"],
+  ["Levels: level 4, its number on the fill", "text-inverse", "div-7", "text"],
+  // Level 2 and an unknown level sit close to the page, so a hexagon outline keeps them in view.
+  ["Levels: the outline of level 2 and of an unknown level, in a layer's row", "border-strong", "surface", "mark"],
+  ["Levels: the outline of level 2 and of an unknown level, in the legend on the stage", "border-strong", "bg-sunken", "mark"],
+  ["Levels: an unknown level's question mark", "text-muted", "surface", "text"],
+  // The stage on the left: the table, the legend and the note at its foot.
+  ["Text on the stage", "text", "bg-sunken", "text"],
+  ["The legend and the note at the stage's foot", "text-muted", "bg-sunken", "text"],
+  ["Critical, the weakest link and the lowest level, named in merlot on the rows", "accent-text", "surface", "text"],
+  // The story on the right: the agent's words, and the bar that says whose turn it is.
+  ["The agent's words on its lilac tint", "text", "feature-bg", "text"],
+  ["Your turn: its words on the merlot tint", "on-accent-soft", "accent-soft", "text"],
+  ["Your turn: its lead on the merlot tint", "accent-text", "accent-soft", "text"],
+  ["Your turn: the bar's merlot edge on its tint", "accent", "accent-soft", "mark"],
+  // The tiles: a figure a decision moved turns green; a share of blocks at risk turns red.
+  ["A tile a decision moved: its value on the green tint", "success-text", "success-bg", "text"],
+  ["A tile at risk: its value on the red tint", "danger-text", "danger-bg", "text"]
 ];
 
 /**
  * Colours that must stay apart, beyond the shared ones in tests/tokens.mjs: [what, token, token].
  * The test reports how far apart they stay under colour-vision deficiency; it does not fail on them.
+ * The levels carry their number too, so a pair that comes close still reads.
  */
 export const SEPARATIONS = [
-  ["The assessed service (teal) vs a compared service (apricot)", "data-2", "data-3"],
-  ["The assessed service (teal) vs checking (fjord), which pulses beside it", "data-2", "info-solid"],
-  ["Level 0 vs level 1 in the honeycomb", "div-1", "div-3"],
-  ["Level 3 vs level 4 in the honeycomb", "div-5", "div-7"]
+  ["Level 0 vs level 1", "div-1", "div-3"],
+  ["Level 1 vs level 2", "div-3", "div-4"],
+  ["Level 2 vs level 3", "div-4", "div-5"],
+  ["Level 3 vs level 4", "div-5", "div-7"]
 ];
 
 /**
- * The hexagon test's tour of the app (tests/hexagon.mjs): the start screen with its intro, the
- * catalogue, Diagnostics, the mode and key dialogs, the drawer's tabs, and the German interface.
- * The page has just been opened, without SKIP_INTRO, so the intro opens by itself.
+ * The hexagon test's tour of the page (tests/hexagon.mjs): the guide that opens by itself, the five
+ * steps of the BundID case with every decision taken, the case menu, Start agent, and the German page
+ * with its guide. The page has just been opened, without ?guide=0, so the guide opens by itself.
  * visit(name, { settle }) checks the page as it is, settle ms (250) after the step.
  */
 export async function hexagonTour(page, visit) {
   await page.waitForSelector('html[data-boot="ready"]', { timeout: 20000 });
-  await page.waitForSelector(".intro-modal", { timeout: 10000 });
-  await visit("start screen with the intro");
+  await page.waitForSelector("#guide-en[open]", { timeout: 10000 });
+  await visit("the guide, opened by itself");
   await page.keyboard.press("Escape");
-  await page.waitForSelector(".intro-modal", { state: "detached", timeout: 5000 });
-  await visit("start screen with the catalogue");
-  // The service field's suggestions.
-  await page.fill("#service-input", "Bund");
-  await page.waitForSelector("#service-suggestions:not([hidden]) [role=option]", { timeout: 5000 });
-  await visit("suggestions");
-  await page.keyboard.press("Escape");
-  await page.click("#btn-diagnostics");
-  await page.waitForSelector(".diag-table", { timeout: 5000 });
-  await visit("diagnostics");
-  await page.keyboard.press("Escape");
-  await page.waitForSelector(".diag-table", { state: "detached", timeout: 5000 });
-  // The mode dialog for a catalogue entry, then the key dialog behind the live card.
-  await page.click('.catalogue-chip[data-entry="bundid"]');
-  await page.click("#btn-start");
-  await page.waitForSelector(".mode-card", { timeout: 5000 });
-  await visit("mode dialog");
-  await page.click('.mode-card[data-mode="live"] .mode-cta button');
-  await page.waitForSelector("#api-key-input", { timeout: 5000 });
-  await visit("key dialog");
-  await page.keyboard.press("Escape");
-  await page.waitForSelector("#api-key-input", { state: "detached", timeout: 5000 });
-  // Every drawer tab, then the drawer hidden again.
-  for (const tab of ["blocks", "review", "levers", "outbox", "audit"]) {
-    await page.click(`#tab-${tab}`);
-    await visit(`drawer, ${tab}`, { settle: 150 });
+  await page.waitForSelector("#guide-en[open]", { state: "detached", timeout: 5000 }).catch(() => {});
+  await page.waitForFunction(() => !document.querySelector("dialog[open]"), null, { timeout: 5000 });
+  await page.keyboard.press("1");
+  await visit("1 Understand");
+  for (const [key, name] of [["2", "2 Research"], ["3", "3 Score"], ["4", "4 Your review"]]) {
+    await page.keyboard.press(key);
+    await visit(name, { settle: 200 });
   }
-  await page.click(".drawer-toggle");
-  // The German interface, and the intro in German.
-  await page.click('#lang-switch button[data-lang="de"]');
+  await page.click("#turn-primary");
+  await visit("4 Your review, confirmed", { settle: 200 });
+  await page.keyboard.press("5");
+  await visit("5 Recommend, the lever");
+  await page.click("#turn-primary");
+  await visit("5 Recommend, the memo");
+  await page.click("#turn-primary");
+  await visit("5 Recommend, done");
+  await page.click("#case-button");
+  await page.waitForSelector("#case-menu:popover-open", { timeout: 5000 });
+  await visit("the case menu", { settle: 150 });
+  await page.keyboard.press("Escape");
+  await page.click("#start");
+  await page.waitForSelector("#start-dialog[open]", { timeout: 5000 });
+  await visit("Start agent");
+  await page.keyboard.press("Escape");
+  await page.click('.lang-option[data-lang="de"]');
   await page.waitForSelector('html[lang="de"]', { timeout: 5000 });
-  await visit("German interface");
-  await page.click("#btn-about");
-  await page.waitForSelector(".intro-modal", { timeout: 5000 });
-  await visit("German intro");
+  await visit("the German page");
+  await page.click('[data-vc-guide-open="guide-de"]');
+  await page.waitForSelector("#guide-de[open]", { timeout: 5000 });
+  await visit("the German guide");
   await page.keyboard.press("Escape");
 }
 

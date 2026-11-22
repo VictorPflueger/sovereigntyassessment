@@ -1,9 +1,8 @@
-// Unit tests without a browser (Node.js 22): the streaming client and the cost maths of the shared
-// shell (taken from the Timetable Translator's tests/unit.mjs); the schemas of the data contracts and
-// the validator; the formats in both languages; the catalogue's name matching; the API's errors in
-// both languages; the language module's choice of language; the golden copy that Diagnostics runs;
-// the page's security policy and storage keys, read from the files; the exports (the report's table of
-// blocks and the memo's named weakest link among them) and the ninety-day rule.
+// Unit tests without a browser (Node.js 22): the streaming client and the cost maths; the formats in
+// both languages; the catalogue's name matching; the API's errors in both languages; the language
+// module's choice of language; the page's security policy and storage keys, read from the files; the
+// evidence check and the sequence rules; and the presenter: every pre-run played in both languages and
+// turned into the five steps and the four key figures, with the figures checked against the engine.
 // Usage: node tests/unit.mjs            (every group)
 //        node tests/unit.mjs format     (only the named groups)
 import assert from "node:assert/strict";
@@ -12,7 +11,7 @@ import path from "node:path";
 import vm from "node:vm";
 import { pathToFileURL } from "node:url";
 import { APP_ROOT, ONLY, wanted } from "./lib/harness.mjs";
-import { fixture, allFixtures, blockFromRow, fixtureAssessment } from "./lib/fixtures.mjs";
+import { loadData, playCase, hasLevers } from "./lib/play.mjs";
 
 const mod = (p) => import(pathToFileURL(path.join(APP_ROOT, p)).href);
 const read = (f) => fs.readFileSync(path.join(APP_ROOT, f), "utf8");
@@ -130,60 +129,8 @@ await group("cost", "cost maths: tokens at the listed prices, cache writes and r
   check.ok(Math.abs(snap.usd - 24) < 1e-9 && Math.abs(snap.eur - 24 * 0.894) < 1e-9 && snap.requests === 2);
 });
 
-// ---- the data contracts ------------------------------------------------------------------------------
-await group("schemas", "the eleven schemas: the brief's example block, the golden blocks, the catalogue and the reference facts are valid; broken copies are not", async () => {
-  const { validate } = await mod("js/schema.js");
-  const S = dataScript("data/schemas.js").SA_SCHEMAS;
-  const names = ["CatalogueEntry", "ServiceProfile", "BuildingBlock", "Evidence", "LayerStatus", "Assessment", "EngineResult", "Lever", "Decision", "RunEvent", "AuditEvent"];
-  check.deepEqual(Object.keys(S).sort(), [...names].sort());
-  for (const n of names) check.equal(S[n].$id, `https://victorpflueger.github.io/sovereigntyassessment/schemas/${n}.json`, n);
-  const ok = (v, n) => validate(v, S[n], S).valid;
-  // The brief's example (section 10), as the agent records a block.
-  const example = {
-    id: "B-03", layer: "access", name: "App distribution on iOS", role: "Delivers the app to iPhone users",
-    note: "No other distribution path for iOS users in Germany is documented for this app", criticality: "critical",
-    tech: { name: "Apple Inc.", country: "US", parent: null }, operator: { name: "Apple Inc.", country: "US", parent: null },
-    hosting: "NON_EU", licence: "proprietary", exit: "hard",
-    evidence: [{ url: "https://…", title: "…", quote: "…", lang: "en", read_on: "2026-11-20", supports: ["tech", "operator", "hosting", "licence"] }],
-    confidence: "high"
-  };
-  check.ok(ok(example, "BuildingBlock"), "the brief's example block");
-  // A pre-run's block carries its texts in both languages.
-  check.ok(ok({ ...example, name: { en: "App distribution on iOS", de: "App-Vertrieb unter iOS" }, role: { en: "Delivers the app", de: "Liefert die App aus" }, note: { en: "x", de: "y" } }, "BuildingBlock"), "a pre-run's bilingual block");
-  // The golden blocks are fictional and carry no source; with one, each is a valid block (a recorded
-  // block always has at least one evidence record).
-  for (const row of fixture("s2-assessment.json").blocks) check.ok(ok({ ...blockFromRow(row), evidence: example.evidence }, "BuildingBlock"), `S2 ${row.id}`);
-  check.equal(ok(blockFromRow(fixture("s2-assessment.json").blocks[0]), "BuildingBlock"), false, "a block without evidence");
-  const cat = dataScript("data/catalogue.js").SA_CATALOGUE;
-  // Sixteen services and, from version 0.3.0, this prototype's self-assessment in a category of its own.
-  check.equal(cat.entries.length, 17);
-  check.equal(cat.entries.filter((e) => e.category === "self_assessment").map((e) => e.id).join(), "sovereignty-assessment");
-  for (const e of cat.entries) check.ok(ok(e, "CatalogueEntry"), `catalogue ${e.id}`);
-  const rf = dataScript("data/ref_facts.js").SA_REF_FACTS;
-  check.ok(rf.facts.length >= 6);
-  for (const f of rf.facts) check.ok(ok(f.evidence, "Evidence"), `reference fact ${f.id}`);
-  // Broken copies: a missing field, a wrong enum, a long quote, a URL without a scheme, a stray field,
-  // an empty German name, a parent without a country.
-  const broken = [
-    [{ ...example, criticality: "vital" }, "BuildingBlock", "criticality outside its enum"],
-    [{ ...example, hosting: undefined }, "BuildingBlock", "hosting missing"],
-    [{ ...example, vendor_rank: 1 }, "BuildingBlock", "a field outside the contract"],
-    [{ ...example, level: 5 }, "BuildingBlock", "a level outside 0 to 4"],
-    [{ ...example, tech: { name: "X", country: "US", parent: { name: "Y" } } }, "BuildingBlock", "a parent without its country"],
-    [{ ...example.evidence[0], quote: "x".repeat(151) }, "Evidence", "a quote longer than 150 characters"],
-    [{ ...example.evidence[0], url: "www.example.org" }, "Evidence", "a URL without a scheme"],
-    [{ ...example.evidence[0], supports: [] }, "Evidence", "evidence that supports nothing"],
-    [{ ...cat.entries[0], names: { en: "BundID", de: "" } }, "CatalogueEntry", "an empty German name"],
-    [{ ...cat.entries[0], category: "standard" }, "CatalogueEntry", "a category outside the version-1 set (D5)"]
-  ];
-  for (const [value, schema, what] of broken) {
-    const clean = JSON.parse(JSON.stringify(value));
-    check.equal(ok(clean, schema), false, what);
-  }
-});
-
 // ---- formats in both languages -------------------------------------------------------------------------------
-await group("format", "Intl formats: whole scores, whole percentages, signed changes, euros, dates with the month written out, no data", async () => {
+await group("format", "Intl formats: whole scores, whole percentages, signed changes, whole numbers, dates with the month written out, no data", async () => {
   const f = await mod("js/format.js");
   const plain = (s) => String(s).replace(/[  ]/g, " ");
   const both = (fn, x) => [plain(fn(x, "en")), plain(fn(x, "de"))];
@@ -194,13 +141,10 @@ await group("format", "Intl formats: whole scores, whole percentages, signed cha
   check.deepEqual(both(f.fmtDelta, 0), ["0", "0"]);
   check.deepEqual(both(f.fmtDelta, -3.2), ["-3", "-3"]);
   check.deepEqual(both(f.fmtInt, 1122), ["1,122", "1.122"]);
-  check.deepEqual(both(f.fmtEur, 0.3789), ["€0.38", "0,38 €"]);
-  check.deepEqual(both(f.fmtEur, 3), ["€3.00", "3,00 €"]);
   check.deepEqual(both(f.fmtDate, "2026-11-19"), ["19 November 2026", "19. November 2026"]);
   check.deepEqual(both(f.fmtScore, null), ["no data", "keine Daten"]);
   check.deepEqual(both(f.fmtShare, undefined), ["no data", "keine Daten"]);
   check.deepEqual(both(f.fmtDate, "not a date"), ["no data", "keine Daten"]);
-  check.equal(f.clock(3_725_000), "1:02:05");
 });
 
 // ---- the catalogue's name matching -------------------------------------------------------------------
@@ -280,32 +224,13 @@ await group("lang", "choice of language: English on a first visit, ?lang= wins a
   off();
   check.equal(i.t("fact.level", { n: 4 }), "Stufe 4");
   check.equal(i.t("fact.level", { n: 4 }, "en"), "level 4");
-  check.equal(i.tn("console.count", 1, {}, "en"), "1 entry");
-  check.equal(i.tn("console.count", 3, {}, "de"), "3 Einträge");
+  check.equal(i.tn("p.log.summary", 1, {}, "en"), "Decision log: 1 entry");
+  check.equal(i.tn("p.log.summary", 3, {}, "de"), "Entscheidungsprotokoll: 3 Einträge");
   check.equal(i.t("no.such.key"), "no.such.key");
   check.ok(i.missingKeys().includes("no.such.key"));
   check.equal(i.locale("de"), "de-DE");
   check.equal(i.locale("en"), "en-GB");
   i.setLang("en");
-});
-
-// ---- the golden copy for Diagnostics -----------------------------------------------------------------------------
-await group("golden", "data/golden.js is the exact copy of tests/fixtures/, its checks all pass, and a changed expectation fails them", async () => {
-  const { goldenSource } = await mod("tools/golden.mjs");
-  check.equal(read("data/golden.js"), goldenSource(), "data/golden.js is the current copy (node tools/golden.mjs)");
-  const golden = (await mod("data/golden.js")).default;
-  check.deepEqual(JSON.parse(JSON.stringify(golden)), allFixtures());
-  const { goldenChecks } = await mod("js/selftest.js");
-  const groups = goldenChecks(golden);
-  check.deepEqual(groups.map((g) => g.id), ["s1", "s2", "s3", "s4", "audit", "decisions"]);
-  for (const g of groups) check.equal(g.passed, g.total, `${g.id}: ${g.failures.join(", ")}`);
-  // The negative control: one figure changed in a copy, and one audit result flipped.
-  const changed = JSON.parse(JSON.stringify(golden));
-  changed["s2-assessment.json"].expected.overall.exact = "866/12";
-  changed["f-audit.json"].cases[0].expected.pass = false;
-  const bad = goldenChecks(changed);
-  check.ok(bad.find((g) => g.id === "s2").failures.includes("overall"), "a changed overall score is caught");
-  check.ok(bad.find((g) => g.id === "audit").failures.includes("F01"), "a flipped audit result is caught");
 });
 
 // ---- the page's security policy and storage keys, from the files -------------------------------------------
@@ -427,134 +352,92 @@ await group("guards", "sequence rules (brief §7): review after every layer, lev
   check.match(guardTool("ui_choose_service", ready)?.error || "", /new run/, "a service is chosen only before any block");
 });
 
-// ---- the exports (AC-17): the JSON against the schemas, the import, the names, the language -----------
-await group("exports", "the assessment JSON of every pre-run is valid in both languages and imports to the same figures; broken copies are refused; the audit rows are valid AuditEvents; names; the report's language rule; the report's table of blocks and the memo's named weakest link", async () => {
-  // The bundled data as the page has it: window globals.
-  const win = {};
-  for (const f of ["data/catalogue.js", "data/ref_facts.js", "data/schemas.js", ...fs.readdirSync(path.join(APP_ROOT, "data/runs")).map((x) => `data/runs/${x}`)]) {
-    const ctx = { window: win };
-    vm.runInNewContext(read(f), ctx, { filename: f });
-  }
-  globalThis.window = Object.assign(globalThis.window || {}, win);
-  globalThis.SA_RUNS = win.SA_RUNS;
-  const S = win.SA_SCHEMAS;
-  const { validate } = await mod("js/schema.js");
-  const A = await mod("js/assessment.js");
-  const { exportFileName, slugOf, reportMarkdownExport, assessmentJson } = await mod("js/export.js");
-  const runs = Object.values(win.SA_RUNS);
-  check.ok(runs.length >= 6, `the pre-runs (${runs.length})`);
-  for (const def of runs) {
+// ---- the presenter: every pre-run as five steps and four key figures ------------------------------------------
+await group("presenter", "every pre-run played in both languages: five steps, names instead of ids, and the tiles equal to the engine's figures recomputed from the gated blocks; a partial score says on how many layers it rests and the other tiles wait", async () => {
+  const win = loadData();
+  const { digest, STEP_IDS } = await mod("js/run.js");
+  const { story, pct } = await mod("js/story.js");
+  const { score, LAYERS } = await mod("js/engine.js");
+  const { gateBlock } = await mod("js/evidence.js");
+  const { fmtScore, fmtInt } = await mod("js/format.js");
+  const { t } = await mod("js/i18n/index.js");
+  const entries = win.SA_CATALOGUE.entries;
+  check.equal(Object.keys(win.SA_RUNS).length, 17, "seventeen pre-runs");
+  check.deepEqual(STEP_IDS, ["understand", "research", "score", "review", "recommend"]);
+  const play = (def, lang, choice) => playCase(def, lang, { choice });
+  // The texts a person reads on a step, without the fields that only key the page's elements.
+  const SKIP = new Set(["id", "kind", "status", "layer", "decision", "act", "secondaryAct", "url", "lang", "where"]);
+  const texts = (v, out = []) => {
+    if (typeof v === "string") out.push(v);
+    else if (Array.isArray(v)) v.forEach((x) => texts(x, out));
+    else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) if (!SKIP.has(k)) texts(x, out);
+    return out;
+  };
+  const ID = /(?<![\p{L}\p{N}-])(?:B-\d{2}|L[1-3])(?![\p{L}\p{N}])/u;
+
+  for (const def of Object.values(win.SA_RUNS)) {
+    const entry = entries.find((e) => e.id === def.entry_id) || null;
+    check.ok(entry, `${def.id}: its catalogue entry`);
     for (const lang of ["en", "de"]) {
-      const a = await A.assessmentFromPreRun(def, lang, { catalogue: win.SA_CATALOGUE, refFacts: win.SA_REF_FACTS });
-      check.deepEqual(validate(a, S.Assessment, S).errors.slice(0, 2), [], `${def.id} ${lang}: valid`);
-      check.equal(a.lang, lang);
-      check.equal(a.as_of, def.as_of);
-      const back = A.readAssessment(assessmentJson(a), S);
-      check.ok(back.ok, `${def.id} ${lang}: the export reads back`);
-      check.deepEqual(back.assessment.result.facts, a.result.facts, `${def.id} ${lang}: the same figures after the import`);
+      const kept = await play(def, lang, "keep");
+      check.deepEqual(kept.problems, [], `${def.id} ${lang}: plays without a problem`);
+      const run = digest(kept.events);
+      const v = story({ run, lang, mode: "simulation", entry });
+      check.deepEqual(v.steps.map((st) => st.id), STEP_IDS, `${def.id} ${lang}: five steps`);
+      check.deepEqual(v.steps.map((st) => st.person), [false, false, false, true, true], `${def.id} ${lang}: Your review and Recommend are the person's`);
+      const shown = v.steps.flatMap((st) => texts([st.title, st.lead, st.agent, st.stage]));
+      const leak = shown.find((x) => ID.test(x));
+      check.equal(leak, undefined, `${def.id} ${lang}: no block or lever id on screen`);
+      check.ok(!shown.some((x) => /\{\{|\}\}/.test(x)), `${def.id} ${lang}: every figure filled in`);
+      if (run.notService) {
+        check.equal(v.kpis.score.value, t("p.kpi.none", null, lang), `${def.id} ${lang}: not a service, not scored`);
+        continue;
+      }
+      // The engine on the blocks as the toolbox gates them, recomputed here: the tiles must show it.
+      const gated = kept.blocks.map((b) => ({ id: b.id, ...gateBlock(b, b.evidence, {}).effective }));
+      const r = score(gated);
+      const layers = LAYERS.filter((l) => r.layers[l].score !== null).length;
+      check.ok(v.complete, `${def.id} ${lang}: complete at the end`);
+      check.equal(v.kpis.score.value, fmtScore(r.overall, lang), `${def.id} ${lang}: overall score`);
+      check.equal(v.kpis.score.of.trim(), t("p.kpi.layers", { n: fmtInt(layers, lang) }, lang).trim(), `${def.id} ${lang}: the score says on how many layers it rests`);
+      check.match(v.kpis.score.of, lang === "en" ? / of 6 layers$/ : / von 6 Ebenen$/, `${def.id} ${lang}: "of 6" in the value`);
+      if (r.weakest) {
+        check.equal(v.kpis.weakest.value, t("p.kpi.level", { n: fmtInt(r.weakest.level, lang) }, lang), `${def.id} ${lang}: weakest critical link`);
+        check.ok(v.kpis.weakest.note && !ID.test(v.kpis.weakest.note), `${def.id} ${lang}: the weakest link by its name (${v.kpis.weakest.note})`);
+      }
+      check.equal(v.kpis.exclusive.value, r.exclusive_non_eu === null ? t("p.kpi.none", null, lang) : pct(r.exclusive_non_eu, lang), `${def.id} ${lang}: exclusive non-EU control`);
+      // The first lever: the memo is drafted and approved, and a figure the lever moves keeps its old value.
+      if (hasLevers(def)) {
+        const lever = await play(def, lang, "L1");
+        check.deepEqual(lever.problems, [], `${def.id} ${lang}: the first lever plays without a problem`);
+        const w = story({ run: digest(lever.events), lang, mode: "simulation", entry });
+        check.equal(w.steps[4].stage.kind, "memo", `${def.id} ${lang}: the memo after the lever`);
+        check.equal(w.steps[4].stage.status, "approved", `${def.id} ${lang}: the memo approved, nothing sent`);
+        if (w.kpis.score.was) check.equal(w.kpis.score.was, fmtScore(r.overall, lang), `${def.id} ${lang}: the score keeps its old value`);
+      }
     }
   }
-  // A golden case as a file: S2 imports to its exact overall score, 865/12.
-  const s2 = fixtureAssessment({ service: "Musterdienst", category: "base_service", rows: fixture("s2-assessment.json").blocks });
-  const s2back = A.readAssessment(JSON.stringify(s2), S);
-  check.ok(s2back.ok);
-  check.ok(Math.abs(A.scoreAssessment(s2back.assessment).overall - 865 / 12) < 1e-9, "S2's overall from the file");
-  check.equal(A.scoreAssessment(s2back.assessment, { infrastructure: 0 }).overall === A.scoreAssessment(s2back.assessment).overall, false, "the weights count");
-  // Broken files are refused, each for its reason; nothing of them is loaded.
-  const one = structuredClone(s2);
-  const broken = [
-    [{ ...one, service: undefined }, "no service"],
-    [{ ...one, category: "standard" }, "a category outside the set"],
-    [{ ...one, lang: "fr" }, "a language the app does not have"],
-    [{ ...one, weights: { infrastructure: 4 } }, "a weight above 3"],
-    [{ ...one, weights: { politics: 1 } }, "a weight for no layer"],
-    [{ ...one, blocks: [{ ...one.blocks[0], tech: { name: "X", country: "Germany", parent: null } }] }, "a country that is no code"],
-    [{ ...one, blocks: [{ ...one.blocks[0], evidence: [{ ...one.blocks[0].evidence[0], quote: "x".repeat(151) }] }] }, "a quote longer than 150 characters"],
-    [{ ...one, blocks: [{ ...one.blocks[0], evidence: [{ ...one.blocks[0].evidence[0], url: "javascript:alert(1)" }] }] }, "a source that is no web address"],
-    [{ ...one, blocks: [one.blocks[0], one.blocks[0]] }, "the same block twice"],
-    [{ ...one, script: "<script>" }, "a field outside the contract"]
-  ];
-  for (const [value, what] of broken) check.equal(A.readAssessment(JSON.stringify(value), S).ok, false, what);
-  check.equal(A.readAssessment("{ not json", S).ok, false, "text that is no JSON");
-  // The audit log of a played pre-run: every row a valid AuditEvent.
-  const { bus } = await mod("js/events.js");
-  const { initAudit, auditSnapshot } = await mod("js/audit.js");
-  const { playProblems } = await mod("js/runs_check.js");
-  const { createSimulationPlayer } = await mod("js/simulation.js");
-  initAudit();
-  let report = null;
-  let memo = null;
-  const off = bus.on("report", (ev) => { report = ev.payload; });
-  const offMemo = bus.on("action_draft", (ev) => { memo = ev.payload; });
-  const def = win.SA_RUNS.bundid;
-  bus.beginRun({ run_id: "run-unit-exports", mode: "simulation" });
-  bus.emit("run_start", { run_id: "run-unit-exports", mode: "simulation", query: def.query, entry_id: def.entry_id, lang: "en", source: def.source, as_of: def.as_of, weights: { infrastructure: 1 } });
-  const played = await playProblems(def, { lang: "en", choice: "L1", createPlayer: createSimulationPlayer });
-  off();
-  offMemo();
-  bus.endRun();
-  check.deepEqual(played.problems, []);
-  const snap = auditSnapshot();
-  const rows = [...snap.events, ...snap.model_calls];
-  check.ok(rows.length > 20, `audit rows (${rows.length})`);
-  const bad = rows.filter((r) => !validate(r, S.AuditEvent, S).valid).map((r) => r.type);
-  check.deepEqual(bad, [], "every audit row is an AuditEvent");
-  check.equal(snap.kind, "audit");
-  // The names: the prefix, a slug of the service, the date, the language.
-  check.equal(exportFileName("report", { service: "Online ID (eID)", date: "2026-11-19", lang: "en", ext: "md" }), "sovereignty-assessment-report-online-id-eid-2026-11-19-en.md");
-  check.equal(exportFileName(null, { service: "Souveränität für Bürger", date: "2026-11-20", lang: "de", ext: "json" }), "sovereignty-assessment-souveraenitaet-fuer-buerger-2026-11-20-de.json");
-  check.equal(slugOf("  …  "), "service");
-  // The report's language rule: what code writes follows the active language; the findings keep theirs.
-  check.ok(report && report.lang === "en", "the run's report");
-  const de = reportMarkdownExport(report, "de");
-  const en = reportMarkdownExport(report, "en");
-  check.match(de, /## Korrekturen/);
-  check.match(de, /Die Befunde oben sind auf Englisch/);
-  check.match(de, /# BundID: findings/);
-  check.match(en, /## Corrections by the reviewer/);
-  check.doesNotMatch(en, /The findings above are in/);
-  // The report maps the block ids its findings and figures use to the blocks' names (the review's R-26):
-  // one row per block, each name as the run recorded it (here in English, the run's language).
-  const ids = (report.closing?.blocks || []).map((b) => b.id);
-  check.ok(ids.length === 6 && ids[0] === "B-01", `the report's blocks (${ids.join(", ")})`);
-  check.match(en, /## Building blocks\n\n\| Block \| Layer \| Name \| Criticality \| Made in \| Run by \| Level \|/);
-  check.match(de, /## Bausteine\n\n\| Baustein \| Ebene \| Name \| Kritikalität \| Hergestellt in \| Betrieben in \| Stufe \|/);
-  const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  for (const b of report.closing.blocks) {
-    check.equal(typeof b.name, "string", `${b.id}'s name as recorded`);
-    for (const md of [en, de]) check.match(md, new RegExp(`\\| ${b.id} \\| [^|]+ \\| ${esc(b.name)} \\|`), `${b.id} named in its row`);
-  }
-  // The weakest link the figures name is in that table, and the memo names it by its name too.
-  const weakest = report.values?.["weakest.block"];
-  check.ok(ids.includes(weakest), `the weakest block ${weakest} is in the table`);
-  const { memoMarkdown } = await mod("js/drafts.js");
-  const weakestName = report.closing.blocks.find((b) => b.id === weakest)?.name;
-  check.match(memoMarkdown(memo, "en"), new RegExp(`Weakest critical link: ${weakest} \\(${esc(weakestName)}\\) at level`), "the memo names its weakest link");
-  check.doesNotMatch(en + de, /\{\{fact:/);
-  // Every export passes through the redaction: a key pasted into a correction's reason stays out of the
-  // Markdown as it does out of the HTML and the JSON (the review's finding R-03).
-  const fake = "sk-ant-test-NOTAREALKEY-0123456789abcdef";
-  const keyed = { ...report, closing: { ...(report.closing || {}), corrections: [{ block_id: "B-01", field: "hosting", from: "EU", to: "NON_EU", reason: `pasted ${fake} by mistake` }] } };
-  for (const l of ["en", "de"]) {
-    const md = reportMarkdownExport(keyed, l);
-    check.ok(md.includes("sk-ant-[REDACTED]") && !md.includes(fake), `the Markdown export in ${l} redacts a key in a correction's reason`);
-  }
-});
 
-// ---- the ninety-day rule (brief §4): an assessment older than ninety days says "Check for updates" ----------
-await group("stale", "the ninety-day rule: an assessment older than ninety days is marked, on the map and in Compare and the Portfolio's labels; one of ninety days or fewer is not", async () => {
-  const { isStale } = await mod("js/sovmap.js");
-  const { itemLabel } = await mod("js/compare.js");
-  const today = new Date("2026-11-20T12:00:00");
-  check.equal(isStale("2026-08-22", today), false, "ninety days: not yet");
-  check.equal(isStale("2026-08-23", today), false, "eighty-nine days: no");
-  check.equal(isStale("2026-08-21", today), true, "ninety-one days: marked");
-  check.equal(isStale("not a date", today), false, "no date, no mark");
-  // Compare's and the Portfolio's labels carry the mark for an old pre-run or file, never for this session's run.
-  const old = { service: { query: "Example", name: "Example" }, as_of: "2020-01-15", source: "hand_authored" };
-  check.match(itemLabel({ origin: "prerun" }, old, "en"), /Check for updates$/);
-  check.match(itemLabel({ origin: "file" }, old, "de"), /Auf Aktualität prüfen$/);
-  check.doesNotMatch(itemLabel({ origin: "session" }, old, "en"), /Check for updates/);
+  // A partial score, as a live run can show it before every layer is in: three layers scored. The score
+  // says so in its value, and the figures that need every layer wait.
+  const def = win.SA_RUNS.bundid;
+  const full = await play(def, "en", "keep");
+  const run = digest(full.events);
+  const firstThree = new Set(LAYERS.slice(0, 3));
+  const gated = full.blocks.filter((b) => firstThree.has(b.layer)).map((b) => ({ id: b.id, ...gateBlock(b, b.evidence, {}).effective }));
+  const part = score(gated);
+  const scoredNow = LAYERS.filter((l) => part.layers[l].score !== null).length;
+  check.ok(scoredNow > 0 && scoredNow < 6, `the partial case scores ${scoredNow} of 6 layers`);
+  const partial = { ...run, mode: "live", scoredOnce: false, end: null, review: null, reviewed: null, levers: null, decision: null, memo: null,
+    score: { ...run.score, partial: true, result: part, facts: { ...run.score.facts, "score.overall": part.overall } } };
+  for (const lang of ["en", "de"]) {
+    const v = story({ run: partial, lang, mode: "live", entry: entries.find((e) => e.id === "bundid") });
+    check.equal(v.complete, false, `${lang}: a partial run is not complete`);
+    check.equal(v.kpis.score.of.trim(), t("p.kpi.layers", { n: fmtInt(scoredNow, lang) }, lang).trim(), `${lang}: the partial score says "${scoredNow} of 6" in its value`);
+    check.equal(v.kpis.weakest.value, "…", `${lang}: the weakest link waits`);
+    check.equal(v.kpis.exclusive.value, "…", `${lang}: exclusive non-EU control waits`);
+    check.ok(v.kpis.weakest.note && v.kpis.exclusive.note, `${lang}: their notes say what they wait for`);
+  }
 });
 
 // ---- report -----------------------------------------------------------------------------------------------

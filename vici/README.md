@@ -1,8 +1,15 @@
 # Vici, copied into this prototype
 
 These files come unchanged from Vici, Victor Pflüger's design system
-(<https://victorpflueger.github.io/ViciDesign/index.html>), version **v1.0.0** (commit `fdd868b` on its main branch).
-The prototype loads them from here rather than from a CDN, so every page is served from this site alone.
+(<https://victorpflueger.github.io/ViciDesign/index.html>), from its main branch at commit **`4bf5d68`**
+(22 November 2026), on the way to Vici 2.0: the How it works guide (`vc-guide`) with one guide per
+language (ViciDesign#13), the 2.0 byline, key figures with `vc-stat__was` (ViciDesign#11) that answer
+first (ViciDesign#18), the rule that a figure computed from part of the data says so in its value (added
+for this prototype, ViciDesign#17), names, not record ids (ViciDesign#16), Presenting step by step with
+Play, Your turn, `vc-attention` and `--vc-step-fill` (ViciDesign#15) and Play ending on Replay
+(ViciDesign#19) once the story is over (ViciDesign#20), the AI notice and the prototype
+brief this prototype follows. Its files still call themselves 1.0.0 until 2.0 is released. The
+prototype loads them from here rather than from a CDN, so every page is served from this site alone.
 
 | File here | What it is |
 |---|---|
@@ -23,6 +30,7 @@ files; a fix belongs in Vici, and comes here with its next release.
 Bricolage Grotesque, Inter and JetBrains Mono are under the SIL Open Font License; Victor Pflüger's
 name, portrait and logo are reserved for his own use; LinkedIn's logo belongs to LinkedIn.
 
-**Updating.** Copy the same files from a newer Vici release (from its `dist/` and `assets/` folders,
-and `LICENSE`) over these, and change the version and commit above. Then run the tests and look at
-the prototype in light and dark: a new release may rename a class or change a token.
+**Updating.** Copy the same files from a newer Vici main or release (from its `dist/` and `assets/`
+folders, and `LICENSE`) over these, and change the commit above and the one the tests workflow checks
+out. Then run the tests and look at the prototype in light and dark: a new release may rename a
+class or change a token.

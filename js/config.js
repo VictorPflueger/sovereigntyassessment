@@ -4,12 +4,12 @@
 export const APP = {
   id: "sa",
   name: "Sovereignty Assessment",
-  version: "1.0.0"
+  version: "2.0.0"
 };
 
-// The page's content security policy, exactly as index.html's meta tag carries it (TECH_NOTES §4).
-// Diagnostics and tests/accept.mjs compare the two; web search and web fetch run on Anthropic's
-// servers, so api.anthropic.com is the only outside host the page may reach.
+// The page's content security policy, exactly as index.html's meta tag carries it (TECH_NOTES §4);
+// tests/unit.mjs compares the two. Web search and web fetch run on Anthropic's servers, so
+// api.anthropic.com is the only outside host the page may reach.
 export const CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.anthropic.com; object-src 'none'; base-uri 'none'; form-action 'none'";
 
 export const ANTHROPIC = {
@@ -75,20 +75,11 @@ export const FX_USD_EUR = 0.894;
 // Every browser storage key, all under this app's own prefix. GitHub Pages serves all of an
 // account's project sites from one origin, so a sister app (Rebate Hunter uses "rh.", Navigator
 // "nav.", the Timetable Translator "tt.", Repack Pilot "rp.") must never share a key with this one.
-// The only shared key is Vici's theme choice, "vc-theme".
+// The only shared key is Vici's theme choice, "vc-theme"; whether the guide was seen in this tab is
+// Vici's own sessionStorage entry, and js/lang.js marks it for both languages.
 const P = `${APP.id}.`;
 export const STORAGE = {
   apiKey: `${P}anthropic.key`,          // sessionStorage: this tab only
-  diagnostics: `${P}diag`,              // sessionStorage: the last Diagnostics results
-  model: `${P}model`,                   // sessionStorage
-  speed: `${P}speed`,                   // sessionStorage
-  sessionCost: `${P}sessionCostEur`,    // sessionStorage: live spend in this tab
-  introSeen: `${P}introSeen`,           // localStorage: the intro opens by itself only on a first visit
-  lang: `${P}lang`                      // localStorage: the language choice (brief §5)
+  lang: `${P}lang`                      // localStorage: the language choice
 };
 export const THEME_KEY = "vc-theme";    // Vici's own key, shared by all of Victor's pages
-
-export const UI = {
-  // A pre-run older than this shows "Check for updates" (brief §6.6).
-  staleDays: 90
-};
