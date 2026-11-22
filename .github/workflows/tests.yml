@@ -23,9 +23,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
+      # The whole history, so tests/docs.mjs can find PLAN.md and REVIEW.md at 1.0.0's commit.
       - uses: actions/checkout@v4
         with:
           path: app
+          fetch-depth: 0
       - uses: actions/checkout@v4
         with:
           repository: VictorPflueger/ViciDesign
