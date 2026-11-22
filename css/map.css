@@ -4,7 +4,9 @@
  * charge; the levels on Vici's diverging scale with their numbers and codes written in each cell; fjord
  * outlines a search or a fetch while it runs, never as a fill; nothing round. */
 
-.map[data-view="map"] { overflow: hidden; padding: 12px 18px 12px; }
+/* The map fills its panel; where a run has more blocks than a short panel can show (thirty blocks at
+   1280×720), the map scrolls rather than cutting the honeycomb off (AC-18). */
+.map[data-view="map"] { overflow-x: hidden; overflow-y: auto; padding: 12px 18px 12px; }
 .sov-map { display: grid; grid-template-rows: auto minmax(150px, 1fr) auto; gap: 8px; height: 100%; min-height: 0; position: relative; }
 .sov-map[hidden] { display: none; }
 .sov-map[data-table="true"] { grid-template-rows: auto minmax(0, 1fr) auto; }
@@ -46,6 +48,8 @@
 .spider .sp-label--small { font-size: 12px; }
 .spider .sp-label-strong { font-weight: 700; }
 .spider .sp-label-muted { fill: var(--vc-text-muted); font-style: italic; }
+/* The block view: a label moved away from its axis end is joined to it by a thin line. */
+.spider .sp-leader { fill: none; stroke: var(--vc-border-strong); stroke-width: 1; }
 
 /* Made in and Run by: sorted bars in teal, the code and the count written. */
 .sov-mix { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding-top: 6px; overflow: auto; }
@@ -63,6 +67,10 @@
 .sov-table[hidden] { display: none; }
 .map-table caption { text-align: left; font-weight: var(--vc-weight-semibold); padding-bottom: 4px; }
 .map-table .num { text-align: right; }
+/* The map's tables fit their panel: headers and cells wrap rather than push the last column out of view
+   (the review's finding R-23). */
+.sov-table .map-table { width: 100%; }
+.sov-table .map-table th, .sov-table .map-table td { white-space: normal; overflow-wrap: anywhere; }
 
 /* Honeycomb: six groups, one per layer, cells filled by level. */
 .sov-bottom { min-height: 0; }
@@ -100,15 +108,31 @@
   .sov-title { font-size: var(--fs-lg); }
   .sov-honeycomb { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px 8px; }
   .sov-hc-title { display: none; }
-  .hc-cell { width: 30px; height: 26px; }
+  /* Still a target of 40 px (AC-18): the cell keeps its level and drops its id and codes. */
+  .hc-cell { width: 46px; height: 40px; }
   .hc-id, .hc-codes { display: none; }
   .hc-level { font-size: 22px; }
   .hc-head .hc-score { font-size: var(--fs-xs); }
+  .hc-head { font-size: var(--fs-xs); }
 }
 @media (max-height: 820px) {
   .sov-honeycomb { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px 10px; }
-  .hc-cell { width: 44px; height: 38px; }
+  .hc-cell { width: 46px; height: 40px; }
   .sov-title { font-size: var(--fs-lg); }
+}
+/* A narrow group's head: the score or status goes under the layer's name rather than over the next group. */
+.hc-head { flex-wrap: wrap; column-gap: 6px; row-gap: 0; }
+.hc-layer, .hc-score { min-width: 0; overflow-wrap: anywhere; }
+/* The groups share their rows, so every head ends on one line and every group's cells start on one line,
+   however many lines a head wraps to: each group is a subgrid of two of the honeycomb's rows. */
+@supports (grid-template-rows: subgrid) {
+  .hc-group { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+  .hc-head { align-content: flex-end; }
+}
+/* The block view on a short map: every block has its own axis there, so the spider takes the
+   honeycomb's room and keeps its labels apart. */
+@container mappanel (max-height: 640px) {
+  .sov-map[data-view="block"] .sov-bottom { display: none; }
 }
 @media (max-width: 1400px) {
   .sov-top { grid-template-columns: minmax(0, 1.5fr) minmax(170px, 1fr); }
@@ -195,6 +219,7 @@
 .pf-row { display: grid; grid-template-columns: minmax(9em, 1.1fr) minmax(0, 1.4fr) 3.6em; align-items: center; gap: 10px; }
 .pf-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-weight: var(--vc-weight-semibold); min-width: 0; }
 .pf-cat-tag.vc-tag { font-size: var(--fs-xs); font-weight: var(--vc-weight-medium); }
+.pf-layers { margin-inline-start: 6px; font-size: var(--fs-xs); color: var(--vc-text-muted); white-space: nowrap; }
 .pf-track { height: 16px; background: var(--vc-bg-subtle); border: 1px solid var(--vc-border-subtle); }
 .pf-track[data-nodata="true"] { background: none; border: 1px dashed var(--vc-border-strong); }
 .pf-bar { display: block; height: 100%; background: var(--vc-data-2); }

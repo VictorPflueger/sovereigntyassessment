@@ -248,7 +248,11 @@ export function createConsole(panel, { onOpenTab } = {}) {
     const result = h("div", { class: "result", dataset: { open: "false" } });
     const toggle = h("button", { class: "result-toggle", type: "button", "aria-expanded": "false" },
       icon("chevronRight", 14), h("span", { class: "result-summary", dataset: { ok: c.ok ? "true" : "false" } }, toolOutcome(c.name, c.input, c.result, c.ok, lang)));
-    const detail = h("div", { class: "result-body" }, JSON.stringify({ input: c.input, result: c.result }, null, 2));
+    // The call's raw record, in the tools' own (English) field names, under a line in the interface's
+    // language that says so (the review's R-21); the readable evidence is in the Building blocks tab.
+    const detail = h("div", { class: "result-body" },
+      h("p", { class: "result-note" }, t("console.rawRecord")),
+      h("div", { class: "result-json", lang: "en" }, JSON.stringify({ input: c.input, result: c.result }, null, 2)));
     toggle.addEventListener("click", () => {
       const open = result.dataset.open !== "true";
       result.dataset.open = open ? "true" : "false";

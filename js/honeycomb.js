@@ -7,7 +7,7 @@
 
 import { h } from "./dom.js";
 import { t } from "./i18n/index.js";
-import { fmtInt, fmtScore } from "./format.js";
+import { fmtInt, fmtScore, layerStatusKey } from "./format.js";
 import { LAYERS } from "./engine.js";
 import { svg, hexPoints } from "./spider.js";
 
@@ -33,7 +33,7 @@ export function renderHoneycomb(root, result, { layerStatus = {}, onPick, lang }
     const status = layerStatus[layer]?.status || result?.layers?.[layer]?.status || "open";
     const head = h("div", { class: "hc-head" },
       h("span", { class: "hc-layer", title: t(`layer.${layer}.full`) }, t(`layer.${layer}.short`)),
-      h("span", { class: "hc-score vc-tabular" }, score === null ? t(status === "not_applicable" ? "map.status.not_applicable" : status === "no_evidence" ? "map.status.no_evidence" : "map.status.open") : fmtScore(score)));
+      h("span", { class: "hc-score vc-tabular" }, score === null ? t(["not_applicable", "no_evidence", "not_assessed"].includes(status) ? layerStatusKey(status, inLayer.length) : "map.status.open") : fmtScore(score)));
     const cells = h("div", { class: "hc-cells" });
     for (const b of inLayer) {
       const codes = `${t(`class.${b.tech_class}.short`)}·${t(`class.${b.operator_class}.short`)}`;
@@ -48,7 +48,7 @@ export function renderHoneycomb(root, result, { layerStatus = {}, onPick, lang }
       cells.append(btn);
     }
     if (!inLayer.length) {
-      cells.append(h("span", { class: "hc-cell hc-cell--empty", dataset: { level: "gap" }, role: "img", "aria-label": t("map.cell.empty", { layer: t(`layer.${layer}`), status: t(`map.status.${status}`) }) },
+      cells.append(h("span", { class: "hc-cell hc-cell--empty", dataset: { level: "gap" }, role: "img", "aria-label": t("map.cell.empty", { layer: t(`layer.${layer}`), status: t(layerStatusKey(status, inLayer.length)) }) },
         cellSvg({ level: null, label: "", codes: "", gap: true })));
     }
     root.append(h("div", { class: "hc-group", dataset: { layer, status } }, head, cells));

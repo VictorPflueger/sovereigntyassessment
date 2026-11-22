@@ -428,7 +428,7 @@ if (wanted("not-a-service")) {
     checks.requests = fake.requests.length;
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish("not-a-service: a person's name ends the run without blocks", t, checks, [
-    [checks.pill === "Done" && /names no digital service/.test(checks.end || ""), `the run ends as not a service (${checks.pill}; ${checks.end})`],
+    [checks.pill === "Done" && /is not a digital service in operation/.test(checks.end || ""), `the run ends as not a service (${checks.pill}; ${checks.end})`],
     [checks.blocks === 0 && checks.overall === "no data" && checks.requests === 2, `no blocks, no figures (${checks.blocks}, ${checks.overall}, ${checks.requests} calls)`]
   ]);
 }

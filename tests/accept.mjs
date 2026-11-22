@@ -7,11 +7,18 @@
 //                an inline script and a request to another host are refused
 //   mode-dialog  Start agent opens the mode choice: the service, Simulation offered for an entry with a
 //                pre-run and unavailable with its reason for one without and for free text, Live with the
-//                key; Escape cancels
+//                key; Escape cancels. Every catalogue entry has a pre-run from 1.0.0, so the case takes
+//                NOOTS's out of the page's bundle to show an entry without one
 //   key-dialog   a rejected key (401) is not stored; a malformed one is refused before any request; an
 //                accepted key is stored for this tab and starts the live run (two model calls against the
 //                stand-in, which ends the run); "Change or forget key" and Forget key; the dialog in German
 //   frame        inside another page's frame the key dialog refuses to work
+//   keyboard     a whole run by keyboard alone (AC-20): Tab to the service field, type, pick the entry and
+//                start with Enter, choose Simulation in the dialog, confirm the review, choose a lever with
+//                the arrow keys or Space and approve it; every control that takes the focus on the way
+//                shows a visible focus ring (an outline or a ring) and is in view; the run ends done
+//                with the memo and the report in the Outbox; a block's evidence opens and closes by
+//                keyboard with the focus kept on its toggle
 // Every case fails on a page error, a console error, a policy violation or a request to another host.
 // Usage: node tests/accept.mjs [case…]
 import path from "node:path";
@@ -211,7 +218,9 @@ if (wanted("mode-dialog")) {
     checks.simBundidButton = await text(page, '.mode-card[data-mode="simulation"] .mode-cta button');
     await page.keyboard.press("Escape");
     await page.waitForSelector(".mode-card", { state: "detached" });
-    // An entry without one (NOOTS has a research note instead, D3): Simulation unavailable, with its reason.
+    // An entry without one: every entry has a pre-run from 1.0.0, so NOOTS's is taken out of this page's
+    // bundle first (the dialog asks the bundle when it opens). Simulation unavailable, with its reason.
+    checks.nootsHadPreRun = await page.evaluate(() => { const had = Object.hasOwn(window.SA_RUNS || {}, "noots"); delete window.SA_RUNS.noots; return had; });
     await page.click('.catalogue-chip[data-entry="noots"]');
     await page.click("#btn-start");
     await page.waitForSelector(".mode-card");
@@ -252,7 +261,7 @@ if (wanted("mode-dialog")) {
   await finish("mode-dialog: the service, Simulation with its reason, Live, Escape cancels", t, checks, [
     [checks.simBundid !== "true" && !checks.simBundidReason && !!checks.simBundidButton, `an entry with a pre-run offers Simulation (${checks.simBundid}; ${checks.simBundidButton})`],
     [checks.title === "How should the agent run?" && checks.service === "Will assess: NOOTS (National Once-Only Technical System)", `title and service (${checks.service})`],
-    [checks.simDisabled === "true" && checks.simButton === "true" && checks.simReason === "No pre-run assessment exists for this service yet.", "Simulation unavailable, with its reason"],
+    [checks.nootsHadPreRun === true && checks.simDisabled === "true" && checks.simButton === "true" && checks.simReason === "No pre-run assessment exists for this service yet.", `Simulation unavailable, with its reason, once NOOTS's pre-run is out of the bundle (it had one: ${checks.nootsHadPreRun})`],
     [checks.stillOpen === true, "Simulation's button does nothing"],
     [checks.live === "Continue with my API key" && checks.focus === "Continue with my API key", "Live asks for the key, focused"],
     [checks.caps === "At most 40 model calls and €3.00 per run; the cost meter shows the spend live.", `the run's caps (${checks.caps})`],
@@ -361,6 +370,109 @@ if (wanted("frame")) {
     [checks.disabled === true && checks.button === "true", "the field and the check are disabled"],
     [checks.msg === "This page is running inside another page. Open it in its own tab to use live mode.", `it says why (${checks.msg})`],
     [checks.calls?.length === 0 && checks.stored === null, "no request, nothing stored"]
+  ]);
+}
+
+// ---- keyboard (AC-20) ----------------------------------------------------------------------------------------
+if (wanted("keyboard")) {
+  const t = await newPage({ viewport: { width: 1920, height: 1080 } });
+  const { page } = t;
+  const checks = { stops: [], noRing: [], outOfView: [] };
+  /** The focused control: what it is, whether its focus shows (an outline or a ring on it or on the label or chip around it) and whether it is in view. */
+  const focusNow = () => page.evaluate(() => {
+    const el = document.activeElement;
+    if (!el || el === document.body) return null;
+    const probe = document.createElement("i");
+    document.body.append(probe);
+    probe.style.color = "var(--vc-focus)";
+    const focusColour = getComputedStyle(probe).color;
+    probe.remove();
+    // An outline or a ring; or Vici's focus hexagon, which paints a radio in the focus colour, or an icon
+    // button's hexagon ring in its ::after, instead of an outline.
+    const drawn = (e) => {
+      if (!e) return false;
+      const cs = getComputedStyle(e);
+      if ((cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 1) || (cs.boxShadow && cs.boxShadow !== "none")) return true;
+      if (e !== el) return false;
+      return [cs, getComputedStyle(e, "::before"), getComputedStyle(e, "::after")].some((c) => c.backgroundColor === focusColour);
+    };
+    const host = el.closest("label, .vc-chip, .lever-card, .ai-label, .vc-card");
+    const r = el.getBoundingClientRect();
+    const box = (host && !(r.width > 2 && r.height > 2) ? host : el).getBoundingClientRect();
+    return {
+      what: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${el.className && typeof el.className === "string" ? `.${el.className.trim().split(/\s+/).join(".")}` : ""} "${(el.getAttribute("aria-label") || (el.getAttribute("aria-labelledby") ? document.getElementById(el.getAttribute("aria-labelledby"))?.textContent : "") || el.textContent || el.value || "").replace(/\s+/g, " ").trim().slice(0, 30)}"`,
+      ring: el.matches(":focus-visible") && (drawn(el) || drawn(host) || drawn(el.parentElement)),
+      inView: box.bottom > 0 && box.top < innerHeight && box.right > 0 && box.left < innerWidth
+    };
+  });
+  /** Presses Tab until the focus is on sel, noting each stop; Shift+Tab with back. */
+  async function tabTo(sel, { back = false, max = 160 } = {}) {
+    for (let i = 0; i < max; i++) {
+      await page.keyboard.press(back ? "Shift+Tab" : "Tab");
+      // Measured at rest: a skip link slides in, a ring fades in.
+      await page.waitForFunction(() => document.getAnimations().filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity).every((a) => a.playState !== "running"), null, { timeout: 2000 }).catch(() => {});
+      const f = await focusNow();
+      if (f) {
+        checks.stops.push(f.what);
+        if (!f.ring) checks.noRing.push(f.what);
+        if (!f.inView) checks.outOfView.push(f.what);
+      }
+      if (await page.evaluate((s) => !!document.activeElement?.matches(s), sel)) return;
+    }
+    throw new Error(`the focus never reached ${sel} in ${max} presses`);
+  }
+  const state = () => page.evaluate(() => window.__getState().runState);
+  const waitFor = (states) => page.waitForFunction((s) => s.includes(window.__getState().runState), states, { timeout: 90000 });
+  try {
+    // The replay as fast as the tests run it (the speed buttons are themselves reached by Tab).
+    await page.evaluate(async () => { const st = await import("/js/state.js"); window.__getState = st.getState; st.setState({ speed: 40 }); });
+    await tabTo("#service-input");
+    await page.keyboard.type("BundID");
+    await page.waitForSelector(".service-suggestions:not([hidden])");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    checks.picked = await page.evaluate(() => document.querySelector('.catalogue-chip input[value="bundid"]')?.checked === true);
+    await page.keyboard.press("Enter");
+    await page.waitForSelector(".mode-card");
+    await tabTo('.mode-card[data-mode="simulation"] .mode-cta button');
+    await page.keyboard.press("Enter");
+    await waitFor(["awaiting_review"]);
+    await page.waitForSelector("#btn-review-confirm");
+    await tabTo("#btn-review-confirm");
+    await page.keyboard.press("Enter");
+    await waitFor(["awaiting_decision"]);
+    await page.waitForSelector('.lever-card[data-lever="L1"] .lever-radio');
+    await tabTo(".lever-radio");
+    // Arrow keys move within the radio group; Space checks the focused one.
+    for (let i = 0; i < 5 && !(await page.evaluate(() => document.activeElement?.value === "L1")); i++) await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("Space");
+    checks.lever = await page.evaluate(() => document.querySelector(".lever-radio:checked")?.value);
+    await tabTo("#btn-approve-lever");
+    await page.keyboard.press("Enter");
+    await waitFor(["done", "stopped", "aborted", "error"]);
+    checks.state = await state();
+    checks.drafts = await page.$$eval(".outbox-card", (els) => els.map((e) => e.dataset.draft));
+    checks.memo = await page.$eval('.outbox-card[data-draft="memo"] .md', (el) => el.innerText).catch(() => "");
+    await shot(page, "06-keyboard-done.png");
+    // A block's evidence by keyboard: Enter on its row's toggle opens it, and the focus stays on the toggle
+    // while the table is drawn again (the review's finding R-13); Enter again closes it.
+    await tabTo("#tab-blocks");
+    await page.keyboard.press("Enter");
+    await page.waitForSelector('.blocks-table tr[data-block="B-01"] .row-toggle');
+    await tabTo('.blocks-table tr[data-block="B-01"] .row-toggle');
+    await page.keyboard.press("Enter");
+    await page.waitForSelector("#ev-B-01");
+    checks.rowFocus = await page.evaluate(() => { const a = document.activeElement; return { onToggle: !!a?.matches('.blocks-table tr[data-block="B-01"] .row-toggle'), expanded: a?.getAttribute("aria-expanded") }; });
+    await page.keyboard.press("Enter");
+    checks.rowFocusClosed = await page.evaluate(() => { const a = document.activeElement; return { onToggle: !!a?.matches('.blocks-table tr[data-block="B-01"] .row-toggle'), expanded: a?.getAttribute("aria-expanded"), evidence: !!document.querySelector("#ev-B-01") }; });
+  } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
+  await finish("keyboard: a whole run by keyboard alone, every focused control with a visible focus ring and in view", t, checks, [
+    [checks.picked === true, "the keyboard picks the entry from the suggestions"],
+    [checks.lever === "L1" && /Decision: lever L1/.test(checks.memo || ""), `the lever chosen by keyboard (${checks.lever})`],
+    [checks.state === "done" && JSON.stringify(checks.drafts) === JSON.stringify(["memo", "report"]), `the run ends done with the memo and the report (${checks.state}; ${JSON.stringify(checks.drafts)})`],
+    [checks.stops.length >= 5 && checks.noRing.length === 0, `every focused control shows its focus (${checks.stops.length} stops; without a ring: ${JSON.stringify([...new Set(checks.noRing)].slice(0, 8))})`],
+    [checks.outOfView.length === 0, `every focused control is in view (${JSON.stringify([...new Set(checks.outOfView)].slice(0, 8))})`],
+    [checks.rowFocus?.onToggle && checks.rowFocus.expanded === "true" && checks.rowFocusClosed?.onToggle && checks.rowFocusClosed.expanded === "false" && !checks.rowFocusClosed.evidence, `a block's evidence opens and closes by keyboard, the focus kept on its toggle (${JSON.stringify(checks.rowFocus)}; ${JSON.stringify(checks.rowFocusClosed)})`]
   ]);
 }
 

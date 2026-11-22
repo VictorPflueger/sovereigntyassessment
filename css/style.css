@@ -295,9 +295,15 @@ html { font-size: clamp(93.75%, 0.48vw + 50%, 112.5%); }
    longer German note is never cut; contained, so the note never widens its tile. */
 .kpi-sub.vc-stat__note { contain: inline-size; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; text-overflow: clip; }
 
-/* Laptop widths: the four tiles take a row of their own under the brand and the badges, so neither
-   the prototype line nor a tile is squeezed (PLAN.md f.2). */
-@media (max-width: 1500px) {
+/* Wide screens: a tile is at least wide enough for its note's two lines in German (AC-18: nothing cut). */
+@media (min-width: 1701px) {
+  .kpi.vc-stat { min-width: 176px; }
+}
+
+/* Up to 1,700 px: the four tiles take a row of their own under the brand and the badges, so neither
+   the prototype line, the badges nor a tile is squeezed (PLAN.md f.2). From 1,501 to 1,700 px the
+   badges wrapped to three rows and a tile's German note was cut before version 1.0.0. */
+@media (max-width: 1700px) {
   .app-header { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px; }
   .header-badges { justify-content: flex-end; }
   .kpis { grid-column: 1 / -1; }

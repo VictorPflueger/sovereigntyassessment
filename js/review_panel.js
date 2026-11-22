@@ -15,6 +15,8 @@ import { aiLabel, langTag } from "./ai_label.js";
 import { renderFacts } from "./facts.js";
 
 const COUNTRY = /^([A-Z]{2}|UNKNOWN)$/;
+// The origin codes in the order the interface explains them (the review's R-27).
+const CLASSES = ["DE", "EU", "US", "CN", "OTHER", "UNKNOWN"];
 const OPTIONS = {
   criticality: ["critical", "important", "supporting"],
   hosting: ["EU", "NON_EU", "UNKNOWN"],
@@ -41,11 +43,27 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
     return s;
   }
 
+  /**
+   * A country as typed: a two-letter code, or unknown when the field is empty or holds the word for
+   * unknown in either language; null when it is neither.
+   */
+  function readCountry(raw) {
+    const c = String(raw || "").trim().toUpperCase();
+    if (!c || c === "UNKNOWN" || c === t("review.unknownName").toUpperCase()) return "UNKNOWN";
+    return COUNTRY.test(c) ? c : null;
+  }
+
   function partyFields(prefix, party) {
-    const name = h("input", { class: "vc-input", name: `${prefix}.name`, value: party?.name || "", "aria-label": t(`review.${prefix}.name`) });
-    const country = h("input", { class: "vc-input country-input", name: `${prefix}.country`, value: party?.country || "UNKNOWN", maxlength: "7", "aria-label": t(`review.${prefix}.country`), autocomplete: "off", spellcheck: "false" });
+    // An unknown name or country shows in the interface's language, never as the recorded "unknown" or
+    // "UNKNOWN" (the review's R-27): the name field says "unknown" in that language, and an unknown
+    // country is an empty field whose placeholder says so.
+    const unknownWord = t("review.unknownName");
+    const shownName = !party?.name || String(party.name).toLowerCase() === "unknown" ? unknownWord : party.name;
+    const shownCountry = (c) => (!c || c === "UNKNOWN" ? "" : c);
+    const name = h("input", { class: "vc-input", name: `${prefix}.name`, value: shownName, "aria-label": t(`review.${prefix}.name`) });
+    const country = h("input", { class: "vc-input country-input", name: `${prefix}.country`, value: shownCountry(party?.country), placeholder: unknownWord, maxlength: "9", "aria-label": t(`review.${prefix}.country`), autocomplete: "off", spellcheck: "false" });
     const pName = h("input", { class: "vc-input", name: `${prefix}.parent.name`, value: party?.parent?.name || "", "aria-label": t("review.parent.name") });
-    const pCountry = h("input", { class: "vc-input country-input", name: `${prefix}.parent.country`, value: party?.parent?.country || "", maxlength: "7", "aria-label": t("review.parent.country"), autocomplete: "off", spellcheck: "false" });
+    const pCountry = h("input", { class: "vc-input country-input", name: `${prefix}.parent.country`, value: shownCountry(party?.parent?.country), placeholder: unknownWord, maxlength: "9", "aria-label": t("review.parent.country"), autocomplete: "off", spellcheck: "false" });
     return {
       el: h("fieldset", { class: "review-party" }, h("legend", {}, t(`review.${prefix}`)),
         h("label", {}, h("span", {}, t("review.partyName")), name),
@@ -53,12 +71,13 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
         h("label", {}, h("span", {}, t("review.parent.name")), pName),
         h("label", {}, h("span", {}, t("review.parent.country")), pCountry)),
       read() {
-        const c = country.value.trim().toUpperCase();
+        const nm = name.value.trim();
+        const c = readCountry(country.value);
         const pn = pName.value.trim();
-        const pc = pCountry.value.trim().toUpperCase();
-        if (!name.value.trim() || !COUNTRY.test(c)) return { error: true };
-        if ((pn && !COUNTRY.test(pc)) || (!pn && pc)) return { error: true };
-        return { value: { name: name.value.trim(), country: c, parent: pn ? { name: pn, country: pc } : null } };
+        const pc = readCountry(pCountry.value);
+        // A party needs a name; a parent's country needs the parent's name.
+        if (!nm || !c || !pc || (!pn && pCountry.value.trim())) return { error: true };
+        return { value: { name: nm.toLowerCase() === unknownWord.toLowerCase() ? "unknown" : nm, country: c, parent: pn ? { name: pn, country: pc } : null } };
       }
     };
   }
@@ -118,6 +137,8 @@ export function createReviewPanel(panel, { getBlocks } = {}) {
     } else {
       body.append(h("p", { class: "review-lead" }, t("review.lead")));
     }
+    // The codes beside each block, spelled out where the person reads them rather than only in a tooltip.
+    body.append(h("p", { class: "review-key" }, t("review.codesKey", { list: CLASSES.map((c) => `${t(`class.${c}.short`)} ${t(`class.${c}`)}`).join(", ") })));
     const list = h("ul", { class: "review-blocks" });
     const order = [...new Set([...(r.block_ids || []), ...blocks().map((b) => b.id)])];
     for (const id of order) {

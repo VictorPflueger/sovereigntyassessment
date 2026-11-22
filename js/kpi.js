@@ -6,9 +6,10 @@
 
 import { h } from "./dom.js";
 import { tx, retext, attrs } from "./text.js";
-import { onLang } from "./i18n/index.js";
+import { t, onLang } from "./i18n/index.js";
 import { formatFact } from "./facts.js";
-import { noData } from "./format.js";
+import { noData, fmtInt } from "./format.js";
+import { LAYERS } from "./engine.js";
 
 const TILES = [
   { id: "overall", labelKey: "kpi.overall.label" },
@@ -40,6 +41,33 @@ export function createKpis(container) {
   }
 
   let result = null;
+  let weakest = null;
+
+  /**
+   * The weakest-link note names the block where its name fits the note's two lines; where it does not
+   * (a long name, a narrow tile, German), the note keeps the block's id and the tile's tooltip gives the
+   * name, so nothing is cut (AC-18). Checked again when the tile changes size.
+   */
+  function fitWeakest() {
+    const tile = tiles.get("weakest");
+    // The tooltip says which blocks the tile weighs: the critical ones only (the review's finding R-22).
+    tile.el.setAttribute("title", t("kpi.weakest.title"));
+    if (!weakest || !tile.sub.isConnected || !tile.sub.clientHeight) return;
+    if (tile.sub.scrollHeight <= tile.sub.clientHeight + 1) return;
+    retext(tile.sub.firstChild, weakest.key, { block: weakest.id, n: weakest.ties });
+    tile.el.setAttribute("title", `${weakest.full}. ${t("kpi.weakest.title")}`);
+  }
+  if (typeof ResizeObserver === "function") {
+    let frame = 0;
+    let lastWidth = 0;
+    new ResizeObserver(() => {
+      const width = Math.round(tiles.get("weakest").el.getBoundingClientRect().width);
+      if (width === lastWidth) return;
+      lastWidth = width;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => render());
+    }).observe(tiles.get("weakest").el);
+  }
 
   const set = (id, text, noteKey, vars = null, tone = "muted") => {
     const tile = tiles.get(id);
@@ -52,17 +80,23 @@ export function createKpis(container) {
     const r = result;
     const facts = r?.facts || {};
     const has = (k) => facts[k] !== null && facts[k] !== undefined;
-    // The overall score always says "indicative" (brief §4, Honesty).
-    set("overall", has("score.overall") ? formatFact("score.overall", facts["score.overall"]) : noData(), "kpi.overall.note", null, has("score.overall") ? "" : "muted");
+    // The overall score always says "indicative" (brief §4, Honesty), and how many of the six layers it
+    // rests on when not all have a score (the review's finding R-11).
+    const scoredLayers = LAYERS.filter((l) => Number.isFinite(r?.layers?.[l]?.score)).length;
+    const partial = has("score.overall") && scoredLayers < LAYERS.length;
+    set("overall", has("score.overall") ? formatFact("score.overall", facts["score.overall"]) : noData(), partial ? "kpi.overall.partial" : "kpi.overall.note", partial ? { scored: fmtInt(scoredLayers), all: fmtInt(LAYERS.length) } : null, has("score.overall") ? "" : "muted");
     // The weakest critical link names its block, and how many more share its level on a tie.
     const w = r?.weakest;
     if (w && w.block_id) {
       const block = r.blocks?.find((b) => b.id === w.block_id);
       const name = block?.name ? `${w.block_id} ${block.name}` : w.block_id;
       set("weakest", formatFact("weakest.level", w.level), w.ties ? "kpi.weakest.tied" : "kpi.weakest.block", { block: name, n: w.ties }, "");
+      weakest = { full: name, id: w.block_id, ties: w.ties, key: w.ties ? "kpi.weakest.tied" : "kpi.weakest.block" };
     } else {
       set("weakest", noData(), "kpi.weakest.none");
+      weakest = null;
     }
+    fitWeakest();
     set("coverage", has("coverage") ? formatFact("coverage", facts.coverage) : noData(), "kpi.coverage.note", null, has("coverage") ? "" : "muted");
     set("exclusive", has("share.exclusive_non_eu") ? formatFact("share.exclusive_non_eu", facts["share.exclusive_non_eu"]) : noData(), "kpi.exclusive.note", null, has("share.exclusive_non_eu") ? "" : "muted");
   }

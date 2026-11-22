@@ -21,7 +21,7 @@ export function createAuditPanel(panel, { onCount } = {}) {
 
   function render() {
     const c = auditCounts();
-    emptyEl.hidden = !c.run;
+    emptyEl.hidden = !!c.run;
     clear(body);
     onCount?.(c.events);
     if (!c.run) return;

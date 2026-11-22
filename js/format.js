@@ -13,6 +13,15 @@ function nf(lang, opts) {
 }
 const has = (v) => v !== null && v !== undefined && Number.isFinite(Number(v));
 
+/**
+ * The text key of a layer's status. A layer "no evidence found" (brief §6.5) whose blocks are recorded but
+ * none scored has evidence, only none on who makes or runs them: it says so (the review's finding R-15).
+ * blocks: the number of blocks the layer holds.
+ */
+export function layerStatusKey(status, blocks = 0) {
+  return status === "no_evidence" && blocks > 0 ? "map.status.no_origin" : `map.status.${status}`;
+}
+
 /** "no data" for a figure without a basis: never shown as 0 (brief §6.5). */
 export function noData(lang = getLang()) {
   return t("fact.noData", null, lang);

@@ -1,20 +1,13 @@
-# Low-code and workflow automation: research notes, no pre-run
+# Low-code and workflow automation: research notes
 
-Surveyed for version 0.3.0 on 20 November 2026 under decision D3 (TECH_NOTES.md): a pre-run is bundled only where public sources name, for the critical building blocks of most layers, who makes and who runs them.
+Low-code and workflow automation, researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes. Its sources describe no service in operation, so the run ends with the outcome "not_a_service" and records no building blocks; the quotes below are those its profile, narration and report rest on.
 
-## What it is
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/low-code.js cites it. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
-Workflow automation (low code) is a building block of the Deutschland-Stack in the platform layer, for the simple modelling of procedures and work processes; its own standards are still to be set.
+### [Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat](https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf)
+Read on 2026-11-20 (German).
 
-## Why there is no pre-run
-
-It is a category in a standards catalogue, not a service: the sources name no product, no maker and no operator. Each low-code platform that an administration runs would be assessed on its own, with a Live run.
-
-Live mode accepts this entry like any other service; its run starts from the sources below.
-
-## Sources read
-
-The catalogue's sources, each opened with the web fetch tool on 19 November 2026 for the catalogue (DATA_SOURCES.md):
-
-- [Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat](https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf) (German)
-- [Deutschland-Stack, Sachstand](https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf) (German)
+> Workflowautomatisierung (LowCode) wird für die einfache Modellierung von Verfahrens- und Arbeitsabläufen eingesetzt.
+> Format zur Integration oder Anbindung von externen Lösungen
+> Format für Export und Import von Modellen
+> Format für die Ausführung auf verschiedenen Betriebs- und Infrastrukturumgebungen

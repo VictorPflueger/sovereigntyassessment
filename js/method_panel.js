@@ -97,7 +97,7 @@ export function openMethod() {
         (weightsSection = weightsForm()),
         h("section", { class: "method-section", "aria-labelledby": "method-classes-title" },
           h("h3", { id: "method-classes-title" }, t("method.classes.title")),
-          LIST("method.classes", ["codes", "eu", "cn", "parent", "public", "steward", "sides"])),
+          LIST("method.classes", ["codes", "eu", "cn", "parent", "public", "steward", "product", "sides"])),
         h("section", { class: "method-section", "aria-labelledby": "method-evidence-title" },
           h("h3", { id: "method-evidence-title" }, t("method.evidence.title")),
           LIST("method.evidence", ["counts", "check", "fields", "general", "corrections", "primary", "neutral", "date"])),

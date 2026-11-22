@@ -49,6 +49,8 @@ export function createExportPanel(panel, { source }) {
       return { name: exportFileName("report", { service, date, lang, ext: "html" }), text: reportHtml(s.report, { lang, result: s.result, service, asOf: date, sourceKey }), mime: "text/html" };
     }
     if (kind === "assessment") {
+      // A run that ended "not_a_service" recorded no building block: there is no assessment to save.
+      if (s.report?.outcome === "not_a_service") return { why: t("export.why.notAService") };
       const a = s.assessment();
       if (!a) return { why: t("export.why.noAssessment") };
       const errors = assessmentErrors(a);

@@ -528,12 +528,12 @@
      {
       "lever_id": "L1",
       "title": {
-       "en": "Also offer d-you through an alternative app marketplace run in the EU",
-       "de": "d-you auch über einen alternativen App-Marktplatz anbieten, der in der EU betrieben wird"
+       "en": "Distribute d-you on iPhones through an app marketplace run in the EU",
+       "de": "d-you für iPhones über einen in der EU betriebenen App-Marktplatz vertreiben"
       },
       "rationale": {
-       "en": "In the European Union, iPhone users can install alternative app marketplaces, which Apple neither makes nor manages. If the iPhone distribution ran through a marketplace run in the EU, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on Apple's platform.",
-       "de": "In der Europäischen Union können iPhone-Nutzende alternative App-Marktplätze installieren, die Apple weder herstellt noch betreibt. Liefe der Vertrieb für iPhones über einen in der EU betriebenen Marktplatz, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform von Apple."
+       "en": "In the EU, iPhone users can install alternative app marketplaces. If d-you reached iPhones through a marketplace run in the EU rather than the phone maker's store, the overall score would be {{fact:whatif.L1.overall}}; the app would still run on the phone maker's platform.",
+       "de": "In der EU können iPhone-Nutzende alternative App-Marktplätze installieren. Erreichte d-you iPhones über einen in der EU betriebenen Marktplatz statt über den Store des Herstellers, läge der Gesamtwert bei {{fact:whatif.L1.overall}}; die App liefe weiter auf der Plattform des Herstellers."
       },
       "changes": [
        {

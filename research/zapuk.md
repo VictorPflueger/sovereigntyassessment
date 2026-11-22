@@ -1,20 +1,28 @@
-# ZaPuK (target architecture for mailbox and communication solutions): research notes, no pre-run
+# ZaPuK (target architecture for mailbox and communication solutions): research notes
 
-Surveyed for version 0.3.0 on 20 November 2026 under decision D3 (TECH_NOTES.md): a pre-run is bundled only where public sources name, for the critical building blocks of most layers, who makes and who runs them.
+ZaPuK, researched on 20 November 2026 for version 1.0.0, after Victor asked for pre-runs of the entries that had only research notes. Its sources describe no service in operation, so the run ends with the outcome "not_a_service" and records no building blocks; the quotes below are those its profile, narration and report rest on.
 
-## What it is
+Every quote below was read on its page with the web fetch tool on the date given, and the pre-run data/runs/zapuk.js cites it, except the quotes that follow a paragraph beginning "Not cited", which says why. tools/check-runs.mjs sets each quote's verified flag from this file: a quote counts only when it is listed here, verbatim, under its URL.
 
-ZaPuK is the federal target architecture for mailbox and communication solutions between people, organisations and public bodies.
+### [Föderale Zielarchitektur für Postfach- und Kommunikationslösungen: Überblick und Handlungsempfehlung, Version 1.0](https://www.it-planungsrat.de/fileadmin/beschluesse/2025/Beschluss_2025_28_ZaPuK_%C3%9Cberblick.pdf)
+Read on 2026-11-20 (German).
 
-## Why there is no pre-run
+> Die Zielarchitektur dient als strukturiertes Rahmenwerk und konkrete Richtlinie für die strategische Planung
+> Die Zielarchitektur beschreibt eine einheitliche föderale Postfach- und Kommunikationsinfrastruktur
+> Das vorliegende Dokument beschreibt eine Zielarchitektur, d. h. die Konfiguration der einschlägigen Geschäftsprozesse
+> In dieser Phase sollen detaillierte Transitions- und Migrationspläne entwickelt werden.
 
-It is a target architecture, not yet a service: the sources describe principles and a transition, with migration planned from 2028, but no building block that someone makes and runs today. There is nothing yet to assess block by block; the mailboxes that exist today belong to the services that use them, such as Mein Unternehmenskonto, which has a pre-run.
+### [Drucksache 21/9020: Der Deutschland-Stack – Entwicklungsstand, Verbindlichkeit und digitale Souveränität der Verwaltungsarchitektur des Bundes](https://dserver.bundestag.de/btd/21/090/2109020.pdf)
+Read on 2026-11-20 (German).
 
-Live mode accepts this entry like any other service; its run starts from the sources below.
+> Postfach (in Ausgestaltung)
+> Zahlungsabwicklung (ZBDS) und Postfach/Benachrichtigung (ZaPuk) sind Gegenstand einer Konzeptionierung
 
-## Sources read
+Not cited by this pre-run: the ZBDS pre-run cites it.
 
-The catalogue's sources, each opened with the web fetch tool on 19 November 2026 for the catalogue (DATA_SOURCES.md):
+> inklusive Betriebs- und Finanzierungsmodell bis spätestens zur 52. Sitzung des IT-Planungsrats.
 
-- [Die FITKO stellt vor: Zielarchitektur für Postfach- und Kommunikationslösungen (ZaPuK), Handout 16.01.2026](https://www.fitko.de/fileadmin/fitko/veranstaltungen/die_fitko_stellt_vor/20260116-Handout_FITKO_stellt_vor_ZaPuK.pdf) (German)
-- [Föderale Zielarchitektur für Postfach- und Kommunikationslösungen: Überblick und Handlungsempfehlung, Version 1.0](https://www.it-planungsrat.de/fileadmin/beschluesse/2025/Beschluss_2025_28_ZaPuK_%C3%9Cberblick.pdf) (German)
+### [Deutschland-Stack: Zwei von fünf Basiskomponenten nutzbar - Deutscher Bundestag](https://www.bundestag.de/1232782)
+Read on 2026-11-20 (German).
+
+> Für die Bezahlkomponente und das Postfach liefen noch Konzeptionsarbeiten, geht aus der Antwort weiter hervor.
