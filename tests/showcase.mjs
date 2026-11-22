@@ -343,6 +343,9 @@ if (wanted("play")) {
   await page.click("#turn-primary");
   await settle(page);
   await page.waitForFunction(() => window.sovereignty.S.view.steps[4].turn?.act === "memo-approve", null, { timeout: 10000 }).catch(() => {});
+  await page.waitForTimeout(400);
+  s = await state(page);
+  expect(name, "after the lever Play holds on to the draft memo, still playing", s.waits && s.act === "memo-approve" && s.playing && s.play === LABELS.en.pause, JSON.stringify(s));
   await page.click("#turn-primary");
   await settle(page);
   s = await state(page);

@@ -168,6 +168,7 @@ export default Object.freeze({
   "p.unchecked": "Unchecked",
   "p.flag.weakest": "weakest critical link",
   "p.flag.lowest": "lowest level",
+  "p.flag.partly": "one side not in the sources",
   "p.review.confirmed": "You confirmed the findings.",
   "p.review.skipped": "You skipped the review.",
   "p.lever.score": "Overall score",

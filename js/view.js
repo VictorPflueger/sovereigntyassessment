@@ -93,10 +93,13 @@ function sourceList(list, show = 2) {
   return h("div", { class: "src-block" }, ol, more);
 }
 
-/** A level in a hexagon on Vici's diverging scale, with its number, so it never reads by colour alone. */
-function level(n, { partly = false, size = "" } = {}) {
+/**
+ * A level in a hexagon on Vici's diverging scale, with its number, so it never reads by colour alone. A
+ * level with one side unknown keeps its plain number; the words beside it say which side is unknown.
+ */
+function level(n, { size = "" } = {}) {
   const v = n === null || n === undefined ? "gap" : String(n);
-  return h("span", { class: `lvl${size ? ` lvl--${size}` : ""}`, dataset: { level: v } }, h("span", { class: "lvl-n" }, v === "gap" ? "?" : `${v}${partly ? "?" : ""}`));
+  return h("span", { class: `lvl${size ? ` lvl--${size}` : ""}`, dataset: { level: v } }, h("span", { class: "lvl-n" }, v === "gap" ? "?" : v));
 }
 
 /** A party in a table cell: the name, and where it belongs underneath. */
@@ -152,14 +155,16 @@ const STAGES = {
     h("p", { class: "layer-name" }, r.name),
     r.blocks.length
       ? h("ul", { class: "cells" }, r.blocks.map((b) => h("li", { class: "cell", dataset: { weakest: String(b.weakest), lowest: String(b.lowest), critical: String(b.critical) } },
-        level(b.level, { partly: b.partly }),
-        h("span", { class: "cell-name" }, b.name, b.weakest ? h("span", { class: "cell-flag" }, t("p.flag.weakest")) : b.lowest ? h("span", { class: "cell-flag cell-flag--low" }, t("p.flag.lowest")) : null))))
+        level(b.level),
+        h("span", { class: "cell-name" }, b.name,
+          b.weakest ? h("span", { class: "cell-flag" }, t("p.flag.weakest")) : b.lowest ? h("span", { class: "cell-flag cell-flag--low" }, t("p.flag.lowest")) : null,
+          b.partly ? h("span", { class: "cell-flag cell-flag--unknown" }, t("p.flag.partly")) : null))))
       : h("p", { class: "layer-none" }, t(`p.layer.${r.status === "scored" ? "open" : r.status}`)),
     h("p", { class: "layer-score" }, r.score !== null ? r.score : h("span", { class: "muted" }, t("p.noScore")))))),
   h("ul", { class: "legend", "aria-label": t("p.legend") }, [4, 3, 2, 1, 0, null].map((n) => h("li", {}, level(n, { size: "sm" }), t(`p.legend.${n ?? "gap"}`))))],
 
   review: (s) => [h("ul", { class: "review" }, s.blocks.map((b) => h("li", { class: "review-block" },
-    h("div", { class: "review-head" }, level(b.level, { partly: b.partly, size: "lg" }),
+    h("div", { class: "review-head" }, level(b.level, { size: "lg" }),
       h("div", {}, h("p", { class: "review-name" }, b.name), h("p", { class: "review-meta" }, `${b.layer} · ${b.criticality}`))),
     origin(b),
     h("p", { class: "review-why" }, cap(b.why)),

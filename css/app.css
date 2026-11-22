@@ -162,6 +162,7 @@ html { font-size: clamp(100%, 0.48vw + 50%, 112.5%); }
 .cell-name { display: flex; flex-direction: column; font-size: var(--vc-font-size-sm); line-height: 1.2; }
 .cell-flag { color: var(--vc-accent-text); font-size: var(--vc-font-size-xs); font-weight: var(--vc-weight-semibold); }
 .cell-flag--low { color: var(--vc-danger-text); }
+.cell-flag--unknown { color: var(--vc-text-muted); font-weight: var(--vc-weight-regular); }
 .lvl { --s: 2.4rem; display: inline-grid; place-items: center; flex: none; width: var(--s); height: calc(var(--s) * 0.866); clip-path: var(--vc-hex); background: var(--vc-div-4); color: var(--vc-text); font-weight: var(--vc-weight-bold); font-variant-numeric: tabular-nums; }
 .lvl--sm { --s: 1.6rem; font-size: var(--vc-font-size-xs); }
 .lvl--lg { --s: 3.6rem; font-size: var(--vc-font-size-2xl); }

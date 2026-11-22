@@ -166,6 +166,7 @@ export default Object.freeze({
   "p.unchecked": "Ungeprüft",
   "p.flag.weakest": "schwächstes kritisches Glied",
   "p.flag.lowest": "niedrigste Stufe",
+  "p.flag.partly": "eine Seite nicht in den Quellen",
   "p.review.confirmed": "Sie haben die Befunde bestätigt.",
   "p.review.skipped": "Sie haben die Prüfung übersprungen.",
   "p.lever.score": "Gesamtwert",

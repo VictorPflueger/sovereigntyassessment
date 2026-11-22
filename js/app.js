@@ -334,7 +334,10 @@ function frame(now) {
       // The person's turn: Play waits; once they have acted, the step's new words get their reading time.
       P.at = 0;
     } else if (!next || !next.ready) {
-      if (finished() || !next || !next.needed) { pause(); return; }
+      // The story is over, or its next step will not come: Play ends. While the run still goes on (the
+      // memo after the lever, a step still being written), Play holds and waits for it.
+      if (finished() || (next && !next.needed)) { pause(); return; }
+      P.at = 0;
     } else if (!covered()) {
       P.at += dt;
       if (P.at >= step.read) {

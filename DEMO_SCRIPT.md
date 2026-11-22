@@ -23,7 +23,7 @@ Version 2.0.0. **For** a CIO, a head of digitalisation or an IT strategist in go
 The guide's last chapter, *Show it in five minutes*. Closing the guide starts Play: each step stays 7 to 14 seconds and Play stops wherever you act, at **Your turn**. Press Space to give a step its minute; → or a clicker moves on, ← goes back.
 
 1. **Understand: point at the four figures.** (1 min)
-   “Who makes and who runs BundID, scored by code: 77 of 100, indicative.”
+   “Who makes and runs BundID: 77 on 5 of 6 layers, indicative.”
 2. **Research: open one block's quotes.** (1 min)
    “6 building blocks, each with a quote, a link and the date it was read.”
 3. **Score: point at the weakest critical link.** (1 min)
