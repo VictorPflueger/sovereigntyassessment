@@ -69,8 +69,8 @@ html { font-size: clamp(100%, 0.48vw + 50%, 112.5%); }
    (vc-stat__also), two lines whether used or not, so the header keeps its height through a case. */
 #kpi-weakest.kpi { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; column-gap: 10px; flex: 1 1 32rem; max-width: 46rem; }
 #kpi-weakest .vc-stat__label, #kpi-weakest .kpi-also { grid-column: 1 / -1; }
-#kpi-weakest .kpi-note { white-space: normal; }
-.kpi-also { display: grid; align-content: start; gap: 0; min-height: calc(2 * 1.3 * var(--vc-font-size-xs)); margin: 1px 0 0; font-size: var(--vc-font-size-xs); line-height: 1.3; }
+#kpi-weakest .kpi-note { font-size: var(--vc-font-size-sm); white-space: normal; }
+.kpi-also { display: grid; align-content: start; gap: 0; min-height: calc(2 * 1.3 * var(--vc-font-size-sm)); margin: 1px 0 0; font-size: var(--vc-font-size-sm); line-height: 1.3; }
 .kpi-also-line { display: flex; align-items: center; gap: 5px; min-width: 0; }
 .kpi[data-tone] .kpi-also { color: var(--vc-text); }
 .lvl.lvl--xs { --s: 1.15rem; font-size: var(--vc-font-size-2xs); }
@@ -92,9 +92,10 @@ html { font-size: clamp(100%, 0.48vw + 50%, 112.5%); }
 .steps .vc-step__button { min-height: var(--hit); }
 .steps .vc-step__button:disabled { cursor: not-allowed; opacity: 0.55; }
 .steps .vc-step__label { font-size: var(--vc-font-size-md); white-space: nowrap; }
-/* The person's two steps (Your review, Recommend) have a merlot marker until they are done. */
-.steps .vc-step[data-person="true"]:not(.vc-step--done) .vc-step__marker { color: var(--vc-on-accent); }
-.steps .vc-step[data-person="true"]:not(.vc-step--done) .vc-step__marker::before { background: var(--vc-accent); clip-path: var(--vc-hex); }
+/* The person's two steps (Your review, Recommend) wear a merlot ring until they are current or done: they
+   read as yours without looking finished, and the current step stays the strongest (cold read, 2.1.0). */
+.steps .vc-step[data-person="true"]:not(.vc-step--done, .vc-step--current) .vc-step__marker { color: var(--vc-accent-text); }
+.steps .vc-step[data-person="true"]:not(.vc-step--done, .vc-step--current) .vc-step__marker::before { background: var(--vc-accent); }
 .steps .vc-step[data-needed="false"] .vc-step__label { text-decoration: line-through; }
 .case-button.vc-button { gap: 8px; max-width: 15rem; }
 .case-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -155,9 +156,9 @@ html { font-size: clamp(100%, 0.48vw + 50%, 112.5%); }
 /* Step 2 as a table: one row a block, its layer once, who makes it and who runs it with their country. */
 .research { font-size: var(--vc-font-size-sm); table-layout: fixed; }
 .research col.c-layer { width: 8rem; }
-.research col.c-block { width: 25%; }
+.research col.c-block { width: 29%; }
 .research th[scope="row"] { font-weight: var(--vc-weight-semibold); vertical-align: top; }
-.research td { vertical-align: top; line-height: 1.3; }
+.research td { vertical-align: top; line-height: 1.3; hyphens: auto; }
 .research .block-name { font-weight: var(--vc-weight-medium); }
 .research .crit { margin-inline-start: 0.4em; color: var(--vc-accent-text); font-size: var(--vc-font-size-xs); font-weight: var(--vc-weight-semibold); white-space: nowrap; }
 .research .party .where { color: var(--vc-text-muted); font-size: var(--vc-font-size-xs); white-space: nowrap; }
@@ -237,7 +238,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .memo[data-status="approved"] .memo-state { color: var(--vc-success-text); font-weight: var(--vc-weight-semibold); }
 .memo-meta { margin: 0; color: var(--vc-text-muted); font-size: var(--vc-font-size-xs); }
 .memo-subject { margin: 0; font-weight: var(--vc-weight-semibold); line-height: 1.3; }
-.memo-body { max-height: 11rem; overflow: auto; padding-right: 4px; font-size: var(--vc-font-size-sm); line-height: 1.45; }
+.memo-body { max-height: 16rem; overflow: auto; padding-right: 4px; font-size: var(--vc-font-size-sm); line-height: 1.45; }
 .memo-body p { margin: 0 0 6px; }
 .memo-figures { display: flex; flex-wrap: wrap; gap: 6px 28px; margin: 4px 0 0; }
 .memo-figures div { display: flex; flex-direction: column; }
@@ -263,7 +264,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .agent figcaption .vc-tag { gap: 5px; }
 .agent-note { color: var(--vc-feature-text); font-size: var(--vc-font-size-sm); }
 .agent-words { display: grid; align-content: start; gap: 8px; flex: 1 1 auto; min-height: 0; overflow-y: auto; color: var(--vc-text); font-size: var(--vc-font-size-sm); line-height: 1.5; }
-.agent-words p { margin: 0; text-wrap: pretty; }
+.agent-words p { max-width: 70ch; margin: 0; text-wrap: pretty; }
 .agent-words .unchecked { margin-inline-start: 0.5em; vertical-align: 1px; }
 .agent-words[data-more="true"], .memo-body[data-more="true"] { mask-image: linear-gradient(to bottom, #000 calc(100% - 2.2rem), transparent); }
 .log { font-size: var(--vc-font-size-sm); }
@@ -274,7 +275,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 /* The bar under the story: whose turn it is and the one dark button. It follows the story's last line
    and stays in view when the story is long. */
 .turn-bar { position: sticky; bottom: 0; z-index: 1; display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; margin: auto 0 0; padding: 10px 14px; background: var(--vc-surface); border: 1px solid var(--vc-border-subtle); border-radius: var(--vc-radius-md) var(--vc-radius-md) 0 0; border-bottom: 0; box-shadow: 0 -8px 16px var(--vc-surface); }
-.turn-bar[data-state="turn"] { background: var(--vc-accent-soft); border-color: var(--vc-accent); border-left: 4px solid var(--vc-accent); }
+.turn-bar[data-state="turn"] { background: var(--vc-accent-soft); border-color: var(--vc-accent); }
 .turn-text { flex: 1 1 14rem; margin: 0; line-height: 1.4; }
 .turn-lead { color: var(--vc-text-muted); font-weight: var(--vc-weight-semibold); }
 .turn-bar[data-state="turn"] .turn-lead { color: var(--vc-accent-text); }
@@ -319,7 +320,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .comp-this { color: var(--vc-text-muted); font-weight: var(--vc-weight-regular); }
 .comp-score { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .comp-cmp.vc-button { justify-self: end; }
-.svc-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 8px 10px; background: var(--vc-info-bg); border: 1px solid var(--vc-info-border); border-radius: var(--vc-radius-sm); color: var(--vc-info-text); font-size: var(--vc-font-size-sm); line-height: 1.4; }
+.svc-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--vc-info-text); font-size: var(--vc-font-size-sm); line-height: 1.4; }
 .svc-note .vc-icon { flex: none; margin-top: 2px; }
 
 /* ---------------------------------------------------------------- how a figure is made */
@@ -344,6 +345,12 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .cmp.vc-dialog { --vc-dialog-width: 62rem; max-height: min(94vh, 64rem); }
 :is(.overview, .cmp) .vc-dialog__body { padding-block: 4px; }
 .overview-note { flex: 1 1 auto; margin: 0; color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+.overview-lead { margin: 0; padding: var(--vc-space-4) 0 var(--vc-space-2); color: var(--vc-text-muted); font-size: var(--vc-font-size-sm); }
+/* The body's own top padding would leave a strip above the sticky header row where rows show through. */
+:is(.overview-body, .cmp-body).vc-dialog__body { padding-top: 0; }
+.cmp-body.vc-dialog__body > .cmp-wrap { margin-top: var(--vc-space-4); }
+/* The table's own wrap does not scroll, so its header row sticks to the dialog's scrolling body. */
+:is(.ov-wrap, .cmp-wrap).vc-table-wrap { overflow: visible; }
 :is(.ov-table, .cmp-table) { font-size: var(--vc-font-size-sm); }
 :is(.ov-table, .cmp-table) :is(th, td) { vertical-align: middle; line-height: 1.3; }
 :is(.ov-table, .cmp-table) thead th { position: sticky; top: 0; z-index: 1; background: var(--vc-surface); }
@@ -372,7 +379,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .ov-of, .ov-also { font-size: var(--vc-font-size-xs); }
 .ov-also { display: block; }
 .ov-link { display: inline-flex; align-items: center; gap: 8px; }
-.ov-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ov-num { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .ov-date { white-space: nowrap; }
 .ov-apart { border-top: 2px solid var(--vc-border); }
 .cmp-table { table-layout: fixed; }
@@ -388,7 +395,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
 .start-sim { display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: var(--vc-bg); border: 1px solid var(--vc-border-subtle); border-radius: var(--vc-radius-md); }
 .start-sim-text { flex: 1 1 auto; }
 .start-sim h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; font-size: var(--vc-font-size-lg); }
-.start-sim p, .start-live { margin: 0; line-height: 1.45; }
+.start-sim p, .start-live { max-width: 68ch; margin: 0; line-height: 1.45; }
 .start-sim .vc-button { flex: none; }
 .vc-live__key .vc-input { font-family: var(--vc-font-mono); }
 .vc-live__key .vc-help:empty { display: none; }
@@ -414,6 +421,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
   .research { font-size: var(--vc-font-size-md); }
   .layer { padding: 10px 14px; }
   .layer-name, .cell-name { font-size: var(--vc-font-size-md); }
+  .cell-meta { font-size: var(--vc-font-size-sm); }
   .lvl { --s: 3rem; font-size: var(--vc-font-size-lg); }
   .lvl--sm { --s: 1.9rem; font-size: var(--vc-font-size-sm); }
   .lvl--lg { --s: 4.4rem; }
@@ -465,14 +473,14 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
   .alt-blocks { gap: 4px; }
   .story-title { font-size: var(--vc-font-size-xl); }
   .agent { min-height: 4.5rem; padding: 6px 12px 8px; }
-  .research.vc-table--compact :is(th, td) { padding-block: 5px; }
+  .research.vc-table--compact :is(th, td) { padding-block: 3px; line-height: 1.22; }
   /* The table's own column heads say what the stage shows, and the key what the levels mean: their title
      gives its room to the last layer. */
   .stage:has(> .stage-body:is([data-kind="layers"], [data-kind="levels"], [data-kind="levers"], [data-kind="memo"])) .stage-title { display: none; }
-  .agent-words { gap: 6px; }
+  .agent-words { gap: 6px; line-height: 1.44; }
   .turn-bar { padding: 8px 12px; }
   .turn-actions .vc-button { --_h: 40px; }
-  .layer { padding: 3px 10px; gap: 8px; }
+  .layer { padding: 2px 10px; gap: 8px; }
   .layers { gap: 4px; }
   .layers--levels .layer { grid-template-columns: 11.25rem minmax(0, 1fr) 3.5rem; }
   .layers--levels .cells { gap: 3px 14px; }
@@ -490,7 +498,7 @@ button.layer-score { justify-self: end; min-height: 32px; padding-block: 0; }
   .lever--keep .lever-why::before { content: " · "; }
   .lever--keep .lever-figures div { flex-direction: row; align-items: baseline; gap: 8px; }
   .memo { padding: 10px 14px 12px; }
-  .memo-body { max-height: 8rem; }
+  .memo-body { max-height: 14rem; }
   .lvl { --s: 2.1rem; }
   .lvl--lg { --s: 3rem; }
   .src { padding: 4px 9px 5px; }

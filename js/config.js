@@ -4,7 +4,7 @@
 export const APP = {
   id: "sa",
   name: "Sovereignty Assessment",
-  version: "2.0.0"
+  version: "2.1.0"
 };
 
 // The page's content security policy, exactly as index.html's meta tag carries it (TECH_NOTES §4);

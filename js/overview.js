@@ -39,7 +39,7 @@ export function renderOverview(body, m, picks) {
   const cols = ["service", "score", "weakest", "lower", "exclusive", "group", "asOf"];
   const span = cols.length + 1;
   const head = (key) => h("tr", { class: "ov-head" }, h("th", { scope: "colgroup", colspan: String(span) }, t(key)));
-  body.replaceChildren(h("div", { class: "vc-table-wrap ov-wrap" }, h("table", { class: "vc-table vc-table--compact ov-table" },
+  body.replaceChildren(h("p", { class: "overview-lead" }, t("p.ov.lead")), h("div", { class: "vc-table-wrap ov-wrap" }, h("table", { class: "vc-table vc-table--compact ov-table" },
     h("caption", { class: "vc-visually-hidden" }, t("p.ov.title")),
     h("colgroup", {}, h("col", { class: "c-pick" }), cols.map((c) => h("col", { class: `c-${c}` }))),
     h("thead", {}, h("tr", {}, h("th", { scope: "col", class: "ov-pick" }, h("span", { class: "vc-visually-hidden" }, t("p.ov.pick"))),

@@ -78,7 +78,7 @@ export function renderTile(el, v) {
   el.querySelector(".kpi-main").textContent = v.value;
   const of = el.querySelector(".kpi-of");
   if (of) { of.hidden = !v.of; of.textContent = v.of ? ` ${v.of}` : ""; }
-  el.querySelector(".kpi-note").replaceChildren(v.blockId ? opener(`block:${v.blockId}`, "kpi-open", v.note) : v.note || "");
+  el.querySelector(".kpi-note").replaceChildren(v.blockId ? opener(`block:${v.blockId}`, "kpi-open", v.note) : v.note || "", v.ties ? h("span", { class: "kpi-ties" }, ` ${v.ties}`) : "");
   const also = el.querySelector(".kpi-also");
   if (also) {
     // Empty, it keeps its room, so the header keeps its height through a case.
@@ -281,7 +281,7 @@ const STAGES = {
       h("div", {}, h("p", { class: "review-name" }, b.name), h("p", { class: "review-meta" }, `${b.layer} · ${b.criticality}`))),
     origin(b),
     h("p", { class: "review-why" }, cap(b.why)),
-    b.sources.length ? h("section", { class: "sources", "aria-label": t("p.sources") }, h("p", { class: "sources-head" }, t("p.sources.n", { n: b.sources.length })), sourceList(b.sources)) : null))),
+    b.sources.length ? h("section", { class: "sources", "aria-label": t("p.sources") }, h("p", { class: "sources-head" }, t("p.sources.n", { n: b.sources.length })), sourceList(b.sources, b.show)) : null))),
   s.status !== "open" ? h("p", { class: "outcome" }, icon("check"), t(s.status === "skip" ? "p.review.skipped" : "p.review.confirmed")) : null],
 
   levers: (s, act) => [h("ul", { class: "levers" },

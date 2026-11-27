@@ -70,7 +70,8 @@ export function caseFigures(run) {
   }
   return {
     overall: r.overall, scored: LAYERS.filter((l) => r.layers[l].score !== null).length,
-    weakest: L.weakest, lower: L.lower, unknownCritical: L.unknownCritical, exclusive: r.exclusive_non_eu, layers
+    weakest: L.weakest, lower: L.lower, unknownCritical: L.unknownCritical, exclusive: r.exclusive_non_eu,
+    critical: r.blocks.filter((b) => !b.unscored && b.criticality === "critical").length, layers
   };
 }
 
@@ -81,13 +82,15 @@ function cells(c, f, lang) {
   return {
     score: f.overall === null ? t("p.noScore", null, lang) : fmtScore(f.overall, lang),
     of: t("p.kpi.layers", { n: fmtInt(f.scored, lang) }, lang),
+    // The critical blocks no source names stand with the weakest critical link, as on the tile; the next
+    // column holds only blocks that are not critical (cold read, 2.1.0).
     weakest: f.weakest
-      ? { level: f.weakest.level, name: blockName(f.weakest.id), more: f.weakest.ties ? t("p.ov.ties", { n: fmtInt(f.weakest.ties, lang) }, lang) : "" }
-      : { none: t("p.kpi.noCritical", null, lang) },
+      ? { level: f.weakest.level, name: blockName(f.weakest.id), more: f.weakest.ties ? tn("p.ov.ties", f.weakest.ties, { n: fmtInt(f.weakest.ties, lang) }, lang) : "", unknown }
+      : { none: [t("p.kpi.noCritical", null, lang), unknown].filter(Boolean).join("; ") },
     lower: f.lower.length
-      ? { level: f.lower[0].level, name: blockName(f.lower[0].id), more: f.lower.length > 1 ? t("p.ov.below", { n: fmtInt(f.lower.length - 1, lang), level: fmtInt(f.weakest.level, lang) }, lang) : "", unknown }
-      : { none: unknown || t("p.ov.noneLower", null, lang) },
-    exclusive: f.exclusive === null ? t("p.kpi.none", null, lang) : pct(f.exclusive, lang)
+      ? { level: f.lower[0].level, name: blockName(f.lower[0].id), more: f.lower.length > 1 ? tn("p.ov.below", f.lower.length - 1, { n: fmtInt(f.lower.length - 1, lang), level: fmtInt(f.weakest.level, lang) }, lang) : "" }
+      : { none: t("p.ov.noneLower", null, lang) },
+    exclusive: f.exclusive === null ? t("p.kpi.none", null, lang) : t("p.ov.exclusive", { pct: pct(f.exclusive, lang), n: fmtInt(f.critical, lang) }, lang)
   };
 }
 
@@ -130,7 +133,7 @@ export function compareModel({ cases, keys, lang }) {
       layers: Object.fromEntries(LAYERS.map((l) => {
         const x = f.layers[l];
         if (x.score === null) return [l, { none: t(`p.layer.${x.status === "scored" ? "open" : x.status}`, null, lang) }];
-        return [l, { score: fmtScore(x.score, lang), level: x.low.level, name: blockName(x.low.id), more: x.low.same ? t("p.ov.ties", { n: fmtInt(x.low.same, lang) }, lang) : "", blocks: tn("p.cmp.blocks", x.low.blocks, { n: fmtInt(x.low.blocks, lang) }, lang) }];
+        return [l, { score: fmtScore(x.score, lang), level: x.low.level, name: blockName(x.low.id), more: x.low.same ? tn("p.ov.ties", x.low.same, { n: fmtInt(x.low.same, lang) }, lang) : "", blocks: tn("p.cmp.blocks", x.low.blocks, { n: fmtInt(x.low.blocks, lang) }, lang) }];
       }))
     };
   }).filter(Boolean);

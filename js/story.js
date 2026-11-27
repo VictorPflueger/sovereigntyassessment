@@ -7,7 +7,7 @@
 // the run's language. They reach the screen through plain(): the engine's placeholders filled in, block
 // ids such as B-06 replaced by the block's name, lever ids by the lever's title.
 
-import { t, tn } from "./i18n/index.js";
+import { t, tn, locale } from "./i18n/index.js";
 import { renderFacts } from "./facts.js";
 import { fmtScore, fmtInt, fmtDate } from "./format.js";
 import { LAYERS, techLevel, opLevel } from "./engine.js";
@@ -36,21 +36,58 @@ export function eur(value, lang) {
 /** The origin class as words: "Germany", "the US", "unknown". */
 const place = (cls, lang) => t(`p.class.${cls || "UNKNOWN"}`, null, lang);
 
-/** A party's name for the screen, with its parent: "Apple Distribution International Ltd., part of Apple Inc.". */
+/**
+ * A party's name for the screen, with its parent, and its own country where the parent's differs, since the
+ * parent's country is the one that counts: "Apple Distribution International Ltd. (Ireland), part of Apple Inc.".
+ */
 function partyName(p, lang) {
   const unknown = !p || !p.name || /^(unknown|unbekannt)$/i.test(String(p.name).trim());
   if (unknown && !p?.parent) return t("p.party.unknown", null, lang);
-  const own = unknown ? t("p.party.unknown", null, lang) : p.name;
+  let own = unknown ? t("p.party.unknown", null, lang) : p.name;
+  if (!unknown && p.parent?.country && /^[A-Z]{2}$/.test(p.country || "") && p.country !== p.parent.country) own = `${own} (${country(p.country, lang)})`;
   return p.parent?.name ? t("p.party.parent", { party: own, parent: p.parent.name }, lang) : own;
+}
+
+/** A country's name in the page's language, from its ISO code: "Ireland", "Irland". */
+function country(code, lang) {
+  try { return new Intl.DisplayNames([locale(lang)], { type: "region" }).of(code) || code; } catch { return code; }
+}
+
+/**
+ * A review card's quotes: the `show` it shows first are those that back the side setting the block's level,
+ * the side's own quotes before its parent's or its hosting, and those naming its party before the rest; they
+ * stand in the order recorded, so a sentence and the line it introduces read in turn (cold read, 2.1.0).
+ */
+function backing(list, b, show) {
+  const tech = techLevel(b.tech_class, b.scored?.licence ?? b.licence);
+  const op = opLevel(b.operator_class, b.scored?.hosting ?? b.hosting);
+  const side = tech === null ? "operator" : op === null || tech < op ? "tech" : "operator";
+  const related = side === "tech" ? ["tech.parent", "licence"] : ["operator.parent", "hosting"];
+  const party = side === "tech" ? b.tech : b.operator;
+  const names = [party?.name, party?.parent?.name].filter((n) => n && !/^(unknown|unbekannt)$/i.test(n)).map((n) => n.toLowerCase());
+  const rank = (s) => {
+    const own = (s.supports || []).includes(side);
+    const near = (s.supports || []).some((x) => related.includes(x));
+    const named = names.some((n) => s.quote.toLowerCase().includes(n));
+    return (own ? 0 : near ? 2 : 4) + (named ? 0 : 1);
+  };
+  const ranked = list.map((s, i) => [rank(s), i, s]).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+  const first = ranked.slice(0, show).sort((x, y) => x[1] - y[1]);
+  return [...first, ...ranked.slice(show).sort((x, y) => x[1] - y[1])].map((x) => x[2]);
 }
 
 /** Why a block has its level, in words: who makes it, who runs it, and what that gives. */
 function levelWhy(b, lang) {
   const tech = techLevel(b.tech_class, b.scored?.licence ?? b.licence);
   const op = opLevel(b.operator_class, b.scored?.hosting ?? b.hosting);
-  const made = tech === 4 ? "p.why.tech4" : tech === 3 ? "p.why.tech3" : tech === 2 ? "p.why.tech2" : "p.why.techNone";
-  const run = op === 4 ? "p.why.op4" : op === 1 ? "p.why.op1" : op === 0 ? "p.why.op0" : "p.why.opNone";
-  return t("p.why", { made: t(made, null, lang), run: t(run, null, lang) }, lang);
+  // A party in a group from another country counts as its group's country: the words say so, beside its own
+  // country ("Ireland") on the card (cold read, 2.1.0).
+  const group = (p) => !!(p?.parent?.name && p.parent.country && p.country && p.country !== p.parent.country);
+  const made = tech === 4 ? "p.why.tech4" : tech === 3 ? (group(b.tech) ? "p.why.tech3.group" : "p.why.tech3") : tech === 2 ? (group(b.tech) ? "p.why.tech2.group" : "p.why.tech2") : "p.why.techNone";
+  const run = op === 4 ? "p.why.op4" : op === 1 ? (group(b.operator) ? "p.why.op1.group" : "p.why.op1") : op === 0 ? (group(b.operator) ? "p.why.op0.group" : "p.why.op0") : "p.why.opNone";
+  // The rule that sets the level, as the make-up states it: the lower side, a cap of 2, or no level.
+  const rule = tech === null && op === null ? "p.why.unscored" : tech === null || op === null ? "p.why.capped" : "p.why";
+  return t(rule, { made: t(made, null, lang), run: t(run, null, lang) }, lang);
 }
 
 /** A block in words with its criticality and level: "Sign-in page at id.bund.de (critical, level 4)". */
@@ -101,7 +138,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
   const unknownIds = new Set(chain?.unknownCritical || []);
   const pages = run.research.filter((s) => s.kind === "fetch" && s.ok).length;
   const quotes = new Set(run.evidence.filter((c) => c.verified && c.quote).map((c) => `${c.url}|${c.quote}`)).size;
-  const sources = (list) => (list || []).filter((c) => c.verified && c.quote).map((c) => ({ quote: c.quote, url: c.url, title: c.title || c.url, read: c.read_on ? fmtDate(c.read_on, lang) : "", lang: c.lang || "" }));
+  const sources = (list) => (list || []).filter((c) => c.verified && c.quote).map((c) => ({ quote: c.quote, url: c.url, title: c.title || c.url, read: c.read_on ? fmtDate(c.read_on, lang) : "", lang: c.lang || "", supports: c.supports || [] }));
   const ended = run.end && !["done", "not_a_service"].includes(run.end.status) ? { status: run.end.status } : null;
   const pending = ended ? { kind: "empty", text: t("p.stage.stopped", null, lang) } : { kind: "wait", text: t("p.stage.working", null, lang) };
   const agent = (i) => run.narration.filter((m) => m.step === i).map((m) => ({ text: plain(m.text, m.values), unchecked: m.audit === "unchecked" }));
@@ -262,7 +299,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
         level: b.unscored ? null : b.level, partly: !!b.partly_unknown, why: levelWhy(b, lang),
         made: { who: partyName(b.tech, lang), where: place(b.tech_class, lang) },
         run: { who: partyName(b.operator, lang), where: place(b.operator_class, lang) },
-        sources: sources(b.evidence)
+        sources: backing(sources(b.evidence), b, focus.length > 1 ? 1 : 2), show: focus.length > 1 ? 1 : 2
       }))
     } : pending
   });
@@ -394,7 +431,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     else if (!result || facts["score.overall"] === null || facts["score.overall"] === undefined) k.score = { value: "…", of: "", note: waiting || t("p.kpi.score.empty", null, lang) };
     else {
       const of = t("p.kpi.layers", { n: fmtInt(scored, lang) }, lang);
-      if (chosen && chosen.overall !== null && Math.round(chosen.overall) !== Math.round(keepScore)) k.score = { was: fmtScore(keepScore, lang), value: chosen.text.overall, of, note: t("p.kpi.score.lever", null, lang), tone: "done" };
+      // An approved lever is a proposal: the figures stay as assessed, and a note says what it would give, since
+      // a struck-through 77 beside 81 read as a change already made (cold read, 2.1.0).
+      if (chosen && chosen.overall !== null && Math.round(chosen.overall) !== Math.round(keepScore)) k.score = { value: fmtScore(keepScore, lang), of, note: t("p.kpi.score.lever", { value: chosen.text.overall }, lang), tone: "done" };
       else if (decided) k.score = { value: fmtScore(keepScore, lang), of, note: t(decided === "keep" ? "p.kpi.score.kept" : "p.kpi.score.same", null, lang), tone: "done" };
       else k.score = { value: fmtScore(facts["score.overall"], lang), of, note: complete ? t("p.kpi.score.note", null, lang) : t("p.kpi.score.partial", null, lang) };
     }
@@ -408,25 +447,19 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     } else {
       const after = chosen && chosen.weakest !== null && weakest && chosen.weakest !== weakest.level ? chosen.weakest : null;
       k.weakest = weakest
-        ? { value: t("p.kpi.level", { n: fmtInt(after ?? weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: after !== null ? t("p.kpi.weakest.lever", { n: fmtInt(weakest.level, lang) }, lang) : weakest.name, blockId: after !== null ? null : weakest.id, tone: after !== null ? "done" : "" }
+        ? { value: t("p.kpi.level", { n: fmtInt(weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: weakest.name, blockId: weakest.id, tone: after !== null ? "done" : "",
+          // Other critical blocks at the same level, so the name never reads as the only one (cold read, 2.1.0).
+          ties: weakest.ties > 0 ? tn("p.ov.ties", weakest.ties, { n: fmtInt(weakest.ties, lang) }, lang) : "" }
         : { value: t("p.kpi.none", null, lang), of: "", note: t("p.kpi.noCritical", null, lang) };
-      k.weakest.also = alsoLines(chosen ? leverChain(chosen.id) : chain);
+      // The lines under it are the findings as assessed, as the score step shows them; a lever that would move
+      // the level says so first (critique, 2.1.0).
+      k.weakest.also = [...(after !== null ? [{ kind: "lever", level: after, text: t("p.kpi.weakest.lever", { n: fmtInt(after, lang) }, lang) }] : []), ...alsoLines(chain)];
       const exAfter = chosen && chosen.exclusive !== null && Math.round(chosen.exclusive * 100) !== Math.round((result.exclusive_non_eu ?? 0) * 100) ? chosen.exclusive : null;
       k.exclusive = result.exclusive_non_eu === null
         ? { value: t("p.kpi.none", null, lang), note: t("p.kpi.noCritical", null, lang) }
-        : { ...(exAfter !== null ? { was: pct(result.exclusive_non_eu, lang) } : {}), value: pct(exAfter ?? result.exclusive_non_eu, lang), note: t("p.kpi.ofCritical", { n: fmtInt(critical.length, lang) }, lang), tone: atRisk ? "risk" : "" };
+        : { value: pct(result.exclusive_non_eu, lang), note: [t("p.kpi.ofCritical", { n: fmtInt(critical.length, lang) }, lang), exAfter !== null ? t("p.kpi.exclusive.lever", { pct: pct(exAfter, lang) }, lang) : ""].filter(Boolean).join("; "), tone: atRisk ? "risk" : exAfter !== null ? "done" : "" };
     }
     return k;
-  }
-
-  /** The chain after an approved lever, from the engine's what-if blocks the lever carries; else as recorded. */
-  function leverChain(id) {
-    const l = levers.find((x) => x.lever_id === id);
-    const w = l?.whatif;
-    if (!w?.blocks) return chain;
-    const f = w.facts || {};
-    const p = `whatif.${id}`;
-    return links({ blocks: w.blocks, weakest: f[`${p}.weakest.block`] ? { block_id: f[`${p}.weakest.block`], level: f[`${p}.weakest.level`], ties: f[`${p}.weakest.ties`] } : null });
   }
 
   /**
@@ -439,7 +472,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     if (c.lower.length) {
       const low = c.lower[0];
       const vars = { level: fmtInt(low.level, lang), block: blockName(low.id), more: fmtInt(c.lower.length - 1, lang), weakest: fmtInt(c.weakest.level, lang) };
-      out.push({ kind: "lower", level: low.level, blockId: low.id, text: t(c.lower.length === 1 ? "p.kpi.also.lower" : "p.kpi.also.lowerMany", vars, lang) });
+      out.push({ kind: "lower", level: low.level, blockId: low.id, text: c.lower.length === 1 ? t("p.kpi.also.lower", vars, lang) : tn("p.kpi.also.lowerMany", c.lower.length - 1, vars, lang) });
     } else if (!c.weakest && c.lowest) {
       out.push({ kind: "lower", level: c.lowest.level, blockId: c.lowest.id, text: t("p.kpi.also.lower", { level: fmtInt(c.lowest.level, lang), block: blockName(c.lowest.id) }, lang) });
     }

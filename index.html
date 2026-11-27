@@ -54,7 +54,7 @@
     <div class="header-actions">
       <span class="vc-tooltip-anchor">
         <span class="vc-tag vc-tag--lg mode-tag" id="mode-tag" data-mode="simulation" tabindex="0" aria-describedby="tip-mode"><span id="mode-text">SIMULATION</span></span>
-        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-mode">A replay of the agent's run of 20 November 2026 through its own tools: code computes every figure and no model is called. Start agent offers a live run.</span>
+        <span class="vc-tooltip vc-tooltip--bottom" role="tooltip" id="tip-mode">A replay of the agent's run of 27 November 2026 through its own tools: code computes every figure and no model is called. Start agent offers a live run.</span>
       </span>
       <!-- One guide per language, each with its own button; js/lang.js shows the page's. -->
       <button type="button" class="vc-button vc-button--secondary guide-open" data-vc-guide-open="guide-en" lang="en"><span class="vc-icon vc-icon--info" aria-hidden="true"></span>How it works</button>
@@ -73,16 +73,16 @@
 
     <!-- The four key figures. data-vc-kpi names each in English, data-vc-kpi-de in German; each guide
          explains them in a row of its How it works chapter, and the talk track points at them. A figure
-         computed from part of the layers says so in its value; when the decision moves the score, its
-         tile keeps the old value struck through (vc-stat__was). In a simulation, Session cost shows what a
-         live run would cost and says the replay costs nothing. The values below are BundID's. -->
+         computed from part of the layers says so in its value; an approved lever leaves the figures as
+         assessed and notes what it would give ("81 if carried out"). In a simulation, Session cost is labelled
+         "A live run would cost" and says the replay costs nothing. The values below are BundID's. -->
     <div class="kpis" role="group" aria-label="Key figures" data-i18n-attr="aria-label:p.kpis">
       <div class="kpi vc-stat" id="kpi-score" data-vc-kpi="Overall score" data-vc-kpi-de="Gesamtwert">
         <p class="vc-stat__label" data-i18n="p.kpi.score.label">Overall score</p>
         <p class="vc-stat__value kpi-value"><s class="vc-stat__was" hidden></s><span class="vc-visually-hidden kpi-to" hidden></span><span class="kpi-main">77</span><span class="kpi-of"> on 5 of 6 layers</span></p>
         <p class="vc-stat__note kpi-note">indicative, out of 100</p>
       </div>
-      <div class="kpi vc-stat" id="kpi-weakest" data-vc-kpi="Weakest critical link" data-vc-kpi-de="Schwächstes kritisches Glied">
+      <div class="kpi vc-stat" id="kpi-weakest" data-vc-kpi="Weakest critical link" data-vc-kpi-de="Schwächstes kritisches Glied" data-vc-part="critical blocks">
         <p class="vc-stat__label" data-i18n="p.kpi.weakest.label">Weakest critical link</p>
         <p class="vc-stat__value kpi-value"><s class="vc-stat__was" hidden></s><span class="vc-visually-hidden kpi-to" hidden></span><span class="kpi-main">Level 3</span><span class="kpi-of"> of 4</span></p>
         <p class="vc-stat__note kpi-note">Kubernetes platform at the ITZBund</p>
@@ -96,8 +96,8 @@
         <p class="vc-stat__note kpi-note">of 4 critical blocks</p>
       </div>
       <div class="kpi vc-stat" id="kpi-cost" data-vc-kpi="Session cost" data-vc-kpi-de="Sitzungskosten">
-        <p class="vc-stat__label" data-i18n="p.kpi.cost.label">Session cost</p>
-        <p class="vc-stat__value kpi-value"><span class="kpi-main">≈&nbsp;€0.52</span><span class="kpi-of"> for a live run</span></p>
+        <p class="vc-stat__label">A live run would cost</p>
+        <p class="vc-stat__value kpi-value"><span class="kpi-main">≈&nbsp;€0.62</span><span class="kpi-of" hidden></span></p>
         <p class="vc-stat__note kpi-note">this replay: €0</p>
       </div>
     </div>
@@ -115,8 +115,8 @@
       <li class="vc-step" data-step="understand"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">1</span><span class="vc-step__label">Understand</span></button></li>
       <li class="vc-step" data-step="research"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">2</span><span class="vc-step__label">Research</span></button></li>
       <li class="vc-step" data-step="score"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">3</span><span class="vc-step__label">Score</span></button></li>
-      <li class="vc-step" data-step="review" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">4</span><span class="vc-step__label">Your review</span></button></li>
-      <li class="vc-step" data-step="recommend" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">5</span><span class="vc-step__label">Recommend</span></button></li>
+      <li class="vc-step" data-step="review" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">4</span><span class="vc-step__label">Your review</span><span class="vc-visually-hidden" data-i18n="p.step.you">, your step</span></button></li>
+      <li class="vc-step" data-step="recommend" data-person="true"><button type="button" class="vc-step__button"><span class="vc-step__marker" aria-hidden="true">5</span><span class="vc-step__label">Recommend</span><span class="vc-visually-hidden" data-i18n="p.step.you">, your step</span></button></li>
     </ol>
     <button type="button" class="vc-button vc-button--ghost case-button" id="case-button" popovertarget="case-menu" aria-haspopup="menu" aria-expanded="false"><span class="vc-visually-hidden" data-i18n="p.case.label">Case: </span><span class="case-name" id="case-name">BundID</span><span class="vc-icon vc-icon--chevron-down" aria-hidden="true"></span></button>
     <div class="vc-menu case-menu" id="case-menu" popover role="menu" aria-label="Cases" data-i18n-attr="aria-label:p.cases"></div>
@@ -185,7 +185,7 @@
     </header>
     <div class="vc-dialog__body overview-body" id="overview-body"></div>
     <footer class="vc-dialog__footer overview-foot">
-      <p class="overview-note" id="overview-note" data-i18n="p.ov.note">Every figure computed by code from the service's pre-run, in this tab; indicative.</p>
+      <p class="overview-note" id="overview-note" data-i18n="p.ov.note">Every figure computed by code from the agent's run of each service, in your browser; indicative.</p>
       <button type="button" class="vc-button" id="ov-cmp" disabled><span class="vc-icon vc-icon--scale" aria-hidden="true"></span><span id="ov-cmp-text">Compare</span></button>
     </footer>
   </dialog>
@@ -196,7 +196,7 @@
     </header>
     <div class="vc-dialog__body cmp-body" id="cmp-body"></div>
     <footer class="vc-dialog__footer cmp-foot">
-      <p class="overview-note" data-i18n="p.cmp.note">Every figure computed by code from the services' pre-runs; indicative.</p>
+      <p class="overview-note" data-i18n="p.cmp.note">Every figure computed by code from the agent's runs of these services, in your browser; indicative.</p>
       <button type="button" class="vc-button vc-button--secondary" id="cmp-all"><span class="vc-icon vc-icon--list" aria-hidden="true"></span><span data-i18n="p.ov.open">All services</span></button>
     </footer>
   </dialog>
@@ -218,7 +218,7 @@
           <caption>The case it opens on</caption>
           <tbody>
             <tr><th scope="row">Service</th><td>BundID, the account people sign in with for online services of the administration</td></tr>
-            <tr><th scope="row">Read</th><td><span data-fig="pages">11</span> pages, <span data-fig="quotes">21</span> quotes kept, as of <span data-fig="as-of">20 November 2026</span></td></tr>
+            <tr><th scope="row">Read</th><td><span data-fig="pages">11</span> pages, <span data-fig="quotes">21</span> quotes kept, as of <span data-fig="as-of">27 November 2026</span></td></tr>
             <tr><th scope="row">Found</th><td><span data-fig="blocks">6</span> building blocks <span data-fig="layers">on 5 of 6 layers</span></td></tr>
             <tr><th scope="row">Proposed</th><td>One lever, for you to decide; nothing is sent</td></tr>
           </tbody>
@@ -259,7 +259,7 @@
           <caption>Where everything comes from</caption>
           <tbody>
             <tr><th scope="row">Real</th><td>The services, the pages, every quote and the date it was read</td></tr>
-            <tr><th scope="row">Replayed</th><td>The agent's run of <span data-fig="as-of">20 November 2026</span>, played offline; no model is called</td></tr>
+            <tr><th scope="row">Replayed</th><td>The agent's run of <span data-fig="as-of">27 November 2026</span>, played offline; no model is called</td></tr>
             <tr><th scope="row">Indicative</th><td>Every level and score: not an official assessment, and not an official service of the German Federal Government</td></tr>
             <tr><th scope="row">Live</th><td>With your key, Claude researches the service on the web; its memo stays a draft and nothing is sent</td></tr>
           </tbody>
@@ -270,10 +270,10 @@
         <p class="vc-guide__lead">It plays by itself and stops where you act; Space pauses.</p>
         <ol class="vc-guide__path">
           <li><strong>Understand: point at the four figures.</strong> <span class="vc-guide__say">“BundID: <span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span>, <span data-fig="blocks">6</span> blocks; this replay costs nothing.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Score: open the App Store block.</strong> <span class="vc-guide__say">“Weakest critical link: <span data-fig="weakest">Level 3 of 4</span>; lower but not critical: the App Store, level 0.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Confirm the findings, then open a starting point.</strong> <span class="vc-guide__say">“A marketplace run in the EU lifts it to <span data-fig="lever">81</span>; starting points are for research.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>All services: compare BundID with the EUDI wallet.</strong> <span class="vc-guide__say">“<span data-fig="score">77</span> against <span data-fig="score@eudi-wallet">67</span>, layer by layer.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Open the Serviceportal NRW.</strong> <span class="vc-guide__say">“A state's platform on the same six layers: <span data-fig="score@serviceportal-nrw">91</span>.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Score: open the App Store block.</strong> <span class="vc-guide__say">“Weakest critical link: <span data-fig="weakest">Level 3 of 4</span>; the App Store (<span data-fig="lowest-level">0</span>) isn't critical.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Confirm the findings, then open a starting point.</strong> <span class="vc-guide__say">“An app marketplace run in the EU would lift the score to <span data-fig="lever">81</span>.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>All services: compare BundID with the ID wallet d-you.</strong> <span class="vc-guide__say">“BundID <span data-fig="score">77</span>, the ID wallet <span data-fig="score@eudi-wallet">67</span>: Compare puts each layer side by side.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Open the Serviceportal.NRW.</strong> <span class="vc-guide__say">“A state's platform, on the same six layers and by the same method: <span data-fig="score@serviceportal-nrw">91</span>.”</span> <span class="vc-guide__time">1 min</span></li>
         </ol>
       </section>
     </div>
@@ -297,7 +297,7 @@
           <caption>Der Fall, mit dem er startet</caption>
           <tbody>
             <tr><th scope="row">Dienst</th><td>BundID, das Konto, mit dem man sich für Onlinedienste der Verwaltung anmeldet</td></tr>
-            <tr><th scope="row">Gelesen</th><td><span data-fig="pages">11</span> Seiten, <span data-fig="quotes">21</span> Zitate belegt, Stand <span data-fig="as-of">20. November 2026</span></td></tr>
+            <tr><th scope="row">Gelesen</th><td><span data-fig="pages">11</span> Seiten, <span data-fig="quotes">21</span> Zitate belegt, Stand <span data-fig="as-of">27. November 2026</span></td></tr>
             <tr><th scope="row">Gefunden</th><td><span data-fig="blocks">6</span> Bausteine <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
             <tr><th scope="row">Vorgeschlagen</th><td>Ein Hebel, über den Sie entscheiden; nichts wird versendet</td></tr>
           </tbody>
@@ -311,7 +311,7 @@
           <thead><tr><th scope="col">Kennzahl</th><th scope="col">Was sie misst</th><th scope="col">BundID</th></tr></thead>
           <tbody>
             <tr><th scope="row">Gesamtwert</th><td>Mittel der belegten Ebenen, von 100</td><td><span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
-            <tr><th scope="row">Schwächstes kritisches Glied</th><td>Niedrigste Stufe der Bausteine, ohne die der Dienst stillsteht</td><td><span data-fig="weakest">Stufe 3 von 4</span>, <span data-fig="weakest-name">Kubernetes-Plattform beim ITZBund</span>. <span data-fig="lowest">Niedrigste insgesamt: AusweisApp auf iPhones über den App Store, nicht kritisch; 1 weitere unter Stufe 3</span>. Kritische Bausteine ohne Quelle: <span data-fig="unknown">0</span></td></tr>
+            <tr><th scope="row">Schwächstes kritisches Glied</th><td>Niedrigste Stufe der Bausteine, ohne die der Dienst stillsteht</td><td><span data-fig="weakest">Stufe 3 von 4</span>, <span data-fig="weakest-name">Kubernetes-Plattform beim ITZBund</span>. <span data-fig="lowest">Niedrigste insgesamt: AusweisApp auf iPhones über den App Store, nicht kritisch; 1 weiterer unter Stufe 3</span>. Kritische Bausteine ohne Quelle: <span data-fig="unknown">0</span></td></tr>
             <tr><th scope="row">Exklusive Nicht-EU-Kontrolle</th><td>Kritische Bausteine, von außerhalb der EU betrieben</td><td><span data-fig="exclusive">0&nbsp;%</span> von <span data-fig="critical">4</span></td></tr>
             <tr><th scope="row">Sitzungskosten</th><td>Was ein Live-Lauf kosten würde</td><td>≈&nbsp;<span data-fig="cost">0,62&nbsp;€</span> im Live-Lauf; <span data-fig="replay">diese Wiedergabe: 0 €</span></td></tr>
           </tbody>
@@ -338,7 +338,7 @@
           <caption>Woher alles kommt</caption>
           <tbody>
             <tr><th scope="row">Echt</th><td>Die Dienste, die Seiten, jedes Zitat und das Datum, an dem es gelesen wurde</td></tr>
-            <tr><th scope="row">Nachgespielt</th><td>Der Lauf des Agenten vom <span data-fig="as-of">20. November 2026</span>, offline abgespielt; kein Modell wird aufgerufen</td></tr>
+            <tr><th scope="row">Nachgespielt</th><td>Der Lauf des Agenten vom <span data-fig="as-of">27. November 2026</span>, offline abgespielt; kein Modell wird aufgerufen</td></tr>
             <tr><th scope="row">Indikativ</th><td>Jede Stufe und jeder Wert: keine amtliche Bewertung und kein offizielles Angebot der Bundesregierung</td></tr>
             <tr><th scope="row">Live</th><td>Mit Ihrem Schlüssel recherchiert Claude den Dienst im Netz; sein Memo bleibt ein Entwurf, nichts wird versendet</td></tr>
           </tbody>
@@ -349,10 +349,10 @@
         <p class="vc-guide__lead">Er spielt von selbst und hält, wo Sie handeln; die Leertaste hält an.</p>
         <ol class="vc-guide__path">
           <li><strong>Verstehen: auf die vier Kennzahlen zeigen.</strong> <span class="vc-guide__say">„BundID: <span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span>, <span data-fig="blocks">6</span> Bausteine; die Wiedergabe kostet nichts.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Bewerten: den App-Store-Baustein öffnen.</strong> <span class="vc-guide__say">„Schwächstes kritisches Glied: <span data-fig="weakest">Stufe 3 von 4</span>. Der App Store: 0, nicht kritisch.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Bestätigen, dann einen Ansatzpunkt öffnen.</strong> <span class="vc-guide__say">„Ein Marktplatz in der EU hebt ihn auf <span data-fig="lever">81</span>; Ansatzpunkte dienen der Recherche.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Alle Dienste: mit der EUDI-Wallet vergleichen.</strong> <span class="vc-guide__say">„<span data-fig="score">77</span> gegen <span data-fig="score@eudi-wallet">67</span>, Ebene für Ebene.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Das Serviceportal NRW öffnen.</strong> <span class="vc-guide__say">„Die Plattform eines Landes auf denselben sechs Ebenen: <span data-fig="score@serviceportal-nrw">91</span>.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Bewerten: den App-Store-Baustein öffnen.</strong> <span class="vc-guide__say">„Schwächstes kritisches Glied: <span data-fig="weakest">Stufe 3 von 4</span>; der App Store (<span data-fig="lowest-level">0</span>) ist nicht kritisch.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Bestätigen, dann einen Ansatzpunkt öffnen.</strong> <span class="vc-guide__say">„Ein App-Marktplatz, betrieben in der EU, würde den Wert auf <span data-fig="lever">81</span> heben.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Alle Dienste: BundID mit der Wallet d-you vergleichen.</strong> <span class="vc-guide__say">„BundID <span data-fig="score">77</span>, die Wallet <span data-fig="score@eudi-wallet">67</span>: Der Vergleich stellt jede Ebene nebeneinander.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Das Serviceportal.NRW öffnen.</strong> <span class="vc-guide__say">„Eine Landesplattform, nach derselben Methode auf sechs Ebenen: <span data-fig="score@serviceportal-nrw">91</span>.“</span> <span class="vc-guide__time">1 min</span></li>
         </ol>
       </section>
     </div>

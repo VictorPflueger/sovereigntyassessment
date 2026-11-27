@@ -18,7 +18,7 @@ import { digest, STEP_IDS } from "./run.js";
 import { story, eur } from "./story.js";
 import { renderStep, renderLog, renderTile, renderMakeup, redraw, h, more } from "./view.js";
 import { estimateCost } from "./estimate.js";
-import { fmtDate, fmtScore } from "./format.js";
+import { fmtDate, fmtScore, fmtInt } from "./format.js";
 import { overviewModel, compareModel, scoresOf } from "./cases.js";
 import { renderOverview, renderCompare } from "./overview.js";
 
@@ -449,10 +449,13 @@ function kpis(view, run) {
   renderTile($("kpi-weakest"), k.weakest);
   renderTile($("kpi-exclusive"), k.exclusive);
   const lang = getLang();
-  // A replay costs nothing; the tile says what a live run of the case would cost (D6).
-  renderTile($("kpi-cost"), S.mode === "live"
+  // A replay costs nothing: its label says the figure is what a live run of the case would cost, and a live
+  // run shows what it cost under Session cost (D6, the brief's default since the cold read).
+  const live = S.mode === "live";
+  $("kpi-cost").querySelector(".vc-stat__label").textContent = t(live ? "p.kpi.cost.label" : "p.kpi.cost.would");
+  renderTile($("kpi-cost"), live
     ? { value: eur(run.cost?.eur || 0, lang), note: t("p.kpi.cost.measured", { model: modelName(S.model) }) }
-    : { value: `≈\u00a0${eur(costOf(S.entry.id).eur, lang)}`, of: t("p.kpi.cost.live"), note: t("p.kpi.cost.replay") });
+    : { value: `≈\u00a0${eur(costOf(S.entry.id).eur, lang)}`, note: t("p.kpi.cost.replay") });
 }
 
 // ---- every pre-run, played once -----------------------------------------------------------------------------
@@ -510,18 +513,25 @@ function fillGuides(lang = getLang()) {
   const v = story({ run: S.run, lang, mode: "simulation", entry: S.entry });
   const k = v.kpis;
   const r = S.run;
+  const events = played.get(FIRST)?.events || [];
+  const review = events.findIndex((e) => e.type === "review_request");
+  const early = review < 0 ? events : events.slice(0, review);
   const res = r.score?.result;
   const lever = played.get(FIRST)?.run?.levers?.levers?.[0];
   const overall = lever?.whatif?.facts?.[`whatif.${lever.lever_id}.overall`];
   const figs = {
     score: k.score.value, layers: k.score.of.trim(), weakest: `${k.weakest.value} ${k.weakest.of}`.trim(), "weakest-name": k.weakest.note,
     exclusive: k.exclusive.value, critical: String(res ? res.blocks.filter((b) => b.criticality === "critical" && !b.unscored).length : ""),
-    cost: eur(costOf(FIRST).eur, lang), blocks: String(r.blockList.length || ""), pages: String(r.research.filter((x) => x.kind === "fetch" && x.ok).length || ""),
-    quotes: String(new Set(r.evidence.filter((c) => c.verified && c.quote).map((c) => `${c.url}|${c.quote}`)).size || ""),
+    cost: eur(costOf(FIRST).eur, lang), blocks: String(r.blockList.length || ""),
+    // What the research read and kept before Your review, as the Research step says it: counted in the
+    // pre-run as played once at start, so the figure does not change while the replay on screen moves on.
+    pages: String(new Set(early.filter((e) => e.type === "research_step" && e.payload?.kind === "fetch" && e.payload?.ok).map((e) => e.payload.url)).size || ""),
+    quotes: String(new Set(early.filter((e) => e.type === "evidence_check" && e.payload?.verified && e.payload?.quote).map((e) => `${e.payload.url}|${e.payload.quote}`)).size || ""),
     lever: Number.isFinite(overall) ? String(Math.round(overall)) : "",
     "as-of": fmtDate(RUNS()[FIRST].as_of, lang),
     // What the tile leaves out, the critical blocks no source names, and the free replay (2.1.0).
     lowest: k.weakest.also?.find((a) => a.kind === "lower")?.text || "", unknown: v.unknownCritical === null ? "" : String(v.unknownCritical),
+    "lowest-level": ((x) => (Number.isFinite(x) ? fmtInt(x, lang) : ""))(k.weakest.also?.find((a) => a.kind === "lower")?.level),
     replay: t("p.kpi.cost.replay", null, lang)
   };
   // The other cases the talk track names, from their own pre-runs: score@id and layers@id.
