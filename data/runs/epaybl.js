@@ -1,4 +1,4 @@
-/* Pre-run assessment of ePayBL (hand-authored, as of 2026-11-20): a recorded event stream that the
+/* Pre-run assessment of ePayBL (hand-authored, as of 2026-11-27): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/epaybl.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "epaybl",
  "entry_id": "epaybl",
  "source": "hand_authored",
- "as_of": "2026-11-20",
+ "as_of": "2026-11-27",
  "method_version": "1.0",
  "query": "ePayBL",
  "steps": [
@@ -671,6 +671,36 @@
    }
   },
   {
+   "say": {
+    "en": "For card payments, PayPal and the payment platform itself I look for what public sources name as alternatives: starting points for research, not a recommendation.",
+    "de": "Für Kartenzahlungen, PayPal und die Bezahlplattform selbst suche ich, was öffentliche Quellen als Alternativen nennen: Ansatzpunkte für die Recherche, keine Empfehlung."
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.thestar.com.my/tech/tech-news/2026/03/26/european-payments-initiative-ceo-says-trump-fears-are-boosting-its-appeal",
+    "title": "European Payments Initiative CEO says Trump fears are boosting its appeal"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.verbraucherzentrale.de/wissen/digitale-welt/onlinedienste/wero-neuer-zahlungsdienst-jetzt-auch-fuers-onlineshopping-97042",
+    "title": "Wero: Neuer Zahlungsdienst jetzt auch fürs Online-Shopping"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.zdfheute.de/wirtschaft/unternehmen/wero-zahlungsdienst-alternative-eu-paypal-100.html",
+    "title": "Paypal-Alternative Wero: Deshalb hakt es"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf",
+    "title": "Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)"
+   }
+  },
+  {
    "tool": "eng_whatif",
    "input": {
     "lever_id": "L1",
@@ -748,6 +778,167 @@
         ],
         "verified": true,
         "read_on": "2026-11-19"
+       }
+      ]
+     }
+    ],
+    "starting_points": [
+     {
+      "block_id": "B-02",
+      "name": "Wero",
+      "note": {
+       "en": "The payment wallet of the European Payments Initiative, based in Brussels.",
+       "de": "Die Bezahl-Wallet der European Payments Initiative mit Sitz in Brüssel."
+      },
+      "tech": {
+       "name": "European Payments Initiative (EPI)",
+       "country": "BE",
+       "parent": null
+      },
+      "operator": {
+       "name": "European Payments Initiative (EPI)",
+       "country": "BE",
+       "parent": null
+      },
+      "evidence": [
+       {
+        "url": "https://www.thestar.com.my/tech/tech-news/2026/03/26/european-payments-initiative-ceo-says-trump-fears-are-boosting-its-appeal",
+        "title": "European Payments Initiative CEO says Trump fears are boosting its appeal",
+        "quote": "The Brussels-based company has developed Wero to serve as an alternative to Mastercard, Visa and Apple Pay",
+        "lang": "en",
+        "supports": [
+         "alternative",
+         "tech"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       },
+       {
+        "url": "https://www.verbraucherzentrale.de/wissen/digitale-welt/onlinedienste/wero-neuer-zahlungsdienst-jetzt-auch-fuers-onlineshopping-97042",
+        "title": "Wero: Neuer Zahlungsdienst jetzt auch fürs Online-Shopping",
+        "quote": "Das Angebot wird von der European Payment Initiative (EPI) betrieben und ermöglicht Überweisungen ohne IBAN und BIC.",
+        "lang": "de",
+        "supports": [
+         "operator"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-03",
+      "name": "Wero",
+      "note": {
+       "en": "The payment wallet of the European Payments Initiative, based in Brussels.",
+       "de": "Die Bezahl-Wallet der European Payments Initiative mit Sitz in Brüssel."
+      },
+      "tech": {
+       "name": "European Payments Initiative (EPI)",
+       "country": "BE",
+       "parent": null
+      },
+      "operator": {
+       "name": "European Payments Initiative (EPI)",
+       "country": "BE",
+       "parent": null
+      },
+      "evidence": [
+       {
+        "url": "https://www.zdfheute.de/wirtschaft/unternehmen/wero-zahlungsdienst-alternative-eu-paypal-100.html",
+        "title": "Paypal-Alternative Wero: Deshalb hakt es",
+        "quote": "Seit Juli 2024 ist das europäische Zahlungssystem Wero als Alternative zu Paypal erhältlich",
+        "lang": "de",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       },
+       {
+        "url": "https://www.thestar.com.my/tech/tech-news/2026/03/26/european-payments-initiative-ceo-says-trump-fears-are-boosting-its-appeal",
+        "title": "European Payments Initiative CEO says Trump fears are boosting its appeal",
+        "quote": "The Brussels-based company has developed Wero to serve as an alternative to Mastercard, Visa and Apple Pay",
+        "lang": "en",
+        "supports": [
+         "tech"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       },
+       {
+        "url": "https://www.verbraucherzentrale.de/wissen/digitale-welt/onlinedienste/wero-neuer-zahlungsdienst-jetzt-auch-fuers-onlineshopping-97042",
+        "title": "Wero: Neuer Zahlungsdienst jetzt auch fürs Online-Shopping",
+        "quote": "Das Angebot wird von der European Payment Initiative (EPI) betrieben und ermöglicht Überweisungen ohne IBAN und BIC.",
+        "lang": "de",
+        "supports": [
+         "operator"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-04",
+      "name": "epay21",
+      "note": {
+       "en": "A payment service the IT-Planungsrat lists beside ePayBL.",
+       "de": "Ein Bezahldienst, den der IT-Planungsrat neben ePayBL nennt."
+      },
+      "evidence": [
+       {
+        "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf",
+        "title": "Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)",
+        "quote": "(v.a. ePayBL, pmPayment, epay21, ePayServiceBayern und SAP Digital Payment)",
+        "lang": "de",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-04",
+      "name": "ePayServiceBayern",
+      "note": {
+       "en": "A payment service the IT-Planungsrat lists beside ePayBL.",
+       "de": "Ein Bezahldienst, den der IT-Planungsrat neben ePayBL nennt."
+      },
+      "evidence": [
+       {
+        "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf",
+        "title": "Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)",
+        "quote": "(v.a. ePayBL, pmPayment, epay21, ePayServiceBayern und SAP Digital Payment)",
+        "lang": "de",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-04",
+      "name": "pmPayment",
+      "note": {
+       "en": "A payment service the IT-Planungsrat lists beside ePayBL.",
+       "de": "Ein Bezahldienst, den der IT-Planungsrat neben ePayBL nennt."
+      },
+      "evidence": [
+       {
+        "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf",
+        "title": "Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)",
+        "quote": "(v.a. ePayBL, pmPayment, epay21, ePayServiceBayern und SAP Digital Payment)",
+        "lang": "de",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
        }
       ]
      }

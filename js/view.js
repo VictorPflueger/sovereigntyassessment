@@ -124,6 +124,7 @@ const STAGES = {
   service: (s) => [h("article", { class: "svc" },
     h("header", { class: "svc-head" }, h("p", { class: "svc-name" }, s.name), h("span", { class: "vc-tag vc-tag--feature vc-tag--sm" }, icon("sparkle"), t("p.recorded"))),
     h("p", { class: "svc-what" }, s.what),
+    s.note ? h("p", { class: "svc-note" }, icon("info"), s.note) : null,
     h("dl", { class: "svc-facts" }, s.rows.map((r) => h("div", {}, h("dt", {}, r.label), h("dd", {}, r.value))))),
   s.sources.length ? h("section", { class: "sources", "aria-label": t("p.sources") }, h("p", { class: "sources-head" }, t("p.sources.n", { n: s.sources.length })), sourceList(s.sources)) : null],
 

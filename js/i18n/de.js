@@ -52,6 +52,7 @@ export default Object.freeze({
   "p.agent.live": "live, Claude {model}",
   "p.close": "Schließen",
   "p.cases": "Fälle",
+  "p.s1.state": "Eine Plattform eines Landes: Die sechs Ebenen sind die des Deutschland-Stacks, und die Methode gilt für die Plattform eines Landes wie für eine des Bundes.",
   "p.case.label": "Fall: ",
   "p.notOfficial": "Ein Prototyp, kein offizielles Angebot der Bundesregierung.",
   "p.strip": "Ein KI-Agent findet aus echten Quellen, wer einen öffentlichen Dienst herstellt und betreibt: indikativ, keine amtliche Bewertung.",
@@ -407,6 +408,9 @@ export default Object.freeze({
   "p.case.deutschland-app": "Die Deutschland-App, die geplante Bürger-App",
   "p.case.deutschland-app.short": "Deutschland-App",
   "p.case.deutschland-app.tip": "Ein Prototyp einer App für Verwaltungsleistungen, erprobt in sechs Kommunen",
+  "p.case.serviceportal-nrw": "Serviceportal.NRW, das Landesportal Nordrhein-Westfalens",
+  "p.case.serviceportal-nrw.short": "Serviceportal.NRW",
+  "p.case.serviceportal-nrw.tip": "Wo die Behörden Nordrhein-Westfalens ihre Onlinedienste anbieten",
   "p.case.sovereignty-assessment": "Dieser Prototyp",
   "p.case.sovereignty-assessment.short": "Souveränitätsbewertung",
   "p.case.sovereignty-assessment.tip": "Die Souveränitätsbewertung bewertet sich selbst: eine statische Seite, die auf US-Diensten läuft"

@@ -1,4 +1,4 @@
-/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-20): a recorded event stream that the
+/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-27): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/fit-connect.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "fit-connect",
  "entry_id": "fit-connect",
  "source": "hand_authored",
- "as_of": "2026-11-20",
+ "as_of": "2026-11-27",
  "method_version": "1.0",
  "query": "FIT-Connect",
  "steps": [
@@ -788,6 +788,30 @@
    }
   },
   {
+   "say": {
+    "en": "For the SDK's distribution and the authentication server I look for what public sources name as alternatives: starting points for research, not a recommendation.",
+    "de": "Für die Verteilung des SDK und den Authentifizierungsserver suche ich, was öffentliche Quellen als Alternativen nennen: Ansatzpunkte für die Recherche, keine Empfehlung."
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://opensource.muenchen.de/software/keycloak.html",
+    "title": "Keycloak | Munich Open Source"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/",
+    "title": "The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://github.com/dzikoysk/reposilite",
+    "title": "GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software"
+   }
+  },
+  {
    "tool": "eng_whatif",
    "input": {
     "lever_id": "L1",
@@ -832,6 +856,71 @@
         ],
         "verified": true,
         "read_on": "2026-11-19"
+       }
+      ]
+     }
+    ],
+    "starting_points": [
+     {
+      "block_id": "B-05",
+      "name": "Keycloak",
+      "note": {
+       "en": "Open-source single sign-on and identity management; the City of Munich lists it.",
+       "de": "Quelloffenes Single Sign-on und Identitätsmanagement; die Stadt München führt es auf."
+      },
+      "evidence": [
+       {
+        "url": "https://opensource.muenchen.de/software/keycloak.html",
+        "title": "Keycloak | Munich Open Source",
+        "quote": "Keycloak is an open source software product that enables single sign-on with identity and access management",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-05",
+      "name": "Nubus",
+      "note": {
+       "en": "Identity and access management from Univention, presented as a European alternative.",
+       "de": "Identitäts- und Zugriffsmanagement von Univention, vorgestellt als europäische Alternative."
+      },
+      "evidence": [
+       {
+        "url": "https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/",
+        "title": "The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management",
+        "quote": "Nubus offers a sovereign, European alternative to Microsoft Entra ID that is open, flexible, and independent.",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-07",
+      "name": "Reposilite",
+      "note": {
+       "en": "A self-hosted repository manager for Maven artifacts, under an open-source licence.",
+       "de": "Ein selbst betriebener Repository-Manager für Maven-Artefakte unter einer Open-Source-Lizenz."
+      },
+      "evidence": [
+       {
+        "url": "https://github.com/dzikoysk/reposilite",
+        "title": "GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software",
+        "quote": "This is a simple, extensible and scalable self-hosted solution that replaces managers like Nexus, Archiva or Artifactory",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
        }
       ]
      }

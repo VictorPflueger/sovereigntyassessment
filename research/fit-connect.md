@@ -57,3 +57,18 @@ Read on 2026-11-19 (English).
 Read on 2026-11-19 (English).
 
 > With Jackson coming on board, Sonatype moves its headquarters from Silicon Valley to Maryland.
+
+### [Keycloak | Munich Open Source](https://opensource.muenchen.de/software/keycloak.html)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. The City of Munich's open-source page; it does not say who develops Keycloak.
+
+> Keycloak is an open source software product that enables single sign-on with identity and access management
+
+### [The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management](https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. A post on Nextcloud's blog of 2 December 2025; it does not say where Univention is based.
+
+> Nubus offers a sovereign, European alternative to Microsoft Entra ID that is open, flexible, and independent.
+
+### [GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software](https://github.com/dzikoysk/reposilite)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. The project's README; the page title continues after the part given here. The page names the Apache-2.0 licence.
+
+> This is a simple, extensible and scalable self-hosted solution that replaces managers like Nexus, Archiva or Artifactory

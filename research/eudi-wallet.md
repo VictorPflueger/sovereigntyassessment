@@ -44,3 +44,21 @@ Read on 2026-11-20 (English).
 
 ### [eID: German version of the EUDI wallet with cloud-based key storage](https://heise.de/-10417676)
 Read on 2026-11-20 (English). The pre-run cites no quote from it: the planned cloud-based key storage it reports is recorded as a layer without evidence.
+
+### [Move over, Apple: Meet the alternative app stores available in the EU and elsewhere](https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. TechCrunch, 22 February 2026. It lists seven alternative app stores for iPhones in the EU. Starting points take those open to apps of any kind from other developers: AltStore PAL, Onside and Skich. Left out by that rule: Setapp Mobile (closed on 16 February 2026), the Epic Games Store (games only), Aptoide's iPhone store (a game store) and the Mobivention marketplace (companies' internal apps).
+
+> AltStore PAL is an officially approved alternative app marketplace in the EU.
+> Onside is an alternative iOS app store available in both the EU and, now, Japan, as of February 17, 2026
+> Last March, Skich announced the launch of an alternative app store for EU users
+> An alternative game store for iPhone, Lisbon-based Aptoide is an open source solution for app distribution.
+
+### [Aptoide Launching Alternative iOS Game Marketplace in EU](https://www.macrumors.com/2024/06/04/aptoide-marketplace-games-ios)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. MacRumors, 4 June 2024.
+
+> Aptoide, a popular Google Play alternative for Android devices, will be launching an iOS game marketplace
+
+### [What is F-Droid and how to set it up | Popular Science](https://www.popsci.com/diy/f-droid-download/)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. Popular Science, 24 December 2022; its headline reads “How to set up F-Droid, the open-source alternative to the Google Play Store”.
+
+> This app store is an alternative to Google Play and only includes open-source applications

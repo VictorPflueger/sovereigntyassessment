@@ -55,6 +55,7 @@ export default Object.freeze({
   "p.close": "Close",
   "p.cases": "Cases",
   "p.case.label": "Case: ",
+  "p.s1.state": "A state's platform: the six layers are the Deutschland-Stack's, and the method applies to a state's platform as it does to a federal one.",
   "p.notOfficial": "A prototype, not an official service of the German Federal Government.",
   "p.strip": "An AI agent finds who makes and who runs each part of a public service, from real sources: indicative, not an official assessment.",
   "p.byline.label": "Built by",
@@ -409,6 +410,9 @@ export default Object.freeze({
   "p.case.deutschland-app": "Deutschland-App, the planned citizen app",
   "p.case.deutschland-app.short": "Deutschland-App",
   "p.case.deutschland-app.tip": "A prototype of one app for administrative services, tested in six municipalities",
+  "p.case.serviceportal-nrw": "Serviceportal.NRW, the state portal of North Rhine-Westphalia",
+  "p.case.serviceportal-nrw.short": "Serviceportal.NRW",
+  "p.case.serviceportal-nrw.tip": "Where the authorities of North Rhine-Westphalia offer their online services",
   "p.case.sovereignty-assessment": "This prototype",
   "p.case.sovereignty-assessment.short": "Sovereignty Assessment",
   "p.case.sovereignty-assessment.tip": "The Sovereignty Assessment assessed by itself: a static site that runs on US services"

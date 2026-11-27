@@ -627,14 +627,16 @@ export function createToolbox(ctx) {
         const blocksAfter = w.result.blocks.map((b) => ({ id: b.id, layer: b.layer, criticality: b.criticality, level: b.level, unscored: b.unscored }));
         return { lever_id: l.lever_id, title: l.title, rationale: l.rationale, changes: structuredClone(l.changes), evidence: checks[l.lever_id], whatif: { facts: w.facts, blocks: blocksAfter } };
       });
-      // A starting point's level is the engine's, and only where verified quotes name both its maker and its operator.
+      // A starting point's level is the engine's, and only where verified quotes name both its maker and its
+      // operator. Each block's list goes in alphabetical order, whatever order the model sent: nothing is ranked.
+      const byName = new Intl.Collator("en-GB", { sensitivity: "base" });
       const starting_points = sps.map((p, k) => {
         const g = gateBlock({ tech: p.tech || { name: "unknown", country: "UNKNOWN", parent: null }, operator: p.operator || { name: "unknown", country: "UNKNOWN", parent: null }, hosting: p.hosting || "UNKNOWN", licence: p.licence || "unknown", exit: "unknown" }, spChecks[k]);
         const assessed = assessBlock({ id: `SP-${k}`, layer: run.blocks.get(p.block_id).recorded.layer, criticality: "supporting", ...g.effective });
         const known = assessed.tech_class !== "UNKNOWN" && assessed.operator_class !== "UNKNOWN";
         return { block_id: p.block_id, name: p.name, ...(p.note ? { note: p.note } : {}), ...(p.catalogue_id ? { catalogue_id: p.catalogue_id } : {}),
           tech_class: assessed.tech_class, operator_class: assessed.operator_class, level: known ? assessed.level : null, evidence: spChecks[k] };
-      });
+      }).sort((a, b) => a.block_id.localeCompare(b.block_id) || byName.compare(a.name, b.name));
       const options_seq = ++run.optionsSeq;
       run.leverSet = { options_seq, levers, keep: { facts: { ...run.result.facts } }, values: values(), lang, ...(starting_points.length ? { starting_points } : {}), ...(a.unchecked ? { unchecked: a.unchecked } : {}) };
       run.levers = "proposed";

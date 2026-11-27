@@ -223,18 +223,26 @@ export function staticProblems(def, ctx = {}) {
     });
   });
 
-  // Starting points for research (2.1.0, brief SA-03): each one stands under a recorded block, and a
-  // verified quote that supports "alternative" writes its name, so no name is the model's own choice.
-  const recorded = new Set((def.steps || []).filter((st) => st.tool === "rec_block").map((st) => st.input?.id));
+  // Starting points for research (2.1.0, brief SA-03): each one stands under a recorded block; the source
+  // that names it as an alternative writes its name, in the quote or in its title, so no name is the
+  // model's own choice; and each block's list is alphabetical, so the order ranks nothing.
+  const recorded = new Set();
+  let blockNo = 0;
+  for (const st of def.steps || []) if (st.tool === "rec_block") recorded.add(st.input?.id || `B-${String(++blockNo).padStart(2, "0")}`);
+  const collator = new Intl.Collator("en-GB", { sensitivity: "base" });
   (def.steps || []).forEach((step, n) => {
     if (step.tool !== "ui_propose_levers") return;
-    (step.input?.starting_points || []).forEach((p, k) => {
+    const list = step.input?.starting_points || [];
+    list.forEach((p, k) => {
       const where = `steps[${n}] starting_points[${k}]`;
       if (!recorded.has(p.block_id)) add("starting_point", where, `names block ${p.block_id}, which the run does not record`);
       const name = normaliseText(p.name || "").toLowerCase();
       if (!name) { add("starting_point", where, "a starting point needs its name"); return; }
-      const named = (p.evidence || []).some((e) => (e.supports || []).includes("alternative") && e.quote && normaliseText(e.quote).toLowerCase().includes(name));
-      if (!named) add("starting_point_unsourced", where, `no quote that supports "alternative" writes the name "${p.name}"`);
+      const named = (p.evidence || []).some((e) => (e.supports || []).includes("alternative") && e.quote
+        && [e.quote, e.title].some((t) => normaliseText(t || "").toLowerCase().includes(name)));
+      if (!named) add("starting_point_unsourced", where, `no source that supports "alternative" writes the name "${p.name}" in its quote or title`);
+      const prev = list[k - 1];
+      if (prev && prev.block_id === p.block_id && collator.compare(prev.name, p.name) > 0) add("starting_point_order", where, `"${prev.name}" stands before "${p.name}": each block's starting points go in alphabetical order`);
     });
   });
 

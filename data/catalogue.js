@@ -1,8 +1,9 @@
-/* The bundled catalogue (brief §8): sixteen German digital base services, platforms and access channels,
+/* The bundled catalogue (brief §8): seventeen German digital base services, platforms and access channels,
  * each with names in both languages, category, a one-line description, status and verified starting
- * URLs, and as the seventeenth entry this prototype itself, in a category of its own (self_assessment,
+ * URLs, and as the eighteenth entry this prototype itself, in a category of its own (self_assessment,
  * from version 0.3.0). Every URL was opened with the web fetch tool on 19 November 2026 (the
- * self-assessment's on 20 November 2026), and every description and status line rests on what those
+ * self-assessment's on 20 November 2026, the Serviceportal.NRW's, added in version 2.1.0, on 27 November
+ * 2026), and every description and status line rests on what those
  * pages say (DATA_SOURCES.md lists them). The live agent's cat_lookup
  * returns an entry with its URLs, which makes them fetchable; the fact audit counts an entry's texts
  * as part of the run's evidence. Live mode accepts any service; Simulation offers the entries that have
@@ -19,8 +20,9 @@
     url: "https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf",
     title: "Deutschland-Stack, Sachstand", lang: "de", read_on: READ
   };
-  function url(u, title, lang, note) {
-    var out = { url: u, title: title, lang: lang, read_on: READ };
+  var NRW_READ = "2026-11-27";
+  function url(u, title, lang, note, read) {
+    var out = { url: u, title: title, lang: lang, read_on: read || READ };
     if (note) out.note = note;
     return out;
   }
@@ -291,6 +293,29 @@
         urls: [
           url("https://www.bundestag.de/1223070", "Deutschland-App: Prototyp wird in sechs Kommunen erprobt", "de"),
           url("https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app", "Wiesbaden becomes pilot municipality for Germany app", "en")
+        ]
+      },
+      {
+        // From version 2.1.0: a state's platform, read on 27 November 2026 (brief SA-05). scope "state" makes
+        // the Understand step say once that the six layers are the Deutschland-Stack's and the method applies
+        // to a state's platform as to a federal one.
+        id: "serviceportal-nrw", category: "platform_or_access", group: "portals", scope: "state",
+        names: { en: "Serviceportal.NRW", de: "Serviceportal.NRW" },
+        aliases: ["Serviceportal NRW", "NRW Serviceportal", "Serviceportal Nordrhein-Westfalen", "meineverwaltung.nrw", "Service portal NRW"],
+        description: {
+          en: "The administrative portal of North Rhine-Westphalia, through which the state's authorities provide electronic administrative services.",
+          de: "Das Verwaltungsportal des Landes Nordrhein-Westfalen, über das die Behörden des Landes elektronische Verwaltungsleistungen bereitstellen."
+        },
+        status: {
+          en: "In operation at meineverwaltung.nrw; in March 2026 the state announced that a landing page of the new Nordrhein-Westfalen-Portal is to replace it.",
+          de: "In Betrieb unter meineverwaltung.nrw; im März 2026 kündigte das Land an, dass eine Landing-Page des neuen Nordrhein-Westfalen-Portals es ersetzen soll."
+        },
+        urls: [
+          url("https://recht.nrw.de/gvnrw/2020-s1212", "GV. NRW. 2020 S. 1212", "de", null, NRW_READ),
+          url("https://recht.nrw.de/gvnrw/2025-s1138", "GV. NRW. 2025 S. 1138", "de", null, NRW_READ),
+          url("https://www.land.nrw/pressemitteilung/das-neue-nordrhein-westfalen-portal-wird-zentrale-anlaufstelle-fuer-digitale", "Das neue Nordrhein-Westfalen-Portal wird zentrale Anlaufstelle für digitale Verwaltungsleistungen", "de", null, NRW_READ),
+          url("https://new.drupal.org/case-study/serviceportal-20", "Serviceportal 2.0 | Drupal.org", "en", null, NRW_READ),
+          url("https://meineverwaltung.nrw/en/content/622acfaf-7cad-400f-8703-ae23effba10f", "NRW Serviceportal - Impressum", "de", null, NRW_READ)
         ]
       },
       {

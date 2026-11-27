@@ -71,3 +71,20 @@ Read on 2026-11-20 (English); first read on 2026-11-19 for the two addresses, an
 > Apple Distribution International Ltd., located at Hollyhill Industrial Estate, Hollyhill, Cork, Republic of Ireland
 > Apple Inc., located at One Apple Park Way, Cupertino, California, United States
 > Apple Media Services include, where available, the App Store
+
+### [Deutschland-Stack – Wohin geht die Reise?](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf)
+Read on 2026-11-27 (German), for the starting points of version 2.1.0. Slides of the BMDS at the IT-Planungsrat's congress of 2026; the catalogue lists them for the ZBDS.
+
+> Digitale Authentifizierung der Antragsteller:innen via EUDI-Wallet bzw. BundID
+
+### [Open eCard: Platform independent and highly extensible Open eCard App released](https://www.openecard.org/en/news/details/platform-independent-and-highly-extensible-open-ecard-app-released/)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. A news item of the Open eCard project of 6 November 2014; its contact address is ecsec GmbH in Michelau, Germany.
+
+> A first result of the project is the Open eCard App, which provides an Open Source alternative to proprietary eID clients.
+
+### [Move over, Apple: Meet the alternative app stores available in the EU and elsewhere](https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. TechCrunch, 22 February 2026. It lists seven alternative app stores for iPhones in the EU. Starting points take those open to apps of any kind from other developers: AltStore PAL, Onside and Skich. Left out by that rule: Setapp Mobile (closed on 16 February 2026), the Epic Games Store (games only), Aptoide's iPhone store (a game store) and the Mobivention marketplace (companies' internal apps).
+
+> AltStore PAL is an officially approved alternative app marketplace in the EU.
+> Onside is an alternative iOS app store available in both the EU and, now, Japan, as of February 17, 2026
+> Last March, Skich announced the launch of an alternative app store for EU users

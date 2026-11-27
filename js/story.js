@@ -119,7 +119,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
         { label: t("p.s1.offered", null, lang), value: partyName(pr.owner, lang) },
         { label: t("p.s1.runBy", null, lang), value: partyName(pr.operator, lang) }
       ],
-      sources: sources(pr.evidence)
+      sources: sources(pr.evidence),
+      // A state's platform (2.1.0, brief SA-05): said once, where the case begins.
+      note: entry?.scope === "state" ? t("p.s1.state", null, lang) : ""
     } : run.choice && !run.chosen ? { kind: "choice", question: plain(run.choice.question), candidates: run.choice.candidates.map((c, i) => ({ index: i, name: plain(c.name), text: plain(c.description) })) } : pending
   });
 
