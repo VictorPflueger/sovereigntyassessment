@@ -1,4 +1,4 @@
-/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-20): a recorded event stream that the
+/* Pre-run assessment of FIT-Connect (hand-authored, as of 2026-11-27): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/fit-connect.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "fit-connect",
  "entry_id": "fit-connect",
  "source": "hand_authored",
- "as_of": "2026-11-20",
+ "as_of": "2026-11-27",
  "method_version": "1.0",
  "query": "FIT-Connect",
  "steps": [
@@ -85,7 +85,8 @@
        "status",
        "governance"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -95,7 +96,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -105,7 +107,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -235,7 +238,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -246,7 +250,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -256,7 +261,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -266,7 +272,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -276,7 +283,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -322,7 +330,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html",
@@ -333,7 +342,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -381,7 +391,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -391,7 +402,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -438,7 +450,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -448,7 +461,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -458,7 +472,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -468,7 +483,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -478,7 +494,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -523,7 +540,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -533,7 +551,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -602,7 +621,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -612,7 +632,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -622,7 +643,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -712,7 +734,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sonatype.com/blog/2010/09/sonatype-headquarters-moves-to-maryland?hs_amp=true",
@@ -723,7 +746,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -733,7 +757,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -760,6 +785,30 @@
      "B-07",
      "B-05"
     ]
+   }
+  },
+  {
+   "say": {
+    "en": "For the SDK's distribution and the authentication server I look for what public sources name as alternatives: starting points for research, not a recommendation.",
+    "de": "Für die Verteilung des SDK und den Authentifizierungsserver suche ich, was öffentliche Quellen als Alternativen nennen: Ansatzpunkte für die Recherche, keine Empfehlung."
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://opensource.muenchen.de/software/keycloak.html",
+    "title": "Keycloak | Munich Open Source"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/",
+    "title": "The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://github.com/dzikoysk/reposilite",
+    "title": "GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software"
    }
   },
   {
@@ -805,7 +854,73 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
+       }
+      ]
+     }
+    ],
+    "starting_points": [
+     {
+      "block_id": "B-05",
+      "name": "Keycloak",
+      "note": {
+       "en": "Open-source single sign-on and identity management; the City of Munich lists it.",
+       "de": "Quelloffenes Single Sign-on und Identitätsmanagement; die Stadt München führt es auf."
+      },
+      "evidence": [
+       {
+        "url": "https://opensource.muenchen.de/software/keycloak.html",
+        "title": "Keycloak | Munich Open Source",
+        "quote": "Keycloak is an open source software product that enables single sign-on with identity and access management",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-05",
+      "name": "Nubus",
+      "note": {
+       "en": "Identity and access management from Univention, presented as a European alternative.",
+       "de": "Identitäts- und Zugriffsmanagement von Univention, vorgestellt als europäische Alternative."
+      },
+      "evidence": [
+       {
+        "url": "https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/",
+        "title": "The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management",
+        "quote": "Nubus offers a sovereign, European alternative to Microsoft Entra ID that is open, flexible, and independent.",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-07",
+      "name": "Reposilite",
+      "note": {
+       "en": "A self-hosted repository manager for Maven artifacts, under an open-source licence.",
+       "de": "Ein selbst betriebener Repository-Manager für Maven-Artefakte unter einer Open-Source-Lizenz."
+      },
+      "evidence": [
+       {
+        "url": "https://github.com/dzikoysk/reposilite",
+        "title": "GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software",
+        "quote": "This is a simple, extensible and scalable self-hosted solution that replaces managers like Nexus, Archiva or Artifactory",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
        }
       ]
      }

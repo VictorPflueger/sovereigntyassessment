@@ -1,4 +1,4 @@
-/* Pre-run assessment of BundID (hand-authored, as of 2026-11-20): a recorded event stream that the
+/* Pre-run assessment of BundID (hand-authored, as of 2026-11-27): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/bundid.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "bundid",
  "entry_id": "bundid",
  "source": "hand_authored",
- "as_of": "2026-11-20",
+ "as_of": "2026-11-27",
  "method_version": "1.0",
  "query": "BundID",
  "steps": [
@@ -80,7 +80,8 @@
        "owner",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -90,7 +91,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.arbeitsagentur.de/bundid",
@@ -100,7 +102,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.arbeitsagentur.de/bundid",
@@ -110,7 +113,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -166,7 +170,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://bmds.bund.de/fileadmin/BMDS/Dokumente/AM_Gesamtarchitektur.pdf",
@@ -282,7 +287,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://github.com/kubernetes/kubernetes",
@@ -292,7 +298,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://cncf.io/about/who-we-are/",
@@ -302,7 +309,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://linuxfoundation.org/legal/privacy-policy",
@@ -312,7 +320,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
@@ -322,7 +331,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
@@ -332,7 +342,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -406,7 +417,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -416,7 +428,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -426,7 +439,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -473,7 +487,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -483,7 +498,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -573,7 +589,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -583,7 +600,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -631,7 +649,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -641,7 +660,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -651,7 +671,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -661,7 +682,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -671,7 +693,8 @@
       "supports": [
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://support.apple.com/en-mide/118110",
@@ -707,6 +730,30 @@
     "focus": [
      "B-06"
     ]
+   }
+  },
+  {
+   "say": {
+    "en": "For the weak blocks I look for what public sources name as alternatives: starting points for research, not a recommendation.",
+    "de": "Für die schwachen Bausteine suche ich, was öffentliche Quellen als Alternativen nennen: Ansatzpunkte für die Recherche, keine Empfehlung."
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf",
+    "title": "Deutschland-Stack – Wohin geht die Reise?"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.openecard.org/en/news/details/platform-independent-and-highly-extensible-open-ecard-app-released/",
+    "title": "Open eCard: Platform independent and highly extensible Open eCard App released"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+    "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere"
    }
   },
   {
@@ -751,6 +798,114 @@
          "alternative"
         ],
         "verified": true
+       }
+      ]
+     }
+    ],
+    "starting_points": [
+     {
+      "block_id": "B-03",
+      "name": "EUDI-Wallet",
+      "note": {
+       "en": "The federal plans name authentication with the EUDI wallet beside the BundID.",
+       "de": "Die Pläne des Bundes nennen die Authentifizierung mit der EUDI-Wallet neben der BundID."
+      },
+      "catalogue_id": "eudi-wallet",
+      "evidence": [
+       {
+        "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf",
+        "title": "Deutschland-Stack – Wohin geht die Reise?",
+        "quote": "Digitale Authentifizierung der Antragsteller:innen via EUDI-Wallet bzw. BundID",
+        "lang": "de",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-03",
+      "name": "Open eCard App",
+      "note": {
+       "en": "An open-source eID client of the Open eCard project.",
+       "de": "Ein quelloffener eID-Client des Projekts Open eCard."
+      },
+      "evidence": [
+       {
+        "url": "https://www.openecard.org/en/news/details/platform-independent-and-highly-extensible-open-ecard-app-released/",
+        "title": "Open eCard: Platform independent and highly extensible Open eCard App released",
+        "quote": "A first result of the project is the Open eCard App, which provides an Open Source alternative to proprietary eID clients.",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-06",
+      "name": "AltStore PAL",
+      "note": {
+       "en": "An alternative app marketplace for iPhones in the EU that takes apps of other developers.",
+       "de": "Ein alternativer App-Marktplatz für iPhones in der EU, der Apps anderer Entwickler aufnimmt."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "AltStore PAL is an officially approved alternative app marketplace in the EU.",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-06",
+      "name": "Onside",
+      "note": {
+       "en": "An alternative app store for iPhones in the EU.",
+       "de": "Ein alternativer App-Store für iPhones in der EU."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "Onside is an alternative iOS app store available in both the EU and, now, Japan, as of February 17, 2026",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-06",
+      "name": "Skich",
+      "note": {
+       "en": "An alternative app store for iPhones in the EU.",
+       "de": "Ein alternativer App-Store für iPhones in der EU."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "Last March, Skich announced the launch of an alternative app store for EU users",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
        }
       ]
      }

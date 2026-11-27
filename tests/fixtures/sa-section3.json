@@ -1,0 +1,67 @@
+{
+  "source": "Revision brief for version 2.1.0, section 3: what the engine on main (35c0dea) shows for the six cases, written here before the code that derives it",
+  "counts": { "pre_runs": 17, "assessed": 14, "tile_above_a_block": 5, "critical_left_out_as_unknown": 2 },
+  "cases": [
+    {
+      "id": "bundid", "overall": 77, "layers": 5,
+      "weakest": { "level": 3, "block": "Kubernetes platform at the ITZBund", "ties": 0 },
+      "lowest": 0,
+      "lower": [
+        { "block": "AusweisApp on iPhones through the App Store", "criticality": "important", "level": 0 },
+        { "block": "Online ID with the AusweisApp", "criticality": "important", "level": 2 }
+      ],
+      "unknown_critical": []
+    },
+    {
+      "id": "fit-connect", "overall": 76, "layers": 5,
+      "weakest": { "level": 4, "block": "Data centre of the Zustelldienst", "ties": 4 },
+      "lowest": 0,
+      "lower": [
+        { "block": "Java SDK distribution through Maven Central", "criticality": "important", "level": 0 },
+        { "block": "Authentication server and self-service portal", "criticality": "important", "level": 2 }
+      ],
+      "unknown_critical": []
+    },
+    {
+      "id": "eudi-wallet", "overall": 67, "layers": 3,
+      "weakest": { "level": 4, "block": "Issuing the digital ID", "ties": 1 },
+      "lowest": 0,
+      "lower": [
+        { "block": "d-you in Apple's store", "criticality": "important", "level": 0 },
+        { "block": "d-you in Google's store", "criticality": "important", "level": 0 }
+      ],
+      "unknown_critical": []
+    },
+    {
+      "id": "epaybl", "overall": 50, "layers": 4,
+      "weakest": { "level": 2, "block": "ePayBL 4 and its instances", "ties": 1 },
+      "lowest": 0,
+      "lower": [
+        { "block": "Card payments (Mastercard, Visa)", "criticality": "important", "level": 0 },
+        { "block": "PayPal", "criticality": "important", "level": 0 }
+      ],
+      "unknown_critical": []
+    },
+    {
+      "id": "online-ausweis", "overall": 70, "layers": 4,
+      "weakest": { "level": 2, "block": "AusweisApp", "ties": 1 },
+      "lowest": 0,
+      "lower": [
+        { "block": "AusweisApp on iPhones through the App Store", "criticality": "important", "level": 0 }
+      ],
+      "unknown_critical": ["eID servers of the services"]
+    },
+    {
+      "id": "opencode", "overall": 85, "layers": 5,
+      "weakest": { "level": 2, "block": "GitLab system", "ties": 0 },
+      "lowest": 2,
+      "lower": [],
+      "unknown_critical": ["Hosting provider of openCode"]
+    }
+  ],
+  "arithmetic": [
+    { "id": "bundid", "layer": "access", "score": 60, "terms": [[4, 3], [0, 2]], "weights": 5 },
+    { "id": "fit-connect", "layer": "access", "score": 0, "terms": [[0, 2]], "weights": 2 },
+    { "id": "fit-connect", "layer": "platform", "score": 80, "terms": [[4, 3], [2, 2]], "weights": 5 }
+  ]
+}

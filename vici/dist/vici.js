@@ -3,8 +3,9 @@
  * No dependencies. Load with <script src="dist/vici.js" defer></script>.
  * Everything works without it except: theme toggle, tabs, toasts, dialog triggers,
  * the mobile header menu (without it the links stay visible), the How it works guide, menu positioning (menus
- * open centred), slider fill, carousel dots, table sorting and copy buttons. Tooltips work
- * without it too; with it they move to the top layer, so no container can clip them.
+ * open centred), slider fill, carousel dots, table sorting, copy buttons and printing a report alone with its
+ * footer (Vici.report). Tooltips work without it too; with it they move to the top layer, so no container can
+ * clip them.
  */
 (function () {
   'use strict';
@@ -241,8 +242,16 @@
     // CSS turns the ratio into a fill that ends under the centre of the thumb
     input.style.setProperty('--vc-slider-value', String(ratio));
     if (input.id) {
-      $all('output[for~="' + input.id + '"]').forEach(function (out) { out.textContent = input.value; });
+      $all('output[for~="' + input.id + '"]').forEach(function (out) { out.textContent = sliderText(out, input.value); });
     }
+  }
+  // An output with data-vc-currency="EUR" shows the value as money in the language of the page around it.
+  function sliderText(out, raw) {
+    var currency = out.getAttribute('data-vc-currency');
+    if (!currency) return raw;
+    var holder = out.closest('[lang]');
+    var lang = (holder && holder.getAttribute('lang')) || 'en';
+    try { return new Intl.NumberFormat(lang, { style: 'currency', currency: currency }).format(Number(raw)); } catch (e) { return raw; }
   }
   function initSliders(scope) {
     $all('input.vc-slider', scope).forEach(updateSlider);
@@ -619,6 +628,329 @@
     return Promise.resolve(done(legacyCopy(value)));
   }
 
+  // A drop zone (.vc-dropzone[data-vc-dropzone]): files dropped on it, or chosen through its file input,
+  // reach the page as one cancelable `vc:files` event on the zone ({ files }); the input is cleared, so
+  // the same file can come again. A page that checks files itself calls preventDefault() and lists them;
+  // otherwise Vici lists each file's name and size with a remove button (wording from
+  // data-vc-dropzone-remove, "Remove {name}" by default). While a zone is on the page, a file dropped
+  // beside it is caught rather than opened by the browser, which would leave the page and lose its work.
+  // The listeners sit on the document, so zones drawn later need no init.
+  var dragDepth = new WeakMap();
+  function hasFiles(e) {
+    var types = e.dataTransfer && e.dataTransfer.types;
+    return !!types && Array.prototype.indexOf.call(types, 'Files') >= 0;
+  }
+  function zoneOf(target) {
+    return target instanceof Element ? target.closest('[data-vc-dropzone]') : null;
+  }
+  function fileSize(bytes) {
+    if (bytes >= 1048576) return (Math.round(bytes / 104857.6) / 10) + ' MB';
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  }
+  function listFiles(zone, files) {
+    var list = zone.querySelector('.vc-dropzone__files');
+    if (!list) return;
+    var wording = zone.getAttribute('data-vc-dropzone-remove') || 'Remove {name}';
+    files.forEach(function (file) {
+      var li = document.createElement('li');
+      li.className = 'vc-dropzone__file';
+      var icon = document.createElement('span');
+      icon.className = 'vc-icon vc-icon--memo';
+      icon.setAttribute('aria-hidden', 'true');
+      var body = document.createElement('span');
+      body.className = 'vc-dropzone__body';
+      var name = document.createElement('span');
+      name.className = 'vc-dropzone__name';
+      name.textContent = file.name;
+      var meta = document.createElement('span');
+      meta.className = 'vc-dropzone__meta';
+      meta.textContent = fileSize(file.size);
+      body.appendChild(name);
+      body.appendChild(meta);
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'vc-icon-button vc-icon-button--sm';
+      remove.setAttribute('aria-label', wording.replace('{name}', file.name));
+      var x = document.createElement('span');
+      x.className = 'vc-icon vc-icon--close';
+      x.setAttribute('aria-hidden', 'true');
+      remove.appendChild(x);
+      remove.addEventListener('click', function () {
+        var next = focusAfterRemoval(li) || zone.querySelector('.vc-dropzone__input');
+        li.remove();
+        if (next) next.focus();
+      });
+      li.appendChild(icon);
+      li.appendChild(body);
+      li.appendChild(remove);
+      list.appendChild(li);
+    });
+  }
+  function sendFiles(zone, fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length || zone.getAttribute('aria-disabled') === 'true') return;
+    var ev = new CustomEvent('vc:files', { bubbles: true, cancelable: true, detail: { files: files } });
+    if (zone.dispatchEvent(ev)) listFiles(zone, files);
+  }
+  document.addEventListener('dragenter', function (e) {
+    var zone = zoneOf(e.target);
+    if (!zone || !hasFiles(e)) return;
+    e.preventDefault();
+    dragDepth.set(zone, (dragDepth.get(zone) || 0) + 1);
+    zone.setAttribute('data-dragging', '');
+  });
+  document.addEventListener('dragleave', function (e) {
+    var zone = zoneOf(e.target);
+    if (!zone || !hasFiles(e)) return;
+    var depth = Math.max(0, (dragDepth.get(zone) || 0) - 1);
+    dragDepth.set(zone, depth);
+    if (!depth) zone.removeAttribute('data-dragging');
+  });
+  document.addEventListener('dragover', function (e) {
+    if (!hasFiles(e)) return;
+    var zone = zoneOf(e.target);
+    if (zone) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = zone.getAttribute('aria-disabled') === 'true' ? 'none' : 'copy';
+    } else if (document.querySelector('[data-vc-dropzone]')) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'none';
+    }
+  });
+  document.addEventListener('drop', function (e) {
+    if (!hasFiles(e)) return;
+    var zone = zoneOf(e.target);
+    if (zone) {
+      e.preventDefault();
+      dragDepth.set(zone, 0);
+      zone.removeAttribute('data-dragging');
+      sendFiles(zone, e.dataTransfer && e.dataTransfer.files);
+    } else if (document.querySelector('[data-vc-dropzone]')) {
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('change', function (e) {
+    var input = e.target;
+    if (!(input instanceof HTMLInputElement) || input.type !== 'file') return;
+    var zone = zoneOf(input);
+    if (!zone) return;
+    sendFiles(zone, input.files);
+    input.value = '';
+  });
+
+  /* --------------------------------------------------------------- report */
+  // A report (.vc-report, components/report.html) prints alone. Vici.report.prepare(report) copies it into a
+  // container at the end of body marked data-vc-print, which the print styles show instead of the page, and
+  // gives the running footer the words in the report's own attributes: data-vc-footer-start (a line break
+  // starts a second line), data-vc-footer-end and data-vc-footer-of around the page numbers, and
+  // data-vc-notice above every page. It returns a function that takes the copy away again.
+  // Vici.report.print(report) does that around the browser's print dialog, and a button with
+  // data-vc-report-print="<report id>" calls it. Vici.report.html(report, { title }) returns the report as an
+  // HTML file of its own: its markup with absolute links and the title as its h1, its pictures as data, the
+  // page's style rules that reach it without web fonts, a policy that loads nothing, and no script.
+  var REPORT_FOOTER = [
+    ['data-vc-footer-start', '--vc-report-footer-start'],
+    ['data-vc-footer-end', '--vc-report-footer-end'],
+    ['data-vc-footer-of', '--vc-report-footer-of'],
+    ['data-vc-notice', '--vc-report-notice']
+  ];
+  function cssString(text) {
+    return '"' + String(text).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, '\\A ') + '"';
+  }
+  function reportOf(target) {
+    var el = typeof target === 'string' ? document.getElementById(target.replace(/^#/, '')) : target;
+    return el && el.classList && el.classList.contains('vc-report') ? el : null;
+  }
+  function footerOf(report) {
+    var out = [];
+    REPORT_FOOTER.forEach(function (pair) {
+      var text = report.getAttribute(pair[0]);
+      if (text) out.push([pair[1], cssString(text)]);
+    });
+    return out;
+  }
+  // The copy keeps its labels and links working: every id gets a suffix, and so does every reference to it.
+  function suffixIds(copy, suffix) {
+    var ids = {};
+    [copy].concat($all('[id]', copy)).forEach(function (el) {
+      if (!el.id) return;
+      ids[el.id] = true;
+      el.id += suffix;
+    });
+    ['for', 'headers', 'aria-labelledby', 'aria-describedby', 'aria-controls', 'aria-owns'].forEach(function (name) {
+      $all('[' + name + ']', copy).forEach(function (el) {
+        el.setAttribute(name, el.getAttribute(name).split(/\s+/).map(function (id) { return ids[id] ? id + suffix : id; }).join(' '));
+      });
+    });
+    $all('a[href^="#"]', copy).forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      if (ids[id]) a.setAttribute('href', '#' + id + suffix);
+    });
+  }
+  // Chromium prints margin boxes from version 131 but lets CSS ask for them only from 148, through
+  // @supports at-rule(@bottom-left). For the versions between, the copy says so itself, so the page prints one
+  // footer, not two.
+  function marginBoxes() {
+    try { if (window.CSS && CSS.supports('at-rule(@bottom-left)')) return true; } catch (e) { /* older engines */ }
+    var m = /Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent || '');
+    return !!m && Number(m[1]) >= 131;
+  }
+  var printing = null;
+  function prepareReport(target) {
+    var report = reportOf(target);
+    if (!report) return function () {};
+    if (printing && printing.report === report && printing.box.isConnected) return printing.undo;
+    if (printing) printing.undo();
+    var box = document.createElement('div');
+    box.setAttribute('data-vc-print', '');
+    if (marginBoxes()) box.setAttribute('data-vc-margin-boxes', '');
+    var copy = report.cloneNode(true);
+    suffixIds(copy, '-print');
+    box.appendChild(copy);
+    document.body.appendChild(box);
+    var footer = footerOf(report);
+    footer.forEach(function (pair) { root.style.setProperty(pair[0], pair[1]); });
+    var state = { report: report, box: box };
+    state.undo = function () {
+      if (printing !== state) return;
+      printing = null;
+      box.remove();
+      footer.forEach(function (pair) { root.style.removeProperty(pair[0]); });
+    };
+    printing = state;
+    return state.undo;
+  }
+  function printReport(target) {
+    var undo = prepareReport(target);
+    function after() { window.removeEventListener('afterprint', after); undo(); }
+    window.addEventListener('afterprint', after);
+    window.print();
+  }
+
+  // Style rules for the file: a rule stays when one of its selectors, without pseudo-elements and the states a
+  // pointer or keyboard sets, matches something in the file's own document. Web fonts stay out: the page
+  // cannot read their files, so the file names them and falls back to the fonts on the reader's machine.
+  var PSEUDO_ELEMENT = /::[a-z-]+(?:\([^)]*\))?|:(?:before|after|first-line|first-letter)\b/gi;
+  var PSEUDO_STATE = /:(?:hover|focus-visible|focus-within|focus|active|visited|any-link|link|target-within|target|checked|disabled|enabled|indeterminate|invalid|valid|user-invalid|user-valid|placeholder-shown|-webkit-autofill|autofill|popover-open|modal|open|closed|fullscreen|playing|paused|defined|-moz-focusring)(?![\w-])/gi;
+  function splitSelectors(text) {
+    var out = [];
+    var depth = 0;
+    var start = 0;
+    for (var i = 0; i < text.length; i++) {
+      var c = text.charAt(i);
+      if (c === '(' || c === '[') depth++;
+      else if (c === ')' || c === ']') depth--;
+      else if (c === ',' && !depth) { out.push(text.slice(start, i)); start = i + 1; }
+    }
+    out.push(text.slice(start));
+    return out;
+  }
+  function reaches(selectorText, doc) {
+    return splitSelectors(selectorText).some(function (sel) {
+      var bare = sel.replace(PSEUDO_ELEMENT, '').replace(PSEUDO_STATE, '').trim();
+      if (!bare) return true;
+      try { return !!doc.querySelector(bare); } catch (e) { return true; }
+    });
+  }
+  // Some engines leave a page rule's margin boxes out of its text, though they hold them as its child rules.
+  function pageRuleText(rule) {
+    var text = rule.cssText;
+    if (/@(top|bottom|left|right)-/.test(text) || !rule.cssRules || !rule.cssRules.length) return text;
+    return text.replace(/\}\s*$/, Array.prototype.map.call(rule.cssRules, function (r) { return r.cssText; }).join('\n') + '\n}');
+  }
+  function rulesFor(list, doc) {
+    var out = [];
+    Array.prototype.forEach.call(list, function (rule) {
+      var inner;
+      if (rule.type === CSSRule.FONT_FACE_RULE || rule.type === CSSRule.IMPORT_RULE) return;
+      if (rule.type === CSSRule.STYLE_RULE) {
+        if (reaches(rule.selectorText, doc)) out.push(rule.cssText);
+        return;
+      }
+      if (rule.type === CSSRule.MEDIA_RULE || rule.type === CSSRule.SUPPORTS_RULE || (window.CSSLayerBlockRule && rule instanceof window.CSSLayerBlockRule) || (window.CSSContainerRule && rule instanceof window.CSSContainerRule)) {
+        inner = rulesFor(rule.cssRules, doc);
+        if (!inner.length) return;
+        var head = rule.type === CSSRule.MEDIA_RULE ? '@media ' + rule.media.mediaText
+          : rule.type === CSSRule.SUPPORTS_RULE ? '@supports ' + rule.conditionText
+          : window.CSSContainerRule && rule instanceof window.CSSContainerRule ? '@container ' + rule.conditionText
+          : '@layer' + (rule.name ? ' ' + rule.name : '');
+        out.push(head + ' {\n' + inner.join('\n') + '\n}');
+        return;
+      }
+      out.push(rule.type === CSSRule.PAGE_RULE ? pageRuleText(rule) : rule.cssText);
+    });
+    return out;
+  }
+  function escHtml(text) {
+    return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function imageData(img, live) {
+    try {
+      if (!live || !live.complete || !live.naturalWidth) return null;
+      var r = live.getBoundingClientRect();
+      var scale = r.width ? Math.min(1, (2 * r.width) / live.naturalWidth) : Math.min(1, 192 / Math.max(live.naturalWidth, live.naturalHeight));
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(live.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(live.naturalHeight * scale));
+      canvas.getContext('2d').drawImage(live, 0, 0, canvas.width, canvas.height);
+      return /\.jpe?g(\?|#|$)/i.test(live.currentSrc || live.src) ? canvas.toDataURL('image/jpeg', 0.86) : canvas.toDataURL('image/png');
+    } catch (e) { return null; }
+  }
+  function reportHtml(target, options) {
+    var report = reportOf(target);
+    if (!report) return '';
+    options = options || {};
+    var lang = report.getAttribute('lang') || root.getAttribute('lang') || 'en';
+    var copy = report.cloneNode(true);
+    var live = $all('img', report);
+    $all('img', copy).forEach(function (img, i) {
+      var data = imageData(img, live[i]);
+      img.removeAttribute('srcset');
+      img.removeAttribute('sizes');
+      img.removeAttribute('loading');
+      if (data) { img.setAttribute('src', data); return; }
+      var alt = img.getAttribute('alt');
+      if (alt) img.replaceWith(document.createTextNode(alt));
+      else img.remove();
+    });
+    $all('picture > source, script, noscript, template', copy).forEach(function (el) { el.remove(); });
+    // In a file of its own the title is the h1, so every heading moves up as far as the title does.
+    var top = copy.querySelector('.vc-report__title');
+    var shift = top && /^H[1-6]$/.test(top.tagName) ? Number(top.tagName.charAt(1)) - 1 : 0;
+    if (shift > 0) $all('h1, h2, h3, h4, h5, h6', copy).forEach(function (el) {
+      var up = document.createElement('h' + Math.max(1, Number(el.tagName.charAt(1)) - shift));
+      Array.prototype.forEach.call(el.attributes, function (a) { up.setAttribute(a.name, a.value); });
+      while (el.firstChild) up.appendChild(el.firstChild);
+      el.replaceWith(up);
+    });
+    $all('a[href]', copy).forEach(function (a) {
+      if (a.getAttribute('href').charAt(0) !== '#') a.setAttribute('href', a.href);
+    });
+    var doc = document.implementation.createHTMLDocument('');
+    doc.documentElement.setAttribute('lang', lang);
+    doc.documentElement.setAttribute('data-theme', 'light');
+    doc.body.className = 'vc-report-file';
+    doc.body.appendChild(doc.importNode(copy, true));
+    var css = [];
+    Array.prototype.forEach.call(document.styleSheets, function (sheet) {
+      var rules;
+      if (sheet.disabled) return;
+      try { rules = sheet.cssRules; } catch (e) { return; }
+      var kept = rulesFor(rules, doc);
+      var media = sheet.media && sheet.media.mediaText;
+      if (kept.length) css.push(media && media !== 'all' ? '@media ' + media + ' {\n' + kept.join('\n') + '\n}' : kept.join('\n'));
+    });
+    // The footer's words stand on the root as prepare() sets them, in its style attribute.
+    var footer = footerOf(report).map(function (pair) { return pair[0] + ': ' + pair[1]; }).join('; ');
+    var title = options.title || (report.querySelector('.vc-report__title') || {}).textContent || document.title;
+    return '<!DOCTYPE html>\n<html lang="' + escHtml(lang) + '" data-theme="light"' + (footer ? ' style="' + escHtml(footer) + '"' : '') + '>\n<head>\n<meta charset="utf-8">\n'
+      + '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+      + '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:">\n'
+      + '<title>' + escHtml(String(title).replace(/\s+/g, ' ').trim()) + '</title>\n'
+      + '<style>\n' + css.join('\n').replace(/<\/style/gi, '<\\/style') + '\n</style>\n</head>\n'
+      + doc.body.outerHTML + '\n</html>\n';
+  }
+
   function init(scope) {
     initTabs(scope);
     initSliders(scope);
@@ -858,6 +1190,12 @@
       return;
     }
 
+    var printBtn = t.closest('[data-vc-report-print]');
+    if (printBtn) {
+      if (reportOf(printBtn.getAttribute('data-vc-report-print') || '')) { e.preventDefault(); printReport(printBtn.getAttribute('data-vc-report-print')); }
+      return;
+    }
+
     var headerToggle = t.closest('.vc-header__toggle');
     if (headerToggle) {
       var header = headerToggle.closest('.vc-header');
@@ -907,6 +1245,7 @@
     toast: toast,
     theme: { get: resolvedTheme, set: setTheme },
     copy: copyText,
+    report: { prepare: prepareReport, print: printReport, html: reportHtml },
     guide: { open: function (id, chapter) { openGuide(id, chapter); }, show: function (id, chapter) {
       var dlg = typeof id === 'string' ? document.getElementById(id) : id;
       var g = dlg && guideParts(dlg);

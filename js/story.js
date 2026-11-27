@@ -7,11 +7,12 @@
 // the run's language. They reach the screen through plain(): the engine's placeholders filled in, block
 // ids such as B-06 replaced by the block's name, lever ids by the lever's title.
 
-import { t } from "./i18n/index.js";
+import { t, tn, locale } from "./i18n/index.js";
 import { renderFacts } from "./facts.js";
 import { fmtScore, fmtInt, fmtDate } from "./format.js";
 import { LAYERS, techLevel, opLevel } from "./engine.js";
 import { STEP_IDS, scoredLayers } from "./run.js";
+import { links, makeup, layerSum, overallSum, weakBlocks, comparable } from "./chain.js";
 
 const words = (s) => (String(s).match(/\S+/g) || []).length;
 const NBSP = " ";
@@ -35,28 +36,74 @@ export function eur(value, lang) {
 /** The origin class as words: "Germany", "the US", "unknown". */
 const place = (cls, lang) => t(`p.class.${cls || "UNKNOWN"}`, null, lang);
 
-/** A party's name for the screen, with its parent: "Apple Distribution International Ltd., part of Apple Inc.". */
+/**
+ * A party's name for the screen, with its parent, and its own country where the parent's differs, since the
+ * parent's country is the one that counts: "Apple Distribution International Ltd. (Ireland), part of Apple Inc.".
+ */
 function partyName(p, lang) {
   const unknown = !p || !p.name || /^(unknown|unbekannt)$/i.test(String(p.name).trim());
   if (unknown && !p?.parent) return t("p.party.unknown", null, lang);
-  const own = unknown ? t("p.party.unknown", null, lang) : p.name;
+  let own = unknown ? t("p.party.unknown", null, lang) : p.name;
+  if (!unknown && p.parent?.country && /^[A-Z]{2}$/.test(p.country || "") && p.country !== p.parent.country) own = `${own} (${country(p.country, lang)})`;
   return p.parent?.name ? t("p.party.parent", { party: own, parent: p.parent.name }, lang) : own;
+}
+
+/** A country's name in the page's language, from its ISO code: "Ireland", "Irland". */
+function country(code, lang) {
+  try { return new Intl.DisplayNames([locale(lang)], { type: "region" }).of(code) || code; } catch { return code; }
+}
+
+/**
+ * A review card's quotes: the `show` it shows first are those that back the side setting the block's level,
+ * the side's own quotes before its parent's or its hosting, and those naming its party before the rest; they
+ * stand in the order recorded, so a sentence and the line it introduces read in turn (cold read, 2.1.0).
+ */
+function backing(list, b, show) {
+  const tech = techLevel(b.tech_class, b.scored?.licence ?? b.licence);
+  const op = opLevel(b.operator_class, b.scored?.hosting ?? b.hosting);
+  const side = tech === null ? "operator" : op === null || tech < op ? "tech" : "operator";
+  const related = side === "tech" ? ["tech.parent", "licence"] : ["operator.parent", "hosting"];
+  const party = side === "tech" ? b.tech : b.operator;
+  const names = [party?.name, party?.parent?.name].filter((n) => n && !/^(unknown|unbekannt)$/i.test(n)).map((n) => n.toLowerCase());
+  const rank = (s) => {
+    const own = (s.supports || []).includes(side);
+    const near = (s.supports || []).some((x) => related.includes(x));
+    const named = names.some((n) => s.quote.toLowerCase().includes(n));
+    return (own ? 0 : near ? 2 : 4) + (named ? 0 : 1);
+  };
+  const ranked = list.map((s, i) => [rank(s), i, s]).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+  const first = ranked.slice(0, show).sort((x, y) => x[1] - y[1]);
+  return [...first, ...ranked.slice(show).sort((x, y) => x[1] - y[1])].map((x) => x[2]);
 }
 
 /** Why a block has its level, in words: who makes it, who runs it, and what that gives. */
 function levelWhy(b, lang) {
   const tech = techLevel(b.tech_class, b.scored?.licence ?? b.licence);
   const op = opLevel(b.operator_class, b.scored?.hosting ?? b.hosting);
-  const made = tech === 4 ? "p.why.tech4" : tech === 3 ? "p.why.tech3" : tech === 2 ? "p.why.tech2" : "p.why.techNone";
-  const run = op === 4 ? "p.why.op4" : op === 1 ? "p.why.op1" : op === 0 ? "p.why.op0" : "p.why.opNone";
-  return t("p.why", { made: t(made, null, lang), run: t(run, null, lang) }, lang);
+  // A party in a group from another country counts as its group's country: the words say so, beside its own
+  // country ("Ireland") on the card (cold read, 2.1.0).
+  const group = (p) => !!(p?.parent?.name && p.parent.country && p.country && p.country !== p.parent.country);
+  const made = tech === 4 ? "p.why.tech4" : tech === 3 ? (group(b.tech) ? "p.why.tech3.group" : "p.why.tech3") : tech === 2 ? (group(b.tech) ? "p.why.tech2.group" : "p.why.tech2") : "p.why.techNone";
+  const run = op === 4 ? "p.why.op4" : op === 1 ? (group(b.operator) ? "p.why.op1.group" : "p.why.op1") : op === 0 ? (group(b.operator) ? "p.why.op0.group" : "p.why.op0") : "p.why.opNone";
+  // The rule that sets the level, as the make-up states it: the lower side, a cap of 2, or no level.
+  const rule = tech === null && op === null ? "p.why.unscored" : tech === null || op === null ? "p.why.capped" : "p.why";
+  return t(rule, { made: t(made, null, lang), run: t(run, null, lang) }, lang);
 }
 
+/** A block in words with its criticality and level: "Sign-in page at id.bund.de (critical, level 4)". */
+const blockWords = (name, criticality, level, lang) => t("p.sum.block", { name, crit: t(`p.crit.${criticality}`, null, lang), level: fmtInt(level, lang) }, lang);
+/** Names in a list: "a and b", "a, b and c". */
+const andList = (items, lang) => (items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} ${t("p.and", null, lang)} ${items[items.length - 1]}`);
+/** The catalogue's entries, as the page and the tests load them. */
+const catalogueEntries = () => globalThis.window?.SA_CATALOGUE?.entries || [];
+
 /**
- * story({ run, lang, mode, entry }) → { service, steps[5], kpis, log, ended, finished, decided }
- * run: digest(events) of js/run.js; entry: the catalogue entry, or null for a service typed in a live run.
+ * story({ run, lang, mode, entry, others }) → { service, steps[5], kpis, log, ended, finished, decided }
+ * run: digest(events) of js/run.js; entry: the catalogue entry, or null for a service typed in a live run;
+ * others: every case's engine result as { [id]: { overall, layers } or { notService } }, once the page has
+ * played them (comparable services wait for it).
  */
-export function story({ run, lang = "en", mode = "simulation", entry = null }) {
+export function story({ run, lang = "en", mode = "simulation", entry = null, others = null }) {
   const result = run.score?.result || null;
   const facts = run.score?.facts || {};
   const blocks = new Map((result?.blocks || run.blockList || []).map((b) => [b.id, b]));
@@ -86,9 +133,12 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
   const atRisk = critical.filter((b) => b.level <= 1).length;
   const weakest = result?.weakest ? { id: result.weakest.block_id, name: blockName(result.weakest.block_id), level: result.weakest.level, ties: result.weakest.ties } : null;
   const lowest = result ? result.blocks.filter((b) => !b.unscored).sort((a, b) => a.level - b.level || LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer))[0] || null : null;
+  const chain = result ? links(result) : null;
+  const lowerIds = new Set((chain?.lower || []).map((x) => x.id));
+  const unknownIds = new Set(chain?.unknownCritical || []);
   const pages = run.research.filter((s) => s.kind === "fetch" && s.ok).length;
   const quotes = new Set(run.evidence.filter((c) => c.verified && c.quote).map((c) => `${c.url}|${c.quote}`)).size;
-  const sources = (list) => (list || []).filter((c) => c.verified && c.quote).map((c) => ({ quote: c.quote, url: c.url, title: c.title || c.url, read: c.read_on ? fmtDate(c.read_on, lang) : "", lang: c.lang || "" }));
+  const sources = (list) => (list || []).filter((c) => c.verified && c.quote).map((c) => ({ quote: c.quote, url: c.url, title: c.title || c.url, read: c.read_on ? fmtDate(c.read_on, lang) : "", lang: c.lang || "", supports: c.supports || [] }));
   const ended = run.end && !["done", "not_a_service"].includes(run.end.status) ? { status: run.end.status } : null;
   const pending = ended ? { kind: "empty", text: t("p.stage.stopped", null, lang) } : { kind: "wait", text: t("p.stage.working", null, lang) };
   const agent = (i) => run.narration.filter((m) => m.step === i).map((m) => ({ text: plain(m.text, m.values), unchecked: m.audit === "unchecked" }));
@@ -106,7 +156,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
         { label: t("p.s1.offered", null, lang), value: partyName(pr.owner, lang) },
         { label: t("p.s1.runBy", null, lang), value: partyName(pr.operator, lang) }
       ],
-      sources: sources(pr.evidence)
+      sources: sources(pr.evidence),
+      // A state's platform (2.1.0, brief SA-05): said once, where the case begins.
+      note: entry?.scope === "state" ? t("p.s1.state", null, lang) : ""
     } : run.choice && !run.chosen ? { kind: "choice", question: plain(run.choice.question), candidates: run.choice.candidates.map((c, i) => ({ index: i, name: plain(c.name), text: plain(c.description) })) } : pending
   });
 
@@ -146,24 +198,87 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
     stage: notService ? { kind: "empty", text: t("p.stage.notService", null, lang) } : blockCount || Object.keys(run.layers).length ? { kind: "layers", rows } : pending
   });
 
-  // 3 Score: code gives every block its level and every layer its score.
+  // 3 Score: code gives every block its level and every layer its score. Each block says its criticality in
+  // words and carries the tile's marks; its make-up and its layer's arithmetic open where the eye is.
+  const sumOf = (l) => {
+    const s = result ? layerSum(result, l) : null;
+    if (!s || s.value === null) return null;
+    const expr = `${fmtScore(s.value, lang)} = (${s.terms.map((x) => `${fmtInt(x.level, lang)} × ${fmtInt(x.weight, lang)}`).join(" + ")}) ÷ ${fmtInt(s.weights, lang)} × 25`;
+    const named = s.terms.map((x) => blockWords(blockName(x.id), x.criticality, x.level, lang));
+    return { expr, named, text: t("p.sum.layer", { expr, blocks: andList(named, lang) }, lang), terms: s.terms.length };
+  };
+  const marksOf = (b) => {
+    const out = [];
+    if (weakest?.id === b.id) out.push({ kind: "weakest", text: t("p.flag.weakest", null, lang) });
+    if (chain?.lower?.[0]?.id === b.id) out.push({ kind: "lowest", text: t("p.flag.lowestOverall", null, lang) });
+    else if (lowerIds.has(b.id)) out.push({ kind: "lower", text: t("p.flag.below", { n: fmtInt(chain.weakest.level, lang) }, lang) });
+    if (unknownIds.has(b.id)) out.push({ kind: "unknown", text: t("p.flag.unknown", null, lang) });
+    if (b.partly_unknown) out.push({ kind: "partly", text: t("p.flag.partly", null, lang) });
+    return out;
+  };
+  const makeupOf = (b) => {
+    const m = makeup(b);
+    const side = (party, cls, detail, level) => ({ who: partyName(party, lang), where: place(cls, lang), detail, level, levelText: level === null ? t("p.mk.noLevel", null, lang) : t("p.levelOf", { n: fmtInt(level, lang) }, lang) });
+    return {
+      made: side(b.tech, m.tech.cls, t(`p.mk.licence.${m.tech.licence}`, null, lang), m.tech.level),
+      run: side(b.operator, m.op.cls, t(`p.mk.hosting.${m.op.hosting}`, null, lang), m.op.level),
+      rule: t(`p.mk.rule.${m.rule}`, { n: m.level === null ? "" : fmtInt(m.level, lang) }, lang),
+      crit: t(`p.mk.crit.${b.criticality}`, null, lang),
+      sources: sources(b.evidence)
+    };
+  };
   const levelRows = LAYERS.map((l) => {
     const lay = result?.layers?.[l] || null;
     return {
       layer: l, name: t(`p.layer.${l}`, null, lang), score: lay && lay.score !== null ? fmtScore(lay.score, lang) : null,
       status: lay ? (lay.score !== null ? "scored" : lay.status) : run.layers[l]?.status || "open",
+      sum: sumOf(l),
       blocks: (result?.blocks || []).filter((b) => b.layer === l).map((b) => ({
         id: b.id, name: blockName(b.id), level: b.unscored ? null : b.level, partly: !!b.partly_unknown, critical: b.criticality === "critical",
-        weakest: weakest?.id === b.id, lowest: !!lowest && lowest.id === b.id && lowest.level < (weakest?.level ?? 5)
+        crit: b.criticality, criticality: t(`p.crit.${b.criticality}`, null, lang), marks: marksOf(b), makeup: makeupOf(b),
+        weakest: weakest?.id === b.id, lowest: chain?.lower?.[0]?.id === b.id
       }))
     };
   });
+  // The overall score in one line, and its arithmetic one click away.
+  const overallLine = (() => {
+    if (!result || result.overall === null) return null;
+    const o = overallSum(result);
+    const all = o.layers.map((x) => fmtScore(x.score, lang));
+    const detail = `${fmtScore(o.score, lang)} = (${all.join(" + ")}) ÷ ${fmtInt(o.layers.length, lang)}`;
+    const left = o.left.map((x) => t("p.sum.left", { layer: t(`p.layer.${x.layer}`, null, lang), why: t(`p.layer.${x.status === "scored" ? "open" : x.status}`, null, lang) }, lang));
+    const low = [...o.layers].sort((a, b) => a.score - b.score || LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer))[0];
+    const vars = { score: fmtScore(o.score, lang), n: fmtInt(o.layers.length, lang) };
+    let text;
+    if (o.layers.every((x) => Math.round(x.score) === Math.round(o.layers[0].score))) text = t("p.sum.overall.even", { ...vars, each: fmtScore(o.layers[0].score, lang) }, lang);
+    else {
+      const s = layerSum(result, low.layer);
+      const lowBlock = [...s.terms].sort((a, b) => a.level - b.level)[0];
+      const layerName = t(`p.layer.${low.layer}.in`, null, lang);
+      text = t(s.terms.length === 1 ? "p.sum.overall.one" : "p.sum.overall.many", { ...vars, layer: layerName, s: fmtScore(low.score, lang), level: fmtInt(lowBlock.level, lang) }, lang);
+    }
+    return { text, detail, left, open: t("p.sum.open", { score: fmtScore(o.score, lang) }, lang) };
+  })();
+  // Every make-up the page can open, by its opener's key, at any step: a block (the Score step's and the
+  // tiles'), a layer's score and the overall score.
+  const makeups = {};
+  for (const r of levelRows) {
+    if (r.sum) makeups[`layer:${r.layer}`] = { kind: "layer", title: t("p.mk.layerOpen", { layer: r.name, score: r.score }, lang), expr: r.sum.expr, blocks: r.sum.named };
+    for (const b of r.blocks) makeups[`block:${b.id}`] = { kind: "block", title: b.name, level: b.level, ...b.makeup, layer: r.sum ? { name: r.name, expr: r.sum.expr } : null };
+  }
+  if (overallLine) makeups.overall = { kind: "overall", title: t("p.sum.title", null, lang), detail: overallLine.detail, left: overallLine.left };
+  const key = {
+    levels: [4, 3, 2, 1, 0, null].map((n) => ({ level: n, text: t(`p.legend.${n ?? "gap"}`, null, lang) })),
+    crit: ["critical", "important", "supporting"].map((c) => ({ term: t(`p.key.${c}.term`, null, lang), text: t(`p.key.${c}`, null, lang) })),
+    points: t("p.key.points", null, lang)
+  };
   const score = result?.overall;
   steps.push({
     title: notService ? t("p.s3.title.none", null, lang) : !complete ? t("p.s3.title.wait", null, lang)
       : score === null ? t("p.s3.title.noScore", null, lang) : t("p.s3.title", { score: fmtScore(score, lang), scored: fmtInt(scored, lang) }, lang),
     lead: notService ? t("p.s3.lead.none", null, lang) : t("p.s3.lead", { exclusive: !complete || !critical.length ? "" : atRisk ? t("p.s3.lead.atRisk", { n: fmtInt(atRisk, lang), of: fmtInt(critical.length, lang) }, lang) : t("p.s3.lead.noneAtRisk", null, lang) }, lang).trim(),
-    stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) } : complete ? { kind: "levels", rows: levelRows, weakest, lowest: lowest ? { id: lowest.id, name: blockName(lowest.id), level: lowest.level } : null } : pending
+    stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) } : complete ? { kind: "levels", rows: levelRows, weakest, lowest: lowest ? { id: lowest.id, name: blockName(lowest.id), level: lowest.level } : null, key } : pending,
+    sum: complete && !notService ? overallLine : null
   });
 
   // 4 Your review: the agent asks a person to check its findings before it recommends anything.
@@ -184,7 +299,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
         level: b.unscored ? null : b.level, partly: !!b.partly_unknown, why: levelWhy(b, lang),
         made: { who: partyName(b.tech, lang), where: place(b.tech_class, lang) },
         run: { who: partyName(b.operator, lang), where: place(b.operator_class, lang) },
-        sources: sources(b.evidence)
+        sources: backing(sources(b.evidence), b, focus.length > 1 ? 1 : 2), show: focus.length > 1 ? 1 : 2
       }))
     } : pending
   });
@@ -211,6 +326,42 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
     };
   });
   const chosen = leverCards.find((c) => c.id === decided) || null;
+  // What could take the weak blocks' place: the lever above, and starting points for research that public
+  // sources name, alphabetical and never ranked; where no source names one, the step says so.
+  const collator = new Intl.Collator(lang === "de" ? "de-DE" : "en-GB", { sensitivity: "base" });
+  const points = run.levers?.starting_points || [];
+  const scoreOf = (id) => (others?.[id] && !others[id].notService && others[id].overall !== null && others[id].overall !== undefined ? others[id] : null);
+  const alternatives = run.levers && result ? weakBlocks(result).map((id) => {
+    const b = blocks.get(id);
+    const starting = points.filter((p) => p.block_id === id).map((p) => {
+      const src = sources(p.evidence)[0] || null;
+      const cat = p.catalogue_id ? scoreOf(p.catalogue_id) : null;
+      return {
+        // A service of the catalogue goes by the name it has here; any other by the name its source gives.
+        key: `alt:${id}:${inLang(p.name, "en")}`, name: p.catalogue_id ? t(`p.case.${p.catalogue_id}.short`, null, lang) : inLang(p.name, lang), note: p.note ? plain(p.note) : "",
+        level: p.level ?? null,
+        levelText: p.level === null || p.level === undefined ? t("p.alt.noLevel", null, lang) : t("p.alt.level", { n: fmtInt(p.level, lang) }, lang),
+        source: src,
+        catalogue: p.catalogue_id ? { id: p.catalogue_id, name: t(`p.case.${p.catalogue_id}.short`, null, lang), text: cat ? t("p.alt.catalogue", { score: fmtScore(cat.overall, lang), n: fmtInt(cat.layers, lang) }, lang) : "" } : null
+      };
+    }).sort((x, y) => collator.compare(x.name, y.name));
+    return { block: { id, name: blockName(id), level: b?.level ?? null, criticality: t(`p.crit.${b?.criticality || "supporting"}`, null, lang) }, starting, none: !starting.length };
+  }) : [];
+  // Each starting point opens its source and, where the source shows it, the level the method would give.
+  for (const a of alternatives) {
+    for (const p of a.starting) makeups[p.key] = { kind: "alt", title: p.name, level: p.level ?? undefined, levelText: p.levelText, note: p.note, catalogue: p.catalogue?.text ? `${p.catalogue.name}: ${p.catalogue.text}` : "", source: p.source, block: a.block.name };
+  }
+  // Comparable services: the other assessed services of the function group, best first, with this case among them.
+  const group = entry?.group && entry.group !== "self" ? entry.group : null;
+  const comparableView = group && result ? (() => {
+    if (!others) return { group: t(`p.group.${group}`, null, lang), pending: true, items: [] };
+    const list = comparable(catalogueEntries(), others, entry.id);
+    const mine = { id: entry.id, overall: result.overall, layers: scored, current: true, weakest: weakest ? { level: weakest.level, name: blockName(weakest.id) } : null };
+    const items = [...list, mine].filter((x) => x.overall !== null).sort((a, b) => b.overall - a.overall || (a.current ? -1 : b.current ? 1 : a.id.localeCompare(b.id)))
+      .map((x) => ({ id: x.id, name: t(`p.case.${x.id}.short`, null, lang), score: fmtScore(x.overall, lang), of: t("p.kpi.layers", { n: fmtInt(x.layers, lang) }, lang), current: !!x.current,
+        weakest: x.weakest ? { level: x.weakest.level, name: inLang(x.weakest.name, lang), label: t("p.comp.weakest", { name: inLang(x.weakest.name, lang), level: fmtInt(x.weakest.level, lang) }, lang) } : null }));
+    return { group: t(`p.group.${group}`, null, lang), pending: false, items, none: !list.length };
+  })() : null;
   let s5title;
   if (notService) s5title = t("p.s5.title.none", null, lang);
   else if (!run.levers) s5title = t("p.s5.title.wait", null, lang);
@@ -234,6 +385,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
     title: s5title,
     lead: notService ? t("p.s5.lead.none", null, lang) : t(decided ? "p.s5.lead.decided" : "p.s5.lead", null, lang),
     agent: agent(4),
+    // The starting points stand beside the decision; once it is taken, the step is about the memo.
+    alternatives: decided ? [] : alternatives,
+    comparable: decided ? null : comparableView,
     stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) }
       : memoStage && decided ? memoStage
         : run.levers ? { kind: "levers", levers: leverCards, keep: { overall: keepScore === null || keepScore === undefined ? t("p.noScore", null, lang) : fmtScore(keepScore, lang), status: decided === "keep" ? "approved" : decided ? "closed" : "open" } }
@@ -267,7 +421,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
   // How long Play stays on a step: the time to read its title and lead, between 7 and 14 seconds.
   for (const s of steps) s.read = Math.min(14000, Math.max(7000, 3000 + 230 * words(`${s.title} ${s.lead}`)));
 
-  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete };
+  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete, makeups, unknownCritical: chain?.unknownCritical.length ?? null };
 
   function kpis() {
     const k = {};
@@ -277,7 +431,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
     else if (!result || facts["score.overall"] === null || facts["score.overall"] === undefined) k.score = { value: "…", of: "", note: waiting || t("p.kpi.score.empty", null, lang) };
     else {
       const of = t("p.kpi.layers", { n: fmtInt(scored, lang) }, lang);
-      if (chosen && chosen.overall !== null && Math.round(chosen.overall) !== Math.round(keepScore)) k.score = { was: fmtScore(keepScore, lang), value: chosen.text.overall, of, note: t("p.kpi.score.lever", null, lang), tone: "done" };
+      // An approved lever is a proposal: the figures stay as assessed, and a note says what it would give, since
+      // a struck-through 77 beside 81 read as a change already made (cold read, 2.1.0).
+      if (chosen && chosen.overall !== null && Math.round(chosen.overall) !== Math.round(keepScore)) k.score = { value: fmtScore(keepScore, lang), of, note: t("p.kpi.score.lever", { value: chosen.text.overall }, lang), tone: "done" };
       else if (decided) k.score = { value: fmtScore(keepScore, lang), of, note: t(decided === "keep" ? "p.kpi.score.kept" : "p.kpi.score.same", null, lang), tone: "done" };
       else k.score = { value: fmtScore(facts["score.overall"], lang), of, note: complete ? t("p.kpi.score.note", null, lang) : t("p.kpi.score.partial", null, lang) };
     }
@@ -291,14 +447,42 @@ export function story({ run, lang = "en", mode = "simulation", entry = null }) {
     } else {
       const after = chosen && chosen.weakest !== null && weakest && chosen.weakest !== weakest.level ? chosen.weakest : null;
       k.weakest = weakest
-        ? { value: t("p.kpi.level", { n: fmtInt(after ?? weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: after !== null ? t("p.kpi.weakest.lever", { n: fmtInt(weakest.level, lang) }, lang) : weakest.name, tone: after !== null ? "done" : "" }
+        ? { value: t("p.kpi.level", { n: fmtInt(weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: weakest.name, blockId: weakest.id, tone: after !== null ? "done" : "",
+          // Other critical blocks at the same level, so the name never reads as the only one (cold read, 2.1.0).
+          ties: weakest.ties > 0 ? tn("p.ov.ties", weakest.ties, { n: fmtInt(weakest.ties, lang) }, lang) : "" }
         : { value: t("p.kpi.none", null, lang), of: "", note: t("p.kpi.noCritical", null, lang) };
+      // The lines under it are the findings as assessed, as the score step shows them; a lever that would move
+      // the level says so first (critique, 2.1.0).
+      k.weakest.also = [...(after !== null ? [{ kind: "lever", level: after, text: t("p.kpi.weakest.lever", { n: fmtInt(after, lang) }, lang) }] : []), ...alsoLines(chain)];
       const exAfter = chosen && chosen.exclusive !== null && Math.round(chosen.exclusive * 100) !== Math.round((result.exclusive_non_eu ?? 0) * 100) ? chosen.exclusive : null;
       k.exclusive = result.exclusive_non_eu === null
         ? { value: t("p.kpi.none", null, lang), note: t("p.kpi.noCritical", null, lang) }
-        : { ...(exAfter !== null ? { was: pct(result.exclusive_non_eu, lang) } : {}), value: pct(exAfter ?? result.exclusive_non_eu, lang), note: t("p.kpi.ofCritical", { n: fmtInt(critical.length, lang) }, lang), tone: atRisk ? "risk" : "" };
+        : { value: pct(result.exclusive_non_eu, lang), note: [t("p.kpi.ofCritical", { n: fmtInt(critical.length, lang) }, lang), exAfter !== null ? t("p.kpi.exclusive.lever", { pct: pct(exAfter, lang) }, lang) : ""].filter(Boolean).join("; "), tone: atRisk ? "risk" : exAfter !== null ? "done" : "" };
     }
     return k;
+  }
+
+  /**
+   * The lines under the weakest-link tile: the lowest block when it is below the critical link (and how
+   * many are), the critical blocks no source could score, or in words that no link is lower or weak.
+   */
+  function alsoLines(c) {
+    if (!c) return [];
+    const out = [];
+    if (c.lower.length) {
+      const low = c.lower[0];
+      const vars = { level: fmtInt(low.level, lang), block: blockName(low.id), more: fmtInt(c.lower.length - 1, lang), weakest: fmtInt(c.weakest.level, lang) };
+      out.push({ kind: "lower", level: low.level, blockId: low.id, text: c.lower.length === 1 ? t("p.kpi.also.lower", vars, lang) : tn("p.kpi.also.lowerMany", c.lower.length - 1, vars, lang) });
+    } else if (!c.weakest && c.lowest) {
+      out.push({ kind: "lower", level: c.lowest.level, blockId: c.lowest.id, text: t("p.kpi.also.lower", { level: fmtInt(c.lowest.level, lang), block: blockName(c.lowest.id) }, lang) });
+    }
+    if (c.unknownCritical.length) {
+      out.push({ kind: "unknown", level: null, text: tn("p.kpi.also.unknown", c.unknownCritical.length, { n: fmtInt(c.unknownCritical.length, lang), names: andList(c.unknownCritical.map(blockName), lang) }, lang) });
+    }
+    if (!out.length && c.weakest) {
+      out.push({ kind: "none", level: null, text: c.weakest.level === 4 ? (scored === 6 ? t("p.kpi.also.noneAll", null, lang) : t("p.kpi.also.noneOn", { n: fmtInt(scored, lang) }, lang)) : t("p.kpi.also.noneLower", null, lang) });
+    }
+    return out;
   }
 
   function log() {

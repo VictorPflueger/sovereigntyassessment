@@ -116,7 +116,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf",
@@ -126,7 +127,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -136,7 +138,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -146,7 +149,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf",
@@ -157,7 +161,8 @@
        "owner",
        "legal_basis"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf",
@@ -167,7 +172,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf",
@@ -177,7 +183,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.bundestag.de/1232782",
@@ -187,7 +194,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.bundestag.de/1232782",
@@ -197,7 +205,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -254,7 +263,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -264,7 +274,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -275,7 +286,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -344,7 +356,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.seitenbau.com/impressum",
@@ -354,7 +367,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -364,7 +378,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -374,7 +389,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -416,7 +432,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-im-internet.de/nootsstvtr/NOOTSStVtr.pdf",
@@ -427,7 +444,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -478,7 +496,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -488,7 +507,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -498,7 +518,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "low"
@@ -549,7 +570,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.seitenbau.com/impressum",
@@ -559,7 +581,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://nova.noots.gov.de/fileadmin/Redaktion_NOVA/Anleitungen/NOOTS_MVP_v1.4.0.pdf",
@@ -569,7 +592,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -579,7 +603,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -603,7 +628,8 @@
       "supports": [
        "not_applicable"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -682,7 +708,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-20"
        }
       ]
      }

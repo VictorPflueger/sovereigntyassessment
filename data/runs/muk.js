@@ -112,7 +112,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://info.mein-unternehmenskonto.de/",
@@ -122,7 +123,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://info.mein-unternehmenskonto.de/",
@@ -133,7 +135,8 @@
        "how",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.gesetze-bayern.de/Content/Document/BayVV_206_D_12940/true",
@@ -144,7 +147,8 @@
        "owner",
        "legal_basis"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.verkuendung-bayern.de/baymbl/2022-237/",
@@ -154,7 +158,8 @@
       "supports": [
        "legal_basis"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.verkuendung-bayern.de/baymbl/2022-237/",
@@ -164,7 +169,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -238,7 +244,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -248,7 +255,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -258,7 +266,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -328,7 +337,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.verkuendung-bayern.de/baymbl/2022-237/",
@@ -338,7 +348,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.verkuendung-bayern.de/baymbl/2022-237/",
@@ -348,7 +359,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -358,7 +370,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -409,7 +422,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -419,7 +433,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "low"
@@ -466,7 +481,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://info.mein-unternehmenskonto.de/",
@@ -476,7 +492,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://itvsh.de/fileadmin/user_upload/Dokumente/DiPlan_SH/Handreichung_zum_Registrierungsprozess_von_ELSTER_zentrale_Stelle_1.2.pdf",
@@ -487,7 +504,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -497,7 +515,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -548,7 +567,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/about-us",
@@ -558,7 +578,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://itvsh.de/fileadmin/user_upload/Dokumente/DiPlan_SH/Handreichung_zum_Registrierungsprozess_von_ELSTER_zentrale_Stelle_1.2.pdf",
@@ -568,7 +589,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -578,7 +600,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -629,7 +652,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -639,7 +663,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -649,7 +674,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -659,7 +685,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -706,7 +733,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://itvsh.de/fileadmin/user_upload/Dokumente/DiPlan_SH/Handreichung_zum_Registrierungsprozess_von_ELSTER_zentrale_Stelle_1.2.pdf",
@@ -716,7 +744,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -726,7 +755,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -736,7 +766,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -777,7 +808,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -787,7 +819,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://download.elster.de/download/dokumente/Datenschutz_Mein_Unternehmenskonto.pdf",
@@ -797,7 +830,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -873,7 +907,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-20"
        }
       ]
      }

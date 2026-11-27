@@ -106,7 +106,8 @@
        "owner",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/about-opencode",
@@ -117,7 +118,8 @@
        "owner",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -127,7 +129,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -137,7 +140,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -147,7 +151,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -197,7 +202,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -207,7 +213,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "low"
@@ -254,7 +261,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/about-opencode",
@@ -264,7 +272,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -275,7 +284,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -285,7 +295,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -295,7 +306,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -305,7 +317,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -377,7 +390,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://about.gitlab.com/press/releases/2025-11-18-gitlab-to-announce-third-quarter-2026-financial-results/",
@@ -387,7 +401,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -397,7 +412,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -407,7 +423,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -417,7 +434,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -509,7 +527,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cncf.io/blog/2023/04/11/keycloak-joins-cncf-as-an-incubating-project/",
@@ -519,7 +538,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.cncf.io/blog/2023/04/11/keycloak-joins-cncf-as-an-incubating-project/",
@@ -529,7 +549,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://linuxfoundation.org/legal/privacy-policy",
@@ -539,7 +560,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://linuxfoundation.org/legal/privacy-policy",
@@ -549,7 +571,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -559,7 +582,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -569,7 +593,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -579,7 +604,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -626,7 +652,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/about-opencode",
@@ -636,7 +663,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -647,7 +675,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -657,7 +686,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -667,7 +697,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -677,7 +708,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -718,7 +750,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/about-opencode",
@@ -728,7 +761,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -739,7 +773,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/frequently-asked-questions",
@@ -749,7 +784,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -759,7 +795,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://opencode.de/en/data-privacy",
@@ -769,7 +806,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -846,7 +884,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-20"
        }
       ]
      }

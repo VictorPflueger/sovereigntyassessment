@@ -1,6 +1,6 @@
 # Sovereignty Assessment: technical notes
 
-These notes were written for version 1.0.0 (20 November 2026), and the code that did not change in 2.0.0 still cites them by section: the models and prices (§1), the API from the browser (§2, §3), the security policy (§4), the origin classes (§7), the engine (§8), the fact audit (§9), the live agent (§13), the evidence check (§14), the guardrails (§15) and the pre-runs (§17 to §19) hold as written. Version 2.0.0 replaced the screen: the recorder (§16), the exports (§20), the method view (§21), the 1.0 layout (§22) and Diagnostics are gone, and the storage keys of §5 are down to the key and the language. PLAN.md and REVIEW.md, which these notes link to, are in the git history at 1dc145e. What 2.0.0 changed is in [DESIGN.md](DESIGN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md).
+These notes were written for version 1.0.0 (20 November 2026), and the code that did not change in 2.0.0 still cites them by section: the models and prices (§1), the API from the browser (§2, §3), the security policy (§4), the origin classes (§7), the engine (§8), the fact audit (§9), the live agent (§13), the evidence check (§14), the guardrails (§15) and the pre-runs (§17 to §19) hold as written. Version 2.0.0 replaced the screen: the recorder (§16), the exports (§20), the method view (§21), the 1.0 layout (§22) and Diagnostics are gone, and the storage keys of §5 are down to the key and the language. PLAN.md and the REVIEW.md these notes link to are in the git history at 1dc145e; the REVIEW.md in the tree is version 2.1.0's. Version 2.1.0's changes, the pinned files among them, are in §25, and its key lives in the page's memory only, not in session storage as §5 says. What 2.0.0 changed is in [DESIGN.md](DESIGN.md); the bundled data's sources are in [DATA_SOURCES.md](DATA_SOURCES.md).
 
 ## 1. Models, prices and the cost meter
 
@@ -291,3 +291,71 @@ The brief's acceptance criteria (§12) and how version 1.0.0 meets each. "Met" m
 | AC-22 | Victor gives the five-minute demo in English and German at ×1 without help | Victor, with DEMO_SCRIPT.md | Open: Victor's |
 | AC-23 | An agent that did not build the prototype reviews figures, sources, honesty rules and the UI; no high or medium finding open | REVIEW.md part 3 | Met: all 29 findings are listed with their commits; the verification of the fixes found R-01 (high) only partly fixed and a new medium finding (N1), and its re-check at `f7e790b` found no high or medium finding open, nor did its final pass at `c7cca52` or its confirmation at `fc4d9e5`; the low ones they left are fixed, apart from five operator fields kept and named in part 3 |
 | AC-24 | README, DESIGN, TECH_NOTES, DATA_SOURCES and DEMO_SCRIPT complete | `tests/docs.mjs`; the build session's document check for 1.0.0 | Met |
+
+## 25. Version 2.1.0: answers to a review
+
+Written on 27 November 2026 for version 2.1.0, which answers a review of version 2.0.0. The review's own notes stay out of this repository; REVIEW.md holds this revision's cold read and reviews, DESIGN.md the screen, DEMO_SCRIPT.md the talk track. The engine's rules are method 1.0's: `js/engine.js`, the fact audit and the golden fixtures S1 to S4 and F01 to F29 are byte for byte 1.0.0's.
+
+### What 2.1.0 changed
+
+| Requirement | On screen | Proved by |
+|---|---|---|
+| SA-01 The weakest link never hides a lower block | Under the weakest critical link the tile names the lowest block overall where that one is lower and not critical, counts the critical blocks no source names and the other blocks at the weakest level, and says in words when no link is weak; every block on the score step says how critical it is | `tests/figures.mjs` (section3, all-cases), `tests/showcase.mjs` (weak-links, fit-connect-agree, criticality) |
+| SA-02 The make-up of every result | A click or Enter on a block, a layer score, the overall score or the tile's block opens how it is made, in the engine's numbers; Esc closes it | `tests/figures.mjs` (makeup), `tests/showcase.mjs` (makeup, makeup-keys, overall-makeup) |
+| SA-03 Alternatives | At Recommend the comparable services of the case's function group with their scores, and starting points for research that a public source names for a weak block, alphabetical and labelled as no recommendation | `tests/figures.mjs` (comparable, starting-points), `tests/showcase.mjs` (alternatives), `tests/runs.mjs` (planted-starting-points) |
+| SA-04 All services and Compare | A dialog of every case with its four figures, best first, the ended cases and this prototype apart; two or three side by side; a live result kept for the tab's lifetime, nothing stored | `tests/showcase.mjs` (overview, compare, overview-layout), `tests/live.mjs` (nothing-kept) |
+| SA-05 The Serviceportal.NRW | A state's platform assessed on the Deutschland-Stack's six layers, which its first step says once | `tools/check-runs.mjs`, `tests/showcase.mjs` (nrw), `tests/docs.mjs` (nrw-sources) |
+| SA-06 A replay costs nothing | "A live run would cost ≈ €0.62" over "this replay: €0"; a live run shows what it cost under Session cost | `tests/showcase.mjs` (cost), `tests/live.mjs` (cost-tile) |
+| SA-07 Criteria at the story's size | The levels, the three weights and the points in one key under the score step | `tests/showcase.mjs` (criteria) |
+| SA-08 Understood without the guide | A cold read from screenshots alone, in both languages, and the reviews | REVIEW.md, `tests/docs.mjs` (cold-read) |
+| SA-09 A talk track for others | Five timed steps in the guide and in DEMO_SCRIPT.md, English and German, and the review's six questions | `tests/docs.mjs` (talk-track), `tests/vici.mjs` |
+| SA-10 Latest Vici, every check green | `vici/` as ViciDesign `main`; Vici's brief checks on the page | `tests/vici.mjs`, `tests/run-all.mjs` |
+
+### The pinned files this revision changed, and why
+
+`tests/fingerprint.mjs` pinned the case to 1.0.0's hashes. 2.1.0 moved it to a new baseline on purpose (`tests/lib/baseline.mjs`, which keeps 1.0.0's hashes beside the new ones); every file whose hash differs is listed here, and `tests/docs.mjs` ("pinned") checks that none is missing.
+
+| File | Why it changed |
+|---|---|
+| `js/evidence.js` | A replay shows the date each quote was read, as its research note records it, rather than the date of the run. |
+| `js/agent.js` | The live-run dialog sets a budget cap from €0.50 to €3; `run()` takes it and never goes above `AGENT.budgetEur`. |
+| `js/prompt.js` | The Recommend step lets the agent send starting points for research with its levers, under the rules the screen states: sourced, unranked, no company in a lever. |
+| `js/tools.js` | `ui_propose_levers` accepts starting points: each names a recorded block and carries checked evidence; code gives one a level only where quotes name its maker and its operator, sorts each block's list alphabetically, and returns a lever's blocks so the screen can name the lowest block after the lever. |
+| `js/keystore.js` | The key stays in the page's memory only, never in session storage (Vici's nothing-kept rule); this supersedes the key's storage in §5. |
+| `js/simulation.js` | At full speed a step waits for no timer, so the eighteen pre-runs the overview plays at start take milliseconds. |
+| `js/runs_check.js` | The pre-run check sets each quote's read date from its research note and checks every starting point: a recorded block, a source supporting "alternative" that writes its name, and alphabetical order. |
+| `data/catalogue.js` | The Serviceportal.NRW's entry, and every entry's function group for the comparable services (D3). |
+| `data/runs/serviceportal-nrw.js` (new) | The Serviceportal.NRW's pre-run, written by hand in both languages from pages read on 27 November 2026. |
+| `research/serviceportal-nrw.md` (new) | Its research notes, every quote under its page with the date read. |
+| `js/chain.js` (new) | The figures derived from the engine's results: lower blocks, unknown critical blocks, make-up, arithmetic and comparable services; pinned with the case because the screen's figures rest on it. |
+| `data/runs/bundid.js`, `data/runs/online-ausweis.js`, `data/runs/eudi-wallet.js`, `data/runs/fit-connect.js`, `data/runs/epaybl.js` | Starting points for their weak blocks, from pages read on 27 November 2026 (as of that date), and each quote's read date. |
+| `research/bundid.md`, `research/online-ausweis.md`, `research/eudi-wallet.md`, `research/fit-connect.md`, `research/epaybl.md` | The quotes behind those starting points, under their pages with the date read. |
+| `data/runs/bundesportal.js`, `data/runs/deutschland-app.js`, `data/runs/dvc.js`, `data/runs/kipitz.js`, `data/runs/low-code.js`, `data/runs/marktplatz-deutschland-digital.js`, `data/runs/muk.js`, `data/runs/noots.js`, `data/runs/opencode.js`, `data/runs/sovereignty-assessment.js`, `data/runs/zapuk.js`, `data/runs/zbds.js` | Each quote's read date, which `tools/check-runs.mjs` sets from the research note; nothing else in them changed. |
+
+### Decisions
+
+The brief's six decisions had defaults; Phase 0 recommended a choice for each and two more, and Victor's go put them in force. The cold read sent D6 back to its default.
+
+| Decision | Question | Default | In force |
+|---|---|---|---|
+| D1 | How the header shows a lower block that isn't critical | Keep "Weakest critical link", add "Lowest overall" under it when lower | As the default: "Lowest overall: …, not critical", the count of critical blocks no source names, "and N more at this level" for ties, and "No weak link" in words |
+| D2 | May starting points name companies and products? | Yes, when a public source names them as an alternative; alphabetical; labelled; lever titles and rationales generic | As the default, labelled "Starting points for research, not a recommendation" |
+| D3 | Function groups for comparable services | Identity and sign-in; payments; data exchange and mailboxes; platforms, cloud and code; portals and apps | As the default; the Marktplatz under platforms, the Serviceportal.NRW under portals and apps |
+| D4 | How many services Compare takes | Two or three | Two or three |
+| D5 | This prototype in the overview | Apart, outside the ranking | Apart, under "This prototype, outside the ranking" |
+| D6 | The session-cost tile in a simulation | Label "A live run would cost", value "≈ €0.52", note "this replay: €0" | The default: label "A live run would cost" (Ein Live-Lauf kostet), value "≈ €0.62", note "this replay: €0" (diese Wiedergabe: 0 €); a live run shows its measured cost under "Session cost". Phase 0's variant, "Session cost" over "≈ €0.62 for a live run", read as money spent at first glance in all three rounds of the cold read. The estimate is the BundID pre-run's on Sonnet 5.5 |
+| D7 | Start agent | Not in the brief; raised in Phase 0 | Rebuilt as Vici's live-run dialog: key, model, budget cap, acknowledgement, estimate, and Start, disabled until there are a key and the acknowledgement, with the AI notice in its footer |
+| D8 | The header at 1920 × 1080 | Not in the brief; raised in Phase 0 | Two rows at every desktop width, since one row overlapped at 1920 too |
+
+### Deviations and limits moved
+
+- **The byline** keeps its words, "Built by Victor Pflüger" (SA-X3), and moved from the header to the stage's foot beside the note that this is not an official service: the two-row header (D8) had no room for it.
+- **Lean limits** (`tests/lean.mjs`): the presenter grew to ten modules of at most 2,400 lines (7 and 1,500 before), the app to at most 6,600 lines of JavaScript (6,000) and one stylesheet of at most 560 lines (450), and DEMO_SCRIPT.md to 1,400 words for its two languages (700 for the English one). All Services, Compare, the make-up, the starting points and the lower blocks are what the review asked for.
+- **Target size.** Vici asks 40 px for a pointer target; the prototype's own layout test keeps 24 px, as since 2.0.0, which the openers inside a table row reach with 5 px of padding above and below their text.
+- **What scrolls at 1280 × 720.** The score step never does (SA-07). The Research step of the cases with seven blocks (FIT-Connect, the Serviceportal.NRW) hides about one line of its table below the fold, and Your review scrolls when the agent asks a person to check several blocks; each card then shows one quote and keeps the rest one click away.
+- **After a lever** the header keeps the figures as assessed and notes what the lever would give, "81 if carried out, indicative"; until the cold read it struck the old score through beside the new (Vici's `vc-stat__was`), which readers took for a change already made. The lever card and the memo show the before and after.
+- **The guide's "Read" row** counts what the research read before Your review, as the Research step does (11 pages and 21 quotes for BundID); the starting points' pages, read at Recommend, are in research/sources.md.
+
+### Tests 2.1.0 added or changed
+
+`tests/figures.mjs` is new (section 3's six cases, the lower and unknown blocks, the arithmetic, the comparable services, the starting points, and that the view modules compute nothing). `tests/showcase.mjs` gained the cases listed in its header; `tests/live.mjs` the nothing-kept and cost-tile cases and the budget cap; `tests/runs.mjs` the planted starting points; `tests/vici.mjs` Vici's policy, live-dialog and storage checks; `tests/docs.mjs` the talk track in both languages, the Serviceportal.NRW's sources, the pinned files and the cold read; `tests/fingerprint.mjs` the 2.1.0 baseline.

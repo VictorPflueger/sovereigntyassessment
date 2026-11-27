@@ -8,6 +8,11 @@
 //              unknown URL, a long quote, a quote missing from research/, a key-like string, a thinking
 //              block, a field no quote supports (an exit path, an operator), a figure in a party's name, a lever that names a company;
 //              the unchanged copy is the positive control and has no problem
+//   planted-starting-points  version 2.1.0's starting points for research, planted in a copy of BundID's
+//              pre-run: one without a source, without a quote, without a read date, a list out of
+//              alphabetical order, a name no source writes, a block the run does not record, and a lever
+//              whose title or rationale names a company; the unchanged copy is the positive control
+// Prints RUNS OK <case> per case that passed, and RUNS OK when every case ran and passed.
 // Usage: node tests/runs.mjs [case…]
 import path from "node:path";
 import { readFileSync } from "node:fs";
@@ -23,7 +28,9 @@ const D3 = ["dvc", "eudi-wallet", "kipitz", "muk", "opencode", "sovereignty-asse
 // 1.0.0: the five entries that had only a research note. NOOTS and the Marktplatz are assessed; ZBDS, ZaPuK and
 // low-code end "not_a_service" (a concept, a target architecture and a category), with no block.
 const V1 = ["low-code", "marktplatz-deutschland-digital", "noots", "zapuk", "zbds"];
-const ALL = [...SIX, ...D3, ...V1].sort();
+// 2.1.0: a state's platform (brief SA-05).
+const V2_1 = ["serviceportal-nrw"];
+const ALL = [...SIX, ...D3, ...V1, ...V2_1].sort();
 
 // ---- all --------------------------------------------------------------------------------------------------
 if (wanted("all")) {
@@ -38,7 +45,7 @@ if (wanted("all")) {
   for (const id of ALL) if (!new RegExp(`^PASS ${id}:`, "m").test(out)) problems.push(`no PASS line for ${id}`);
   const html = readFileSync(path.join(APP_ROOT, "index.html"), "utf8");
   for (const id of ids) if (!html.includes(`<script src="data/runs/${id}.js" defer></script>`)) problems.push(`index.html does not load data/runs/${id}.js`);
-  results.push({ name: `all: the ${ALL.length} pre-runs pass tools/check-runs.mjs${m ? ` (${m[2]} plays)` : ""}, and index.html loads each`, ok: !problems.length, problems });
+  results.push({ group: "all", name: `all: the ${ALL.length} pre-runs pass tools/check-runs.mjs${m ? ` (${m[2]} plays)` : ""}, and index.html loads each`, ok: !problems.length, problems });
 }
 
 // ---- planted ----------------------------------------------------------------------------------------------
@@ -68,7 +75,7 @@ if (wanted("planted")) {
   ];
   // Positive control: the unchanged copy passes.
   const control = await checkRun(structuredClone(base), { id, researchText: research });
-  results.push({ name: `planted: the unchanged ${id} copy has no problem (${control.plays} plays)`, ok: control.problems.length === 0 && control.plays > 0, problems: control.problems.map((p) => `[${p.code}] ${p.where}: ${p.message}`) });
+  results.push({ group: "planted", name: `planted: the unchanged ${id} copy has no problem (${control.plays} plays)`, ok: control.problems.length === 0 && control.plays > 0, problems: control.problems.map((p) => `[${p.code}] ${p.where}: ${p.message}`) });
   // A planted defect may make the simulation player log its failure; collected here, not printed.
   const logged = [];
   const consoleError = console.error;
@@ -78,7 +85,44 @@ if (wanted("planted")) {
     console.error = (...a) => logged.push(a.map(String).join(" "));
     const r = await checkRun(def, { id, researchText: research }).finally(() => { console.error = consoleError; });
     const hit = r.problems.filter((p) => p.code === code);
-    results.push({ name: `planted: ${what} raises ${code}`, ok: hit.length > 0, problems: hit.length ? [] : [`got ${JSON.stringify(r.problems.map((p) => p.code))}`], detail: hit[0] ? `${hit[0].where}: ${hit[0].message}` : "" });
+    results.push({ group: "planted", name: `planted: ${what} raises ${code}`, ok: hit.length > 0, problems: hit.length ? [] : [`got ${JSON.stringify(r.problems.map((p) => p.code))}`], detail: hit[0] ? `${hit[0].where}: ${hit[0].message}` : "" });
+  }
+}
+
+// ---- planted-starting-points ------------------------------------------------------------------------------
+if (wanted("planted-starting-points")) {
+  const group = "planted-starting-points";
+  const id = "bundid";
+  const base = readRunFile(path.join(APP_ROOT, "data/runs", `${id}.js`));
+  const research = readFileSync(path.join(APP_ROOT, "research", `${id}.md`), "utf8");
+  const leverStep = (def) => def.steps.find((s) => s.tool === "ui_propose_levers");
+  const points = (def) => leverStep(def).input.starting_points;
+  const first = (def) => points(def)[0];
+  // The source of the first starting point, and its section in the research note.
+  const source = first(base).evidence[0];
+  const section = research.indexOf(`(${source.url})`);
+  // Each defect: [name, the problem code it must raise, a test on its message, how to plant it in the copy, in the note].
+  const DEFECTS = [
+    ["a starting point without a source", "starting_point_unsourced", null, (d) => { first(d).evidence = []; }],
+    ["a starting point without a quote", "quote_not_in_research", /needs its quote/, (d) => { delete first(d).evidence[0].quote; }],
+    ["a starting point whose page has no read date", "quote_not_in_research", /"Read on" date/, null, (md) => md.slice(0, section) + md.slice(section).replace(/\nRead on \d{4}-\d{2}-\d{2}/, "\nRead on an unknown day")],
+    ["a list out of alphabetical order", "starting_point_order", null, (d) => { const p = points(d); const k = p.findIndex((x, i) => i > 0 && p[i - 1].block_id === x.block_id); [p[k - 1], p[k]] = [p[k], p[k - 1]]; }],
+    ["a name no source writes", "starting_point_unsourced", null, (d) => { first(d).name = "Any Store Will Do"; }],
+    ["a block the run does not record", "starting_point", /does not record/, (d) => { first(d).block_id = "B-42"; }],
+    ["a lever title that names a company", "lever_names_company", /title/, (d) => { const l = leverStep(d).input.levers[0]; l.title.de = `${l.title.de} bei Apple`; }],
+    ["a lever rationale that names a company", "lever_names_company", /rationale/, (d) => { const l = leverStep(d).input.levers[0]; l.rationale.en = `${l.rationale.en} Ask Google.`; }]
+  ];
+  const control = await checkRun(structuredClone(base), { id, researchText: research });
+  results.push({ group, name: `planted-starting-points: the unchanged ${id} copy has no problem, ${points(base).length} starting points (${control.plays} plays)`, ok: control.problems.length === 0 && control.plays > 0 && points(base).length > 0 && section > 0, problems: control.problems.map((p) => `[${p.code}] ${p.where}: ${p.message}`) });
+  const logged = [];
+  const consoleError = console.error;
+  for (const [what, code, message, plant, plantNote] of DEFECTS) {
+    const def = structuredClone(base);
+    if (plant) plant(def);
+    console.error = (...a) => logged.push(a.map(String).join(" "));
+    const r = await checkRun(def, { id, researchText: plantNote ? plantNote(research) : research }).finally(() => { console.error = consoleError; });
+    const hit = r.problems.filter((p) => p.code === code && (!message || message.test(`${p.where} ${p.message}`)));
+    results.push({ group, name: `planted-starting-points: ${what} raises ${code}`, ok: hit.length > 0, problems: hit.length ? [] : [`got ${JSON.stringify(r.problems.map((p) => `${p.code}: ${p.message}`).slice(0, 4))}`], detail: hit[0] ? `${hit[0].where}: ${hit[0].message}` : "" });
   }
 }
 
@@ -88,5 +132,6 @@ for (const r of results) {
 }
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} runs cases passed.`);
+for (const g of [...new Set(results.map((r) => r.group))]) if (results.filter((r) => r.group === g).every((r) => r.ok)) console.log(`RUNS OK ${g}`);
 if (!failed && ONLY.length === 0) console.log("RUNS OK");
 process.exit(failed ? 1 : 0);

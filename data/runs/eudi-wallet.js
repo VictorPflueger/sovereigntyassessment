@@ -1,4 +1,4 @@
-/* Pre-run assessment of EUDI Wallet “d-you” (hand-authored, as of 2026-11-20): a recorded event stream that the
+/* Pre-run assessment of EUDI Wallet “d-you” (hand-authored, as of 2026-11-27): a recorded event stream that the
  * simulation player replays offline (js/simulation.js), through the same tool executors as the live agent.
  * Every quote is listed with its URL, title and read date in research/eudi-wallet.md; tools/check-runs.mjs
  * checks this file under section 8 of the brief and sets each quote's verified flag from those notes.
@@ -12,7 +12,7 @@
  "id": "eudi-wallet",
  "entry_id": "eudi-wallet",
  "source": "hand_authored",
- "as_of": "2026-11-20",
+ "as_of": "2026-11-27",
  "method_version": "1.0",
  "query": "EUDI Wallet",
  "steps": [
@@ -113,7 +113,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://eudi-wallet.gov.de/en/about",
@@ -123,7 +124,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -133,7 +135,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -143,7 +146,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -153,7 +157,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -163,7 +168,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -261,7 +267,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -318,7 +325,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://netzpolitik.org/?p=512498",
@@ -328,7 +336,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -338,7 +347,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -408,7 +418,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -418,7 +429,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://support.apple.com/en-mide/118110",
@@ -470,7 +482,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -480,7 +493,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -507,6 +521,30 @@
      "B-03",
      "B-04"
     ]
+   }
+  },
+  {
+   "say": {
+    "en": "For the two app stores I look for what public sources name as alternatives: starting points for research, not a recommendation.",
+    "de": "Für die beiden App-Stores suche ich, was öffentliche Quellen als Alternativen nennen: Ansatzpunkte für die Recherche, keine Empfehlung."
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+    "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.macrumors.com/2024/06/04/aptoide-marketplace-games-ios",
+    "title": "Aptoide Launching Alternative iOS Game Marketplace in EU"
+   }
+  },
+  {
+   "fetch": {
+    "url": "https://www.popsci.com/diy/f-droid-download/",
+    "title": "What is F-Droid and how to set it up | Popular Science"
    }
   },
   {
@@ -561,6 +599,135 @@
          "alternative"
         ],
         "verified": true
+       }
+      ]
+     }
+    ],
+    "starting_points": [
+     {
+      "block_id": "B-03",
+      "name": "AltStore PAL",
+      "note": {
+       "en": "An alternative app marketplace for iPhones in the EU that takes apps of other developers.",
+       "de": "Ein alternativer App-Marktplatz für iPhones in der EU, der Apps anderer Entwickler aufnimmt."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "AltStore PAL is an officially approved alternative app marketplace in the EU.",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-03",
+      "name": "Onside",
+      "note": {
+       "en": "An alternative app store for iPhones in the EU.",
+       "de": "Ein alternativer App-Store für iPhones in der EU."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "Onside is an alternative iOS app store available in both the EU and, now, Japan, as of February 17, 2026",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-03",
+      "name": "Skich",
+      "note": {
+       "en": "An alternative app store for iPhones in the EU.",
+       "de": "Ein alternativer App-Store für iPhones in der EU."
+      },
+      "evidence": [
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "Last March, Skich announced the launch of an alternative app store for EU users",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-04",
+      "name": "Aptoide",
+      "note": {
+       "en": "An app store for Android phones, based in Lisbon.",
+       "de": "Ein App-Store für Android-Telefone mit Sitz in Lissabon."
+      },
+      "tech": {
+       "name": "Aptoide",
+       "country": "PT",
+       "parent": null
+      },
+      "operator": {
+       "name": "Aptoide",
+       "country": "PT",
+       "parent": null
+      },
+      "evidence": [
+       {
+        "url": "https://www.macrumors.com/2024/06/04/aptoide-marketplace-games-ios",
+        "title": "Aptoide Launching Alternative iOS Game Marketplace in EU",
+        "quote": "Aptoide, a popular Google Play alternative for Android devices, will be launching an iOS game marketplace",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       },
+       {
+        "url": "https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/",
+        "title": "Move over, Apple: Meet the alternative app stores available in the EU and elsewhere",
+        "quote": "An alternative game store for iPhone, Lisbon-based Aptoide is an open source solution for app distribution.",
+        "lang": "en",
+        "supports": [
+         "tech",
+         "operator"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
+       }
+      ]
+     },
+     {
+      "block_id": "B-04",
+      "name": "F-Droid",
+      "note": {
+       "en": "An app store for Android that takes only open-source apps.",
+       "de": "Ein App-Store für Android, der nur quelloffene Apps aufnimmt."
+      },
+      "evidence": [
+       {
+        "url": "https://www.popsci.com/diy/f-droid-download/",
+        "title": "What is F-Droid and how to set it up | Popular Science",
+        "quote": "This app store is an alternative to Google Play and only includes open-source applications",
+        "lang": "en",
+        "supports": [
+         "alternative"
+        ],
+        "verified": true,
+        "read_on": "2026-11-27"
        }
       ]
      }

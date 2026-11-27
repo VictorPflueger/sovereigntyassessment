@@ -68,3 +68,23 @@ Read on 2026-11-19 (English).
 
 > European Payments Initiative (EPI), the European-grown player committed to offering a sovereign digital payment alternative
 > De Lignestraat 13, 1000 Brussels, Belgium
+
+### [European Payments Initiative CEO says Trump fears are boosting its appeal](https://www.thestar.com.my/tech/tech-news/2026/03/26/european-payments-initiative-ceo-says-trump-fears-are-boosting-its-appeal)
+Read on 2026-11-27 (English), for the starting points of version 2.1.0. A Reuters report of 26 March 2026, as The Star published it. Asked a second time, the fetch tool confirmed the sentence word for word.
+
+> The Brussels-based company has developed Wero to serve as an alternative to Mastercard, Visa and Apple Pay
+
+### [Wero: Neuer Zahlungsdienst jetzt auch fürs Online-Shopping](https://www.verbraucherzentrale.de/wissen/digitale-welt/onlinedienste/wero-neuer-zahlungsdienst-jetzt-auch-fuers-onlineshopping-97042)
+Read on 2026-11-27 (German), for the starting points of version 2.1.0. Verbraucherzentrale, as of 20 November 2025. It writes the name once with and once without the s.
+
+> Das Angebot wird von der European Payment Initiative (EPI) betrieben und ermöglicht Überweisungen ohne IBAN und BIC.
+
+### [Paypal-Alternative Wero: Deshalb hakt es](https://www.zdfheute.de/wirtschaft/unternehmen/wero-zahlungsdienst-alternative-eu-paypal-100.html)
+Read on 2026-11-27 (German), for the starting points of version 2.1.0. ZDFheute, 29 August 2025.
+
+> Seit Juli 2024 ist das europäische Zahlungssystem Wero als Alternative zu Paypal erhältlich
+
+### [Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)](https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf)
+Read on 2026-11-27 (German), for the starting points of version 2.1.0. Version 1.0 of 21 September 2022, section 1. It names the payment services provided centrally; starting points take the first three after ePayBL in alphabetical order, so SAP Digital Payment, the fourth, is not listed.
+
+> (v.a. ePayBL, pmPayment, epay21, ePayServiceBayern und SAP Digital Payment)
