@@ -13,6 +13,7 @@ const SUITES = [
   { id: "unit", what: "client, cost, formats, catalogue, API errors, language, policy, storage, evidence, sequence rules, and every pre-run as five steps and four figures", file: "tests/unit.mjs", browser: false },
   { id: "engine", what: "golden cases S1 to S4 in both languages, origin classes, no data is not zero, weights, fact keys", file: "tests/engine.mjs", browser: false },
   { id: "audit", what: "fact audit: F01 to F29, the non-breaking-space variants, decisions D9 and D10", file: "tests/audit.mjs", browser: false },
+  { id: "figures", what: "the figures 2.1.0 adds: section 3's cases, lower and unknown blocks, make-up and arithmetic, comparable services, starting points", file: "tests/figures.mjs", browser: false },
   { id: "runs", what: "the seventeen pre-runs, index.html loading each, and each rule's planted defect", file: "tests/runs.mjs", browser: false },
   { id: "fingerprint", what: "the case is 1.0.0's byte for byte: engine, fact audit, evidence, guardrails, agent, player, pre-runs, notes", file: "tests/fingerprint.mjs", browser: false },
   { id: "lean", what: "the presenter's size, one request module and one host, the cut of 1.0.0's console, the docs' length", file: "tests/lean.mjs", browser: false },
