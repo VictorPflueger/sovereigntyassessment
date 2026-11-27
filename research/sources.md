@@ -1,10 +1,10 @@
 # Sovereignty Assessment: every source, case by case
 
-The full lists behind [DATA_SOURCES.md](../DATA_SOURCES.md), as version 1.0.0 kept them there on 20 November 2026: the catalogue's starting pages, the reference facts' pages, and for each pre-run its counts and every page it read, with its language and the date it was read. Version 2.0.0 moved them here and changed only their cross-references. The quotes themselves are in the note of each case beside this file (`research/<case>.md`). A § in the text below refers to TECH_NOTES.md.
+The full lists behind [DATA_SOURCES.md](../DATA_SOURCES.md), as version 1.0.0 kept them there on 20 November 2026: the catalogue's starting pages, the reference facts' pages, and for each pre-run its counts and every page it read, with its language and the date it was read. Version 2.0.0 moved them here and changed only their cross-references. Version 2.1.0 added the Serviceportal.NRW and the pages behind the starting points for research, read on 27 November 2026. The quotes themselves are in the note of each case beside this file (`research/<case>.md`). A § in the text below refers to TECH_NOTES.md.
 
 ## The catalogue (data/catalogue.js)
 
-Seventeen entries, each with names in English and German, category, a one-line description, status and starting URLs: sixteen services and, from version 0.3.0, this prototype in the category `self_assessment`. Every URL below was opened with web fetch on 19 November 2026 (the prototype's on 20 November 2026), and each entry's description and status rest on what these pages say. Press sources are marked; official sources come first.
+Eighteen entries, each with names in English and German, category, a one-line description, status and starting URLs: sixteen services, from version 0.3.0 this prototype in the category `self_assessment`, and from version 2.1.0 the Serviceportal.NRW, a state's platform. Every URL below was opened with web fetch on 19 November 2026 (the prototype's on 20 November 2026, the Serviceportal.NRW's on 27 November 2026), and each entry's description and status rest on what these pages say. Press sources are marked; official sources come first.
 
 | Entry | Starting URL | Title | Read |
 |---|---|---|---|
@@ -34,6 +34,11 @@ Seventeen entries, each with names in English and German, category, a one-line d
 | Bundesportal | https://www.gesetze-im-internet.de/egovg/__9a.html | § 9a EGovG - Einzelnorm | 2026-11-19 |
 | Deutschland-App | https://www.bundestag.de/1223070 | Deutschland-App: Prototyp wird in sechs Kommunen erprobt | 2026-11-19 |
 | Deutschland-App | https://www.wiesbaden.de/en/pressemitteilungen/pressereferat/juni/wiesbaden-wird-pilotkommune-fuer-die-deutschland-app | Wiesbaden becomes pilot municipality for Germany app | 2026-11-19 |
+| Serviceportal.NRW | https://recht.nrw.de/gvnrw/2020-s1212 | GV. NRW. 2020 S. 1212 | 2026-11-27 |
+| Serviceportal.NRW | https://recht.nrw.de/gvnrw/2025-s1138 | GV. NRW. 2025 S. 1138 | 2026-11-27 |
+| Serviceportal.NRW | https://www.land.nrw/pressemitteilung/das-neue-nordrhein-westfalen-portal-wird-zentrale-anlaufstelle-fuer-digitale | Das neue Nordrhein-Westfalen-Portal wird zentrale Anlaufstelle für digitale Verwaltungsleistungen | 2026-11-27 |
+| Serviceportal.NRW | https://new.drupal.org/case-study/serviceportal-20 | Serviceportal 2.0 \| Drupal.org | 2026-11-27 |
+| Serviceportal.NRW | https://meineverwaltung.nrw/en/content/622acfaf-7cad-400f-8703-ae23effba10f | NRW Serviceportal - Impressum | 2026-11-27 |
 | This prototype (self-assessment, version 0.3.0) | https://github.com/VictorPflueger/sovereigntyassessment | GitHub - VictorPflueger/sovereigntyassessment | 2026-11-20 |
 | This prototype (self-assessment, version 0.3.0) | https://docs.github.com/en/articles/about-github-pages | About GitHub Pages | 2026-11-20 |
 
@@ -52,19 +57,19 @@ Each fact carries a verbatim quote of at most 150 characters, read on its page w
 
 ## The pre-runs (data/runs/)
 
-Every one of the seventeen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3, in the git history at `1dc145e`), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those listed under The reference facts above, verified when they were built.
+Every one of the eighteen catalogue entries ships with a pre-run for Simulation, written by hand in both languages (`source: "hand_authored"`). The first six were written on 19 November 2026 (`as_of: "2026-11-19"`); the five of decision D3 and the self-assessment on 20 November 2026 (TECH_NOTES.md §18 and §19), and on the same day, for version 1.0.0, the five entries that until then had only a research note (`as_of: "2026-11-20"`). Three of those five, ZBDS, ZaPuK and low-code, end without an assessment: their sources describe a component still being designed, a target architecture and a category, not a service in operation, so they record a profile with its sources and no building block (TECH_NOTES.md §18). For the independent review of version 1.0.0 (REVIEW.md part 3, in the git history at `1dc145e`), BundID, the Online ID, the Deutschland-App and FIT-Connect were revised on 20 November 2026 and carry that date: the AusweisApp's sentence was read again in full and now stands for its developer only, since it names no one who runs the app, BundID's platform names Kubernetes's steward from three newly read sources, and FIT-Connect's data centre rests also on a newer page of the City of Hamburg. After the re-check of those fixes, ePayBL and the Bundesportal were revised on the same day too: BundID's imprint is quoted with the labels that state who built the BundID and who runs it, the address of Apple's Irish entity with the page's sentences on what it provides, and ePayBL's joint development is run by its developer community. The Marktplatz's operator rests on the IT-Planungsrat's news of its start. For version 2.1.0, on 27 November 2026, the Serviceportal.NRW's pre-run was written, and BundID, the Online ID, the EUDI Wallet, FIT-Connect and ePayBL gained the pages behind their starting points for research; those six carry that date. Each pre-run cites only pages its own research steps read, the catalogue lists or the reference facts hold. Every quote is listed verbatim under its URL in `research/<entry>.md` with the date read, and `tools/check-runs.mjs` sets each quote's verified flag from there (TECH_NOTES.md §16 and §17). The tables below name each pre-run's sources with the date read; the reference facts a pre-run uses are those listed under The reference facts above, verified when they were built.
 
 Pages and quotes count what each run cites besides the reference facts.
 
 | Case | Pages | Quotes | Note |
 |---|---|---|---|
-| BundID | 10 | 19 | [bundid.md](bundid.md) |
-| Online ID | 9 | 16 | [online-ausweis.md](online-ausweis.md) |
-| EUDI Wallet | 7 | 10 | [eudi-wallet.md](eudi-wallet.md) |
+| BundID | 13 | 24 | [bundid.md](bundid.md) |
+| Online ID | 12 | 21 | [online-ausweis.md](online-ausweis.md) |
+| EUDI Wallet | 10 | 16 | [eudi-wallet.md](eudi-wallet.md) |
 | Business account (MUK) | 9 | 15 | [muk.md](muk.md) |
-| FIT-Connect | 8 | 14 | [fit-connect.md](fit-connect.md) |
+| FIT-Connect | 11 | 17 | [fit-connect.md](fit-connect.md) |
 | NOOTS | 5 | 16 | [noots.md](noots.md) |
-| ePayBL | 10 | 17 | [epaybl.md](epaybl.md) |
+| ePayBL | 14 | 21 | [epaybl.md](epaybl.md) |
 | ZBDS | 2 | 4 | [zbds.md](zbds.md) |
 | ZaPuK | 3 | 7 | [zapuk.md](zapuk.md) |
 | KIPITZ | 4 | 11 | [kipitz.md](kipitz.md) |
@@ -74,11 +79,12 @@ Pages and quotes count what each run cites besides the reference facts.
 | German Administration Cloud | 6 | 12 | [dvc.md](dvc.md) |
 | Federal Portal | 5 | 9 | [bundesportal.md](bundesportal.md) |
 | Deutschland-App | 8 | 16 | [deutschland-app.md](deutschland-app.md) |
+| Serviceportal.NRW | 15 | 33 | [serviceportal-nrw.md](serviceportal-nrw.md) |
 | This prototype | 12 | 23 | [sovereignty-assessment.md](sovereignty-assessment.md) |
 
 ### BundID (`data/runs/bundid.js`)
 
-11 sources read, 10 of them with the 19 quotes cited; the reference facts on the Federation's IT and app distribution. The AusweisApp's page in the App Store is read for the app's distribution but, since the review (R-01), no longer cited: it does not say who runs the store.
+14 sources read, 13 of them with the 24 quotes cited; the reference facts on the Federation's IT and app distribution. The AusweisApp's page in the App Store is read for the app's distribution but, since the review (R-01), no longer cited: it does not say who runs the store.
 
 | Source | Language | Read |
 |---|---|---|
@@ -93,6 +99,9 @@ Pages and quotes count what each run cites besides the reference facts.
 | [GitHub - kubernetes/kubernetes: Production-Grade Container Scheduling and Management](https://github.com/kubernetes/kubernetes) | English | 2026-11-20 |
 | [Who we are](https://cncf.io/about/who-we-are/) | English | 2026-11-20 |
 | [Privacy Policy \| Linux Foundation](https://linuxfoundation.org/legal/privacy-policy) | English | 2026-11-20 |
+| [Deutschland-Stack – Wohin geht die Reise?](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-27 |
+| [Open eCard: Platform independent and highly extensible Open eCard App released](https://www.openecard.org/en/news/details/platform-independent-and-highly-extensible-open-ecard-app-released/) | English | 2026-11-27 |
+| [Move over, Apple: Meet the alternative app stores available in the EU and elsewhere](https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/) | English | 2026-11-27 |
 
 ### Deutschland-App (`data/runs/deutschland-app.js`)
 
@@ -111,7 +120,7 @@ Pages and quotes count what each run cites besides the reference facts.
 
 ### Online-Ausweis (`data/runs/online-ausweis.js`)
 
-11 sources read, 9 of them with the 16 quotes cited; the reference facts on app distribution. Since the review (R-01), two pages read are no longer cited, as their quotes did not state what they were cited for: the BVA's page on the authorisation certificates and the AusweisApp's page in the App Store.
+15 sources read, 12 of them with the 21 quotes cited; the reference facts on app distribution. Since the review (R-01), two pages read are no longer cited, as their quotes did not state what they were cited for: the BVA's page on the authorisation certificates and the AusweisApp's page in the App Store. The eID service's page, where the catalogue starts, is read to reach the eID server's page and not cited.
 
 | Source | Language | Read |
 |---|---|---|
@@ -126,10 +135,13 @@ Pages and quotes count what each run cites besides the reference facts.
 | [Copyright and trademarks - Apple Support](https://support.apple.com/guide/apple-invites/copyright-and-trademarks-dev2727afbbc/ios) | English | 2026-11-19 |
 | [AusweisApp Bund App - App Store](https://apps.apple.com/us/app/id948660805) | English | 2026-11-19 |
 | [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
+| [Deutschland-Stack – Wohin geht die Reise?](https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf) | German | 2026-11-27 |
+| [Open eCard: Platform independent and highly extensible Open eCard App released](https://www.openecard.org/en/news/details/platform-independent-and-highly-extensible-open-ecard-app-released/) | English | 2026-11-27 |
+| [Move over, Apple: Meet the alternative app stores available in the EU and elsewhere](https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/) | English | 2026-11-27 |
 
 ### FIT-Connect (`data/runs/fit-connect.js`)
 
-9 sources read, 8 of them with the 14 quotes cited. The FITKO's one-pager is read for the SDKs but, since the verification of the review's fixes noted the registry's maker, no longer cited: it says who develops FIT-Connect, not who makes the registry that distributes its SDK.
+12 sources read, 11 of them with the 17 quotes cited. The FITKO's one-pager is read for the SDKs but, since the verification of the review's fixes noted the registry's maker, no longer cited: it says who develops FIT-Connect, not who makes the registry that distributes its SDK.
 
 | Source | Language | Read |
 |---|---|---|
@@ -142,10 +154,13 @@ Pages and quotes count what each run cites besides the reference facts.
 | [FIT-Connect Onepager (FITKO)](https://docs.fitko.de/fit-connect/assets/files/FITConnect_Onepager-1a613eda6435943cc90f0b214bc7321f.pdf) | German | 2026-11-19 |
 | [About Sonatype \| Our Company & Mission \| Sonatype](https://sonatype.com/about) | English | 2026-11-19 |
 | [Sonatype Relocates Headquarters to Maryland](https://www.sonatype.com/blog/2010/09/sonatype-headquarters-moves-to-maryland?hs_amp=true) | English | 2026-11-19 |
+| [Keycloak \| Munich Open Source](https://opensource.muenchen.de/software/keycloak.html) | English | 2026-11-27 |
+| [The sovereign alternative to Microsoft Entra: Nubus from Univention for access and identity management](https://nextcloud.com/blog/the-sovereign-alternative-to-microsoft-entra-nubus-from-univention-for-access-and-identity-management/) | English | 2026-11-27 |
+| [GitHub - dzikoysk/reposilite: Lightweight and easy-to-use repository management software](https://github.com/dzikoysk/reposilite) | English | 2026-11-27 |
 
 ### ePayBL (`data/runs/epaybl.js`)
 
-11 sources read, 10 of them with the 17 quotes cited. The SID's slides on the award are read for the development block but, since the re-check of the review's fixes, no longer cited: they state the SID's responsibility for Saxony's payment component, not who runs the joint development.
+15 sources read, 14 of them with the 21 quotes cited. The SID's slides on the award are read for the development block but, since the re-check of the review's fixes, no longer cited: they state the SID's responsibility for Saxony's payment component, not who runs the joint development.
 
 | Source | Language | Read |
 |---|---|---|
@@ -160,6 +175,10 @@ Pages and quotes count what each run cites besides the reference facts.
 | [PayPal Announces Strategic Reorganization to Accelerate Growth](https://newsroom.paypal-corp.com/2026-04-29-PayPal-Announces-Strategic-Reorganization-to-Accelerate-Growth) | English | 2026-11-19 |
 | [Standardisierung ePayment-Lösung (Nordrhein-Westfalen)](https://www.mhkbd.nrw/system/files/media/document/file/standardisierung_epayment_v1_0.pdf) | German | 2026-11-19 |
 | [Five Belgian Banks Join EPI to Bring Wero to Even More European Customers](https://epicompany.eu/media-insights/five-belgian-banks-join-epi-to-bring-wero-to-even-more-european-customers) | English | 2026-11-19 |
+| [European Payments Initiative CEO says Trump fears are boosting its appeal](https://www.thestar.com.my/tech/tech-news/2026/03/26/european-payments-initiative-ceo-says-trump-fears-are-boosting-its-appeal) | English | 2026-11-27 |
+| [Wero: Neuer Zahlungsdienst jetzt auch fürs Online-Shopping](https://www.verbraucherzentrale.de/wissen/digitale-welt/onlinedienste/wero-neuer-zahlungsdienst-jetzt-auch-fuers-onlineshopping-97042) | German | 2026-11-27 |
+| [Paypal-Alternative Wero: Deshalb hakt es](https://www.zdfheute.de/wirtschaft/unternehmen/wero-zahlungsdienst-alternative-eu-paypal-100.html) | German | 2026-11-27 |
+| [Bedarfsbeschreibung zum Folgeprojekt Standardschnittstelle Bezahldienste (IT-Planungsrat)](https://www.it-planungsrat.de/fileadmin/beschluesse/2022/Beschluss2022-33_Folgeprojekt.pdf) | German | 2026-11-27 |
 
 ### Bundesportal (`data/runs/bundesportal.js`)
 
@@ -175,7 +194,7 @@ Pages and quotes count what each run cites besides the reference facts.
 
 ### EUDI Wallet (`data/runs/eudi-wallet.js`)
 
-8 sources read, 7 of them with the 10 quotes cited; the reference facts on app distribution. The second heise report was read for the infrastructure layer, which the pre-run records as "no evidence found" without a quote.
+11 sources read, 10 of them with the 16 quotes cited; the reference facts on app distribution. The second heise report was read for the infrastructure layer, which the pre-run records as "no evidence found" without a quote.
 
 | Source | Language | Read |
 |---|---|---|
@@ -187,6 +206,9 @@ Pages and quotes count what each run cites besides the reference facts.
 | [FAQ zur EUDI-Wallet: Die wichtigsten Fragen und Antworten zur digitalen Brieftasche](https://netzpolitik.org/?p=512498) | German | 2026-11-20 |
 | [Legal - Privacy Policy Affiliated Company - Apple](https://www.apple.com/legal/privacy/en/affiliated-company/) | English | 2026-11-20 |
 | [Google Terms of Service – Privacy & Terms – Google](https://policies.google.com/terms) | English | 2026-11-20 |
+| [Move over, Apple: Meet the alternative app stores available in the EU and elsewhere](https://techcrunch.com/2026/02/22/move-over-apple-meet-the-alternative-app-stores-available-in-the-eu-and-elsewhere/) | English | 2026-11-27 |
+| [Aptoide Launching Alternative iOS Game Marketplace in EU](https://www.macrumors.com/2024/06/04/aptoide-marketplace-games-ios) | English | 2026-11-27 |
+| [What is F-Droid and how to set it up \| Popular Science](https://www.popsci.com/diy/f-droid-download/) | English | 2026-11-27 |
 
 ### Mein Unternehmenskonto (`data/runs/muk.js`)
 
@@ -314,3 +336,25 @@ Pages and quotes count what each run cites besides the reference facts.
 | Source | Language | Read |
 |---|---|---|
 | [Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat](https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf) | German | 2026-11-20 |
+
+### Serviceportal.NRW (`data/runs/serviceportal-nrw.js`)
+
+15 sources with 33 quotes, all read on 27 November 2026 for version 2.1.0 (`as_of: "2026-11-27"`): the state's ordinance on the portal and its amendment, the state government's announcements of the new Nordrhein-Westfalen-Portal and its press release on signing in with the BundID, the portal's imprint, the pages on drupal.org, IT.NRW's statute, the BundID's imprint, a contractor's post and the forms platform's maker's imprint; for the starting points, the federal content management system's product sheet and a press release of ekom21. A state's platform, assessed on the Deutschland-Stack's six layers by the same method as the federal services.
+
+| Source | Language | Read |
+|---|---|---|
+| [GV. NRW. 2020 S. 1212](https://recht.nrw.de/gvnrw/2020-s1212) | German | 2026-11-27 |
+| [GV. NRW. 2025 S. 1138](https://recht.nrw.de/gvnrw/2025-s1138) | German | 2026-11-27 |
+| [NRW Serviceportal - Impressum](https://meineverwaltung.nrw/en/content/622acfaf-7cad-400f-8703-ae23effba10f) | German | 2026-11-27 |
+| [Weniger digitales Klein-Klein, mehr Service für Bürgerinnen und Bürger: Nordrhein-Westfalen setzt zukünftig auf Nutzerkonto des Bundes](https://www.land.nrw/pressemitteilung/ministerin-scharrenbach-weniger-digitales-klein-klein-mehr-service-fuer) | German | 2026-11-27 |
+| [Serviceportal 2.0 \| Drupal.org](https://new.drupal.org/case-study/serviceportal-20) | English | 2026-11-27 |
+| [Das neue Nordrhein-Westfalen-Portal wird zentrale Anlaufstelle für digitale Verwaltungsleistungen](https://www.land.nrw/pressemitteilung/das-neue-nordrhein-westfalen-portal-wird-zentrale-anlaufstelle-fuer-digitale) | German | 2026-11-27 |
+| [Hybrides Pressegespräch zum neuen Nordrhein-Westfalen-Portal](https://www.land.nrw/node/25824) | German | 2026-11-27 |
+| [Betriebssatzung für den Landesbetrieb Information und Technik Nordrhein-Westfalen](https://recht.nrw.de/mblnrw/2021-s48) | German | 2026-11-27 |
+| [Frequently asked questions](https://www.drupal.org/association/faq) | English | 2026-11-27 |
+| [BundID](https://id.bund.de/en/) | German | 2026-11-27 |
+| [Telekom Multimedia Solutions GmbH \| Drupal.org](https://new.drupal.org/telekom-multimedia-solutions-gmbh) | English | 2026-11-27 |
+| [This is how public services work: Serviceportal.NRW as a one-stop shop for all administrative matters](https://www.materna.de/en/newshub/blog/verwaltung-digital/this-is-how-public-services-work-serviceportalnrw-as-a-one-stop-shop-for-all-administrative-matters/) | English | 2026-11-27 |
+| [Impressum - Lucom GmbH](https://www.lucom.com/impressum) | German | 2026-11-27 |
+| [GSB 11 – Ein modernes CMS für die öffentliche Verwaltung auf Basis von TYPO3](https://produkt.gsb.bund.de/fileadmin/PDF/20250820_GSB_11_Produktblatt_final.pdf) | German | 2026-11-27 |
+| [ekom21-Lösungen in der Deutschen Verwaltungscloud](https://www.ekom21.de/infocenter/presse/2026/01-2026-ekom21-losungen-in-der-dvc.pdf?cid=5fy) | German | 2026-11-27 |
