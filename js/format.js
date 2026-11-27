@@ -48,3 +48,11 @@ export function fmtDate(iso, lang = getLang()) {
   if (Number.isNaN(d.getTime())) return noData(lang);
   return d.toLocaleDateString(locale(lang), { day: "numeric", month: "long", year: "numeric" });
 }
+
+/** A date with the month shortened, for a table's column: "27 Nov 2026" or "27. Nov. 2026". */
+export function fmtDateShort(iso, lang = getLang()) {
+  const text = String(iso ?? "");
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T12:00:00` : text);
+  if (Number.isNaN(d.getTime())) return noData(lang);
+  return d.toLocaleDateString(locale(lang), { day: "numeric", month: "short", year: "numeric" });
+}

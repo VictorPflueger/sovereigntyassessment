@@ -44,18 +44,20 @@ export function disabledServerTool(err) {
 }
 
 /**
- * hooks: { onKeyRejected() }. run({ query, entryId, lang, modelId }) resolves when the run has ended.
+ * hooks: { onKeyRejected() }. run({ query, entryId, lang, modelId, budgetEur }) resolves when the run has
+ * ended; budgetEur is the visitor's cap from the live-run dialog, never above AGENT.budgetEur.
  */
 export function createLiveAgent(hooks = {}) {
   let current = null;
   let last = null; // the latest run, ended or not: its toolbox stays readable for the exports
 
-  async function run({ query, entryId = null, lang = "en", modelId }) {
+  async function run({ query, entryId = null, lang = "en", modelId, budgetEur = AGENT.budgetEur }) {
     const modelDef = MODELS.find((m) => m.id === modelId) || MODELS[0];
+    const capEur = Math.min(AGENT.budgetEur, Number(budgetEur) > 0 ? Number(budgetEur) : AGENT.budgetEur);
     const todayDate = appToday();
     const today = todayDate.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
     const r = {
-      modelDef, lang, ended: false, cancelled: false,
+      modelDef, lang, capEur, ended: false, cancelled: false,
       ac: new AbortController(),
       phase: null, calls: 0, step: 0,
       compat: { effort: true, display: true, thinking: true, cache: true },
@@ -96,7 +98,7 @@ export function createLiveAgent(hooks = {}) {
         if (r.cancelled) throw ABORT;
         // The caps, before every call (AC-10).
         if (r.calls >= AGENT.maxSteps) return stop(r, "notice.stepLimit", { n: AGENT.maxSteps });
-        if (r.cost.snapshot().eur >= AGENT.budgetEur) return stop(r, "notice.costCap");
+        if (r.cost.snapshot().eur >= r.capEur) return stop(r, "notice.costCap");
         r.step += 1;
         r.calls += 1;
         budget(r);
@@ -126,7 +128,7 @@ export function createLiveAgent(hooks = {}) {
         budget(r);
         if (kept.length) messages.push({ role: "assistant", content: kept });
 
-        if (snap.eur >= AGENT.budgetEur) return stop(r, "notice.costCap");
+        if (snap.eur >= r.capEur) return stop(r, "notice.costCap");
         if (stopReason === "pause_turn") continue;
 
         const uses = kept.filter((b) => b.type === "tool_use");
@@ -152,7 +154,7 @@ export function createLiveAgent(hooks = {}) {
           bus.emit("notice", { level: "info", key: "notice.nudge", vars: { n: r.nudges, max: AGENT.maxNudges } });
           const nudge = buildNudge({
             calls: AGENT.maxSteps - r.calls,
-            eurLeft: Math.max(0, AGENT.budgetEur - r.cost.snapshot().eur),
+            eurLeft: Math.max(0, r.capEur - r.cost.snapshot().eur),
             searches: r.searches, fetches: r.fetches, state: st
           });
           sentUpTo = Math.min(sentUpTo, pushUserText(messages, nudge));
@@ -358,7 +360,7 @@ export function createLiveAgent(hooks = {}) {
       searches: { used: r.searches, per_turn_cap: PER_TURN.web_search },
       fetches: { used: r.fetches, per_turn_cap: PER_TURN.web_fetch },
       nudges: r.nudges,
-      cost: { eur: r.cost.snapshot().eur, cap: AGENT.budgetEur }
+      cost: { eur: r.cost.snapshot().eur, cap: r.capEur }
     });
   }
 

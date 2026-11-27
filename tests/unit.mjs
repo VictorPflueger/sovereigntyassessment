@@ -168,7 +168,7 @@ await group("catalogue", "catalogue matching: names and aliases in both language
   check.equal(c.nameKey("Straße Ä"), "strassea");
   const groups = c.byCategory(data);
   check.equal(groups.base_service.length, 9);
-  check.equal(groups.platform_or_access.length, 7);
+  check.equal(groups.platform_or_access.length, 8, "eight platforms or access channels, the Serviceportal.NRW among them");
   for (const e of data.entries) {
     check.ok(c.entryUrls(e).length >= 1 && c.entryUrls(e).every((u) => u.startsWith("https://")), e.id);
     check.ok(c.entryTexts(e).length >= 4, e.id);
@@ -362,7 +362,7 @@ await group("presenter", "every pre-run played in both languages: five steps, na
   const { fmtScore, fmtInt } = await mod("js/format.js");
   const { t } = await mod("js/i18n/index.js");
   const entries = win.SA_CATALOGUE.entries;
-  check.equal(Object.keys(win.SA_RUNS).length, 17, "seventeen pre-runs");
+  check.equal(Object.keys(win.SA_RUNS).length, 18, "eighteen pre-runs");
   check.deepEqual(STEP_IDS, ["understand", "research", "score", "review", "recommend"]);
   const play = (def, lang, choice) => playCase(def, lang, { choice });
   // The texts a person reads on a step, without the fields that only key the page's elements.

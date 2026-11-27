@@ -90,13 +90,13 @@ export function weakBlocks(result) {
 
 /**
  * The comparable services of an entry: the other assessed services of its function group, best first.
- * entries: the catalogue's entries; scores: { [id]: { overall, layers } or { notService: true } }.
+ * entries: the catalogue's entries; scores: { [id]: { overall, layers, weakest? } or { notService: true } }.
  */
 export function comparable(entries, scores, id) {
   const me = (entries || []).find((e) => e.id === id);
   if (!me || !me.group || me.group === "self") return [];
   return entries
     .filter((e) => e.id !== id && e.group === me.group && scores?.[e.id] && !scores[e.id].notService && scores[e.id].overall !== null && scores[e.id].overall !== undefined)
-    .map((e) => ({ id: e.id, overall: scores[e.id].overall, layers: scores[e.id].layers }))
+    .map((e) => ({ id: e.id, overall: scores[e.id].overall, layers: scores[e.id].layers, weakest: scores[e.id].weakest ?? null }))
     .sort((a, b) => b.overall - a.overall || a.id.localeCompare(b.id));
 }

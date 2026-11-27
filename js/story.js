@@ -168,7 +168,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     if (!s || s.value === null) return null;
     const expr = `${fmtScore(s.value, lang)} = (${s.terms.map((x) => `${fmtInt(x.level, lang)} × ${fmtInt(x.weight, lang)}`).join(" + ")}) ÷ ${fmtInt(s.weights, lang)} × 25`;
     const named = s.terms.map((x) => blockWords(blockName(x.id), x.criticality, x.level, lang));
-    return { expr, text: t("p.sum.layer", { expr, blocks: andList(named, lang) }, lang), terms: s.terms.length };
+    return { expr, named, text: t("p.sum.layer", { expr, blocks: andList(named, lang) }, lang), terms: s.terms.length };
   };
   const marksOf = (b) => {
     const out = [];
@@ -222,6 +222,14 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     }
     return { text, detail, left, open: t("p.sum.open", { score: fmtScore(o.score, lang) }, lang) };
   })();
+  // Every make-up the page can open, by its opener's key, at any step: a block (the Score step's and the
+  // tiles'), a layer's score and the overall score.
+  const makeups = {};
+  for (const r of levelRows) {
+    if (r.sum) makeups[`layer:${r.layer}`] = { kind: "layer", title: t("p.mk.layerOpen", { layer: r.name, score: r.score }, lang), expr: r.sum.expr, blocks: r.sum.named };
+    for (const b of r.blocks) makeups[`block:${b.id}`] = { kind: "block", title: b.name, level: b.level, ...b.makeup, layer: r.sum ? { name: r.name, expr: r.sum.expr } : null };
+  }
+  if (overallLine) makeups.overall = { kind: "overall", title: t("p.sum.title", null, lang), detail: overallLine.detail, left: overallLine.left };
   const key = {
     levels: [4, 3, 2, 1, 0, null].map((n) => ({ level: n, text: t(`p.legend.${n ?? "gap"}`, null, lang) })),
     crit: ["critical", "important", "supporting"].map((c) => ({ term: t(`p.key.${c}.term`, null, lang), text: t(`p.key.${c}`, null, lang) })),
@@ -232,9 +240,8 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     title: notService ? t("p.s3.title.none", null, lang) : !complete ? t("p.s3.title.wait", null, lang)
       : score === null ? t("p.s3.title.noScore", null, lang) : t("p.s3.title", { score: fmtScore(score, lang), scored: fmtInt(scored, lang) }, lang),
     lead: notService ? t("p.s3.lead.none", null, lang) : t("p.s3.lead", { exclusive: !complete || !critical.length ? "" : atRisk ? t("p.s3.lead.atRisk", { n: fmtInt(atRisk, lang), of: fmtInt(critical.length, lang) }, lang) : t("p.s3.lead.noneAtRisk", null, lang) }, lang).trim(),
-    stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) } : complete ? { kind: "levels", rows: levelRows, weakest, lowest: lowest ? { id: lowest.id, name: blockName(lowest.id), level: lowest.level } : null } : pending,
-    sum: complete && !notService ? overallLine : null,
-    key: complete && !notService ? key : null
+    stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) } : complete ? { kind: "levels", rows: levelRows, weakest, lowest: lowest ? { id: lowest.id, name: blockName(lowest.id), level: lowest.level } : null, key } : pending,
+    sum: complete && !notService ? overallLine : null
   });
 
   // 4 Your review: the agent asks a person to check its findings before it recommends anything.
@@ -293,7 +300,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
       const src = sources(p.evidence)[0] || null;
       const cat = p.catalogue_id ? scoreOf(p.catalogue_id) : null;
       return {
-        name: inLang(p.name, lang), note: p.note ? plain(p.note) : "",
+        key: `alt:${id}:${inLang(p.name, "en")}`, name: inLang(p.name, lang), note: p.note ? plain(p.note) : "",
         level: p.level ?? null,
         levelText: p.level === null || p.level === undefined ? t("p.alt.noLevel", null, lang) : t("p.alt.level", { n: fmtInt(p.level, lang) }, lang),
         source: src,
@@ -302,14 +309,19 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     }).sort((x, y) => collator.compare(x.name, y.name));
     return { block: { id, name: blockName(id), level: b?.level ?? null, criticality: t(`p.crit.${b?.criticality || "supporting"}`, null, lang) }, starting, none: !starting.length };
   }) : [];
+  // Each starting point opens its source and, where the source shows it, the level the method would give.
+  for (const a of alternatives) {
+    for (const p of a.starting) makeups[p.key] = { kind: "alt", title: p.name, level: p.level ?? undefined, levelText: p.levelText, note: p.note, catalogue: p.catalogue?.text ? `${p.catalogue.name}: ${p.catalogue.text}` : "", source: p.source, block: a.block.name };
+  }
   // Comparable services: the other assessed services of the function group, best first, with this case among them.
   const group = entry?.group && entry.group !== "self" ? entry.group : null;
   const comparableView = group && result ? (() => {
     if (!others) return { group: t(`p.group.${group}`, null, lang), pending: true, items: [] };
     const list = comparable(catalogueEntries(), others, entry.id);
-    const mine = { id: entry.id, overall: result.overall, layers: scored, current: true };
+    const mine = { id: entry.id, overall: result.overall, layers: scored, current: true, weakest: weakest ? { level: weakest.level, name: blockName(weakest.id) } : null };
     const items = [...list, mine].filter((x) => x.overall !== null).sort((a, b) => b.overall - a.overall || (a.current ? -1 : b.current ? 1 : a.id.localeCompare(b.id)))
-      .map((x) => ({ id: x.id, name: t(`p.case.${x.id}.short`, null, lang), score: fmtScore(x.overall, lang), of: t("p.kpi.layers", { n: fmtInt(x.layers, lang) }, lang), current: !!x.current }));
+      .map((x) => ({ id: x.id, name: t(`p.case.${x.id}.short`, null, lang), score: fmtScore(x.overall, lang), of: t("p.kpi.layers", { n: fmtInt(x.layers, lang) }, lang), current: !!x.current,
+        weakest: x.weakest ? { level: x.weakest.level, name: inLang(x.weakest.name, lang), label: t("p.comp.weakest", { name: inLang(x.weakest.name, lang), level: fmtInt(x.weakest.level, lang) }, lang) } : null }));
     return { group: t(`p.group.${group}`, null, lang), pending: false, items, none: !list.length };
   })() : null;
   let s5title;
@@ -370,7 +382,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
   // How long Play stays on a step: the time to read its title and lead, between 7 and 14 seconds.
   for (const s of steps) s.read = Math.min(14000, Math.max(7000, 3000 + 230 * words(`${s.title} ${s.lead}`)));
 
-  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete };
+  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete, makeups };
 
   function kpis() {
     const k = {};

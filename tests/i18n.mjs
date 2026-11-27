@@ -41,7 +41,7 @@ const SAME_ALLOWED = new Set([
   "p.case.epaybl.short", "p.case.kipitz.short", "p.case.opencode.short", "p.case.opencode", "p.case.dvc.short",
   "p.case.bundesportal.short", "p.case.deutschland-app.short", "p.case.noots.short", "p.case.zbds.short",
   "p.case.zapuk.short", "p.case.marktplatz-deutschland-digital.short", "p.case.muk.short",
-  "p.case.marktplatz-deutschland-digital",
+  "p.case.marktplatz-deutschland-digital", "p.case.serviceportal-nrw.short",
   "p.agent", "p.agent.live",                     // "Agent" and "live, Claude …" read the same in German
   "p.byline.tip", "p.play.pause", "p.start.sim"  // "Website", "Pause", "Simulation"
 ]);
@@ -139,7 +139,10 @@ const FAMILIES = {
   "p.memo.": ["pending", "approved", "rejected"],
   "p.play.": ["play", "pause", "replay"],
   "p.live.end.": ["stopped", "aborted", "error"],
-  "p.case.": catalogue.flatMap((id) => [id, `${id}.short`, `${id}.tip`])
+  "p.case.": catalogue.flatMap((id) => [id, `${id}.short`, `${id}.tip`]),
+  "p.ov.col.": ["service", "score", "weakest", "lower", "exclusive", "group", "asOf"],
+  // The cases whose pre-run ends without an assessment, each with its reason in All services.
+  "p.ov.reason.": ["zbds", "zapuk", "low-code"]
 };
 const families = [];
 for (const [prefix, values] of Object.entries(FAMILIES)) {

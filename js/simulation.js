@@ -145,6 +145,9 @@ export function createSimulationPlayer({ getSpeed }) {
   function wait(r, ms) {
     if (r.cancelled) return Promise.reject(ABORT);
     const speed = Math.max(0.25, Number(getSpeed?.()) || 1);
+    // At full speed (the presenter's replay, and every pre-run the overview plays) a step waits for no
+    // timer: a browser holds chained timers to 4 ms, so a play of 40 steps took a sixth of a second.
+    if (speed === Infinity) return Promise.resolve();
     return new Promise((resolve, reject) => {
       const cancel = () => { clearTimeout(timer); r.waiters.delete(cancel); reject(ABORT); };
       const timer = setTimeout(() => { r.waiters.delete(cancel); resolve(); }, ms / speed);

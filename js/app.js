@@ -6,7 +6,9 @@
 // ← → (a clicker's PageUp and PageDown) and 1 to 5 step by hand. Links: ?case=bundid&step=score opens a
 // step, paused. EN | DE switches every word in place: the simulation plays the same run again in the
 // other language with the person's decisions, in a fraction of a second; a live run keeps the agent's
-// own words in the language it started in.
+// own words in the language it started in. From 2.1.0 every pre-run plays once at the start, with nothing
+// stored: All services compares them, Compare sets two or three side by side, and a block, a layer's score
+// or the overall score opens how it is made.
 
 import { bus, newRunId } from "./events.js";
 import { createSimulationPlayer } from "./simulation.js";
@@ -14,9 +16,11 @@ import { MODELS, DEFAULT_MODEL } from "./config.js";
 import { t, setLang, getLang, onLang } from "./i18n/index.js";
 import { digest, STEP_IDS } from "./run.js";
 import { story, eur } from "./story.js";
-import { renderStep, renderLog, redraw, h, more } from "./view.js";
+import { renderStep, renderLog, renderTile, renderMakeup, redraw, h, more } from "./view.js";
 import { estimateCost } from "./estimate.js";
 import { fmtDate } from "./format.js";
+import { overviewModel, compareModel, scoresOf } from "./cases.js";
+import { renderOverview, renderCompare } from "./overview.js";
 
 const $ = (id) => document.getElementById(id);
 const CATALOGUE = () => window.SA_CATALOGUE.entries;
@@ -28,7 +32,18 @@ const cases = () => CATALOGUE().filter((e) => RUNS()[e.id]);
 const modelName = (id) => MODELS.find((m) => m.id === id)?.label || id;
 
 const player = createSimulationPlayer({ getSpeed: () => Infinity });
-const estimates = new Map();
+/**
+ * Every pre-run, played once in this tab with an automatic person (the review confirmed, the first lever and
+ * the memo approved): the figures of All services and of the comparable services, and what a live run would
+ * cost. Nothing is stored; a reload plays them again.
+ */
+const played = new Map();
+const costs = new Map();
+let others = null;
+/** What this tab has seen: the cases opened, a live run's result by case, the services picked for Compare. */
+const seen = { viewed: new Set(), live: new Map(), picks: [] };
+/** The make-up open: its opener and key, and whether a press on that opener is closing it. */
+const MK = { opener: null, key: null, sig: "", closing: false };
 /** The page: the case, the step, the mode, the run's events and the person's decisions with their times. */
 const S = { entry: null, step: 0, mode: "simulation", model: DEFAULT_MODEL, runId: null, events: [], view: null, run: null, live: null, follow: false, frame: 0, decisions: {}, replaying: false, liveLang: null };
 /** Play: on, the frame it asked for, the time spent reading the step, the step it timed. */
@@ -47,12 +62,12 @@ export async function start() {
   buildCaseMenu();
   bindKeys();
   bindLanguage();
+  bindMakeup();
+  bindCases();
+  bindStart();
   $("play").addEventListener("click", () => (P.on ? pause() : play()));
   $("turn-primary").addEventListener("click", () => act(S.view?.steps[S.step]?.turn?.act || "next"));
   $("turn-second").addEventListener("click", () => act(S.view?.steps[S.step]?.turn?.secondaryAct));
-  $("start").addEventListener("click", openStart);
-  $("start-sim").addEventListener("click", () => { $("start-dialog").close(); openCase(S.entry, 0).then(play); });
-  $("key-form").addEventListener("submit", (e) => { e.preventDefault(); startLive(); });
   $("stop").addEventListener("click", () => S.live?.abort());
   $("agent-text").addEventListener("scroll", (e) => more(e.target), { passive: true });
   addEventListener("resize", () => more($("agent-text")), { passive: true });
@@ -68,12 +83,13 @@ export async function start() {
     else if (done) play();
     if (done && P.on) $("play").focus({ preventScroll: true });
   });
+  await playAll();
   await openCase(entry, 0, { boot: true });
   fillGuides();
   // A link to a step opens it, paused, at the furthest step the run has reached.
   if (at >= 0) go(Math.min(at, S.view.steps.findLastIndex((st) => st.ready)), { focus: false });
   if (!document.querySelector("dialog.vc-guide[open]") && at < 0) play();
-  window.sovereignty = { S, P, go, play, pause, act, setLanguage, openCase };
+  window.sovereignty = { S, P, go, play, pause, act, setLanguage, openCase, openOverview, openCompare, seen };
 }
 
 // ---- the case: played at once from its pre-run, and again in the other language -------------------------
@@ -87,6 +103,7 @@ async function openCase(entry, step = 0, { boot = false } = {}) {
   S.step = step;
   S.decisions = {};
   S.liveLang = null;
+  seen.viewed.add(entry.id);
   Object.assign(P, { step, at: 0 });
   $("case-name").textContent = t(`p.case.${entry.id}.short`);
   document.querySelectorAll("#case-menu .vc-menu__item").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.case === entry.id)));
@@ -96,7 +113,6 @@ async function openCase(entry, step = 0, { boot = false } = {}) {
     url.searchParams.delete("step");
     history.replaceState(null, "", url);
   }
-  await estimateFor(entry);
   await replay();
   setMode();
   render();
@@ -246,7 +262,7 @@ function render() {
     if (d?.at && e.kind !== "report") e.at = d.at;
   }
   const lang = getLang();
-  const view = story({ run, lang, mode: S.mode, entry: S.entry });
+  const view = story({ run, lang, mode: S.mode, entry: S.entry, others });
   view.mode = S.mode;
   view.runLang = run.lang;
   S.run = run;
@@ -275,6 +291,7 @@ function render() {
   $("story-working").hidden = !working;
   $("story-working-text").textContent = working;
   kpis(view, run);
+  refreshMakeup();
   document.body.dataset.step = step.id;
   drawPlay();
   drawBar();
@@ -291,10 +308,10 @@ function finished() {
   const step = S.view.steps[S.step];
   return S.step === last && !step.waits && !!S.run?.end;
 }
-/** A dialog or the case menu covers the page: Play holds its time until it closes. */
+/** A dialog, the case menu or a make-up covers the page: Play holds its time until it closes. */
 function covered() {
   if (document.querySelector("dialog[open]")) return true;
-  try { return $("case-menu").matches(":popover-open"); } catch { return false; }
+  try { return $("case-menu").matches(":popover-open") || $("makeup").matches(":popover-open"); } catch { return false; }
 }
 
 function play() {
@@ -428,58 +445,57 @@ function nudge() {
 
 function kpis(view, run) {
   const k = view.kpis;
-  tile("score", k.score);
-  tile("weakest", k.weakest);
-  tile("exclusive", k.exclusive);
+  renderTile($("kpi-score"), k.score);
+  renderTile($("kpi-weakest"), k.weakest);
+  renderTile($("kpi-exclusive"), k.exclusive);
   const lang = getLang();
-  if (S.mode === "live") {
-    tile("cost", { value: eur(run.cost?.eur || 0, lang), note: t("p.kpi.cost.measured", { model: modelName(S.model) }) });
-  } else {
-    const e = estimates.get(S.entry.id);
-    tile("cost", { value: e ? `≈${" "}${eur(e.eur, lang)}` : "…", note: t("p.kpi.cost.estimated") });
-  }
+  // A replay costs nothing; the tile says what a live run of the case would cost (D6).
+  renderTile($("kpi-cost"), S.mode === "live"
+    ? { value: eur(run.cost?.eur || 0, lang), note: t("p.kpi.cost.measured", { model: modelName(S.model) }) }
+    : { value: `≈\u00a0${eur(costOf(S.entry.id).eur, lang)}`, of: t("p.kpi.cost.live"), note: t("p.kpi.cost.replay") });
 }
 
-function tile(id, v) {
-  const el = $(`kpi-${id}`);
-  const was = el.querySelector(".vc-stat__was");
-  const to = el.querySelector(".kpi-to");
-  if (was) { was.hidden = !v.was; was.textContent = v.was || ""; }
-  if (to) { to.hidden = !v.was; to.textContent = v.was ? t("p.kpi.now") : ""; }
-  el.querySelector(".kpi-main").textContent = v.value;
-  const of = el.querySelector(".kpi-of");
-  if (of) { of.hidden = !v.of; of.textContent = v.of ? ` ${v.of}` : ""; }
-  el.querySelector(".kpi-note").textContent = v.note || "";
-  el.dataset.tone = v.tone || "";
+// ---- every pre-run, played once -----------------------------------------------------------------------------
+
+/** Plays every case's pre-run in turn before the first screen; about 20 ms a case. */
+async function playAll() {
+  for (const e of cases()) if (!played.has(e.id)) played.set(e.id, await playOnce(e));
+  others = scoresOf(cases().map((e) => ({ entry: e, def: RUNS()[e.id], run: played.get(e.id).run })));
 }
 
-/** The session cost of a live run on the case, estimated from the pre-run played with an automatic person. */
-async function estimateFor(entry) {
-  if (estimates.has(entry.id)) return estimates.get(entry.id);
+/** One pre-run to its end in English, with every decision answered: its events and their digest. */
+async function playOnce(entry) {
   const def = RUNS()[entry.id];
-  const runId = `estimate-${entry.id}`;
+  const runId = `play-${entry.id}`;
   const events = [];
   const off = bus.onAny((ev) => {
     if (ev.run_id !== runId) return;
     events.push(ev);
     const p = ev.payload || {};
+    if (ev.type === "choice_request") queueMicrotask(() => bus.emit("choice_decision", { request_id: p.request_id, chosen: 0, by: "user" }));
     if (ev.type === "review_request") queueMicrotask(() => bus.emit("review_decision", { request_id: p.request_id, action: "confirm", by: "user" }));
     if (ev.type === "levers") queueMicrotask(() => bus.emit("lever_decision", { options_seq: p.options_seq, lever_id: p.levers[0]?.lever_id || "keep", by: "user" }));
     if (ev.type === "action_draft") queueMicrotask(() => bus.emit("action_decision", { action_id: p.action_id, decision: "approved", by: "user" }));
   });
   bus.beginRun({ run_id: runId, mode: "simulation" });
   try {
+    bus.emit("run_start", { run_id: runId, mode: "simulation", query: def.query, entry_id: def.entry_id, lang: "en", source: def.source, as_of: def.as_of });
     await player.play(structuredClone(def), { lang: "en", service: def.query, mode: "simulation" });
   } finally {
     off();
     bus.endRun();
   }
-  const today = fmtDate(def.as_of, "en");
-  const per = Object.fromEntries(MODELS.map((m) => [m.id, estimateCost({ events, lang: "en", query: def.query, entryId: def.entry_id, today, modelId: m.id })]));
-  // The whole run, with the first lever and the memo approved: the guide quotes its lever figure.
-  const e = { eur: per[DEFAULT_MODEL].eur, per, run: digest(events) };
-  estimates.set(entry.id, e);
-  return e;
+  return { events, run: digest(events) };
+}
+
+/** What a live run of the case would cost with a model, estimated from its whole pre-run in English. */
+function costOf(id, modelId = DEFAULT_MODEL) {
+  const key = `${id}|${modelId}`;
+  if (!costs.has(key)) {
+    const def = RUNS()[id];
+    costs.set(key, estimateCost({ events: played.get(id)?.events || [], lang: "en", query: def.query, entryId: def.entry_id, today: fmtDate(def.as_of, "en"), modelId }));
+  }
+  return costs.get(key);
 }
 
 // ---- the guides' figures: the BundID case, from the engine ---------------------------------------------
@@ -495,13 +511,12 @@ function fillGuides(lang = getLang()) {
   const k = v.kpis;
   const r = S.run;
   const res = r.score?.result;
-  const e = estimates.get(S.entry.id);
-  const lever = e?.run?.levers?.levers?.[0];
+  const lever = played.get(FIRST)?.run?.levers?.levers?.[0];
   const overall = lever?.whatif?.facts?.[`whatif.${lever.lever_id}.overall`];
   const figs = {
     score: k.score.value, layers: k.score.of.trim(), weakest: `${k.weakest.value} ${k.weakest.of}`.trim(), "weakest-name": k.weakest.note,
     exclusive: k.exclusive.value, critical: String(res ? res.blocks.filter((b) => b.criticality === "critical" && !b.unscored).length : ""),
-    cost: e ? eur(e.eur, lang) : "", blocks: String(r.blockList.length || ""), pages: String(r.research.filter((x) => x.kind === "fetch" && x.ok).length || ""),
+    cost: eur(costOf(FIRST).eur, lang), blocks: String(r.blockList.length || ""), pages: String(r.research.filter((x) => x.kind === "fetch" && x.ok).length || ""),
     quotes: String(new Set(r.evidence.filter((c) => c.verified && c.quote).map((c) => `${c.url}|${c.quote}`)).size || ""),
     lever: Number.isFinite(overall) ? String(Math.round(overall)) : "",
     "as-of": fmtDate(RUNS()[FIRST].as_of, lang)
@@ -570,6 +585,9 @@ async function setLanguage(lang) {
   redraw();
   render();
   fillGuides(lang);
+  if ($("overview").open) drawOverview();
+  if ($("cmp").open) drawCompare();
+  if ($("start-dialog").open) fillStart();
   $("announce").textContent = t("p.announce.lang");
 }
 
@@ -596,28 +614,225 @@ function setMode() {
   $("start").hidden = running;
 }
 
-// ---- Start agent: the simulation again, or a live run ----------------------------------------------------
+// ---- how a figure is made: one popover for a block, a layer's score or the overall score ----------------
+
+function bindMakeup() {
+  const pop = $("makeup");
+  // A press on the opener of the make-up already open closes it, and the click that follows stays closed.
+  document.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest?.("[data-makeup]");
+    MK.closing = !!b && pop.matches(":popover-open") && b.dataset.makeup === MK.key;
+  }, { capture: true });
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest?.("[data-makeup]");
+    if (!b) return;
+    if (MK.closing) { MK.closing = false; return; }
+    if (pop.matches(":popover-open") && b.dataset.makeup === MK.key) { pop.hidePopover(); return; }
+    openMakeup(b);
+  });
+  pop.addEventListener("beforetoggle", (e) => {
+    if (e.newState !== "closed") return;
+    const back = MK.opener;
+    back?.setAttribute("aria-expanded", "false");
+    Object.assign(MK, { opener: null, key: null, sig: "" });
+    // Esc or a click outside: the focus goes back to what opened it, unless the click put it elsewhere.
+    const at = document.activeElement;
+    if (back?.isConnected && (!at || at === document.body || pop.contains(at))) back.focus({ preventScroll: true });
+  });
+  addEventListener("resize", () => { if (MK.opener) place(pop, MK.opener); }, { passive: true });
+}
+
+function openMakeup(b) {
+  const m = S.view?.makeups?.[b.dataset.makeup];
+  const pop = $("makeup");
+  if (!m) return;
+  if (pop.matches(":popover-open")) pop.hidePopover();
+  renderMakeup(pop, m);
+  Object.assign(MK, { opener: b, key: b.dataset.makeup, sig: JSON.stringify(m) });
+  pop.showPopover();
+  b.setAttribute("aria-expanded", "true");
+  place(pop, b);
+  pop.focus({ preventScroll: true });
+}
+
+/** After a render the make-up follows its opener, and its words the language. */
+function refreshMakeup() {
+  const pop = $("makeup");
+  if (!MK.key || !pop.matches(":popover-open")) return;
+  const m = S.view?.makeups?.[MK.key];
+  if (!m) { pop.hidePopover(); return; }
+  const sig = JSON.stringify(m);
+  if (sig !== MK.sig) { renderMakeup(pop, m); MK.sig = sig; }
+  const b = document.querySelector(`[data-makeup="${MK.key}"]`);
+  if (b && b !== MK.opener) { MK.opener = b; b.setAttribute("aria-expanded", "true"); }
+  if (MK.opener?.isConnected) place(pop, MK.opener);
+}
+
+/** Under its opener, or above it where the window ends; never outside the window. */
+function place(pop, b) {
+  const r = b.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  const ht = pop.offsetHeight;
+  let top = r.bottom + 6;
+  if (top + ht > innerHeight - 8) top = r.top - 6 - ht >= 8 ? r.top - 6 - ht : Math.max(8, innerHeight - 8 - ht);
+  pop.style.left = `${Math.round(Math.min(Math.max(8, r.left), innerWidth - w - 8))}px`;
+  pop.style.top = `${Math.round(top)}px`;
+}
+
+// ---- All services and Compare ---------------------------------------------------------------------------------
+
+/** Every case with its pre-run's result, and after it a live run of this tab, if one assessed it. */
+function allCases() {
+  return cases().flatMap((e) => {
+    const list = [{ entry: e, def: RUNS()[e.id], run: played.get(e.id)?.run }];
+    const live = seen.live.get(e.id);
+    if (live) list.push({ entry: e, def: RUNS()[e.id], run: live.run, asOf: live.at, live: true });
+    return list;
+  });
+}
+
+function bindCases() {
+  $("overview-open").addEventListener("click", openOverview);
+  $("ov-cmp").addEventListener("click", () => openCompare(seen.picks));
+  $("cmp-all").addEventListener("click", openOverview);
+  $("overview-body").addEventListener("change", (e) => {
+    const box = e.target.closest?.("[data-pick]");
+    if (!box) return;
+    const k = box.dataset.pick;
+    seen.picks = box.checked ? [...seen.picks.filter((x) => x !== k), k].slice(-3) : seen.picks.filter((x) => x !== k);
+    syncPicks();
+  });
+  $("cmp-body").addEventListener("click", (e) => {
+    const k = e.target.closest?.("[data-remove]")?.dataset.remove;
+    if (!k) return;
+    seen.picks = seen.picks.filter((x) => x !== k);
+    drawCompare();
+    $("cmp-body").querySelector(".ov-open")?.focus();
+  });
+  // A service's name opens it, from the overview, Compare or the comparable services; Compare with sets
+  // the case beside the one shown.
+  document.addEventListener("click", (e) => {
+    const open = e.target.closest?.("[data-open-case]");
+    const other = e.target.closest?.("[data-cmp-with]");
+    if (open) {
+      const entry = cases().find((c) => c.id === open.dataset.openCase);
+      if (!entry) return;
+      for (const d of [$("overview"), $("cmp")]) if (d.open) d.close();
+      openCase(entry, 0).then(play);
+    } else if (other) openCompare([S.entry.id, other.dataset.cmpWith]);
+  });
+}
+
+function openOverview() {
+  if ($("cmp").open) $("cmp").close();
+  drawOverview();
+  if (!$("overview").open) $("overview").showModal();
+}
+
+function drawOverview() {
+  renderOverview($("overview-body"), overviewModel({ cases: allCases(), lang: getLang(), viewed: seen.viewed }), seen.picks);
+  syncPicks();
+}
+
+/** The picks for Compare: two or three; the button says how many. */
+function syncPicks() {
+  for (const b of $("overview-body").querySelectorAll("[data-pick]")) {
+    b.checked = seen.picks.includes(b.dataset.pick);
+    b.disabled = !b.checked && seen.picks.length >= 3;
+  }
+  const n = seen.picks.length;
+  $("ov-cmp").disabled = n < 2;
+  $("ov-cmp-text").textContent = n < 2 ? t("p.ov.compare.none") : t("p.ov.compare.n", { n });
+}
+
+function openCompare(keys) {
+  seen.picks = [...new Set(keys)].slice(0, 3);
+  if (seen.picks.length < 2) { openOverview(); return; }
+  if ($("overview").open) $("overview").close();
+  drawCompare();
+  if (!$("cmp").open) $("cmp").showModal();
+}
+
+function drawCompare() {
+  if (seen.picks.length < 2) { $("cmp").close(); openOverview(); return; }
+  const m = compareModel({ cases: allCases(), keys: seen.picks, lang: getLang() });
+  $("cmp-title").textContent = m.title;
+  renderCompare($("cmp-body"), m);
+}
+
+// ---- Start agent: the simulation again, or a live run in Vici's live-run dialog ------------------------------
+
+function bindStart() {
+  $("start").addEventListener("click", openStart);
+  $("start-sim").addEventListener("click", () => { $("start-dialog").close(); openCase(S.entry, 0).then(play); });
+  $("live-start").addEventListener("click", startLive);
+  $("live-show").addEventListener("click", () => showKey($("live-show").getAttribute("aria-pressed") !== "true"));
+  $("live-forget").addEventListener("click", async () => {
+    (await import("./keystore.js")).forgetKey();
+    S.keyHeld = "";
+    fillStart();
+    $("live-key").focus();
+  });
+  for (const id of ["live-key", "live-cap", "live-model", "live-ack"]) $(id).addEventListener("input", drawLive);
+  $("live-ack").addEventListener("change", drawLive);
+  // The key is typed into no form: Enter in it starts the run, once the box is ticked.
+  $("live-key").addEventListener("keydown", (e) => { if (e.key === "Enter" && !$("live-start").disabled) { e.preventDefault(); startLive(); } });
+}
 
 async function openStart() {
   pause();
-  const e = await estimateFor(S.entry);
-  const name = t(`p.case.${S.entry.id}.short`);
-  $("start-sim-text").textContent = t("p.start.sim.text", { service: name, date: fmtDate(RUNS()[S.entry.id].as_of) });
-  $("live-text").textContent = t("p.start.live.text", { service: name });
-  $("live-model").replaceChildren(...MODELS.map((m) => h("option", { value: m.id, selected: m.id === S.model }, t("p.start.model", { model: m.label, cost: eur(e.per[m.id].eur, getLang()) }))));
+  const { getKey, maskKey } = await import("./keystore.js");
+  S.keyHeld = getKey() ? maskKey() : "";
   $("live-msg").textContent = "";
   $("live-key").value = "";
+  $("live-ack").checked = false;
+  showKey(false);
+  fillStart();
   $("start-dialog").showModal();
   $("start-sim").focus();
 }
 
+/** The dialog's words for the case, the models with what a run would cost, and the key in memory. */
+function fillStart() {
+  const lang = getLang();
+  const name = t(`p.case.${S.entry.id}.short`);
+  $("start-sim-text").textContent = t("p.start.sim.text", { service: name, date: fmtDate(RUNS()[S.entry.id].as_of) });
+  $("live-text").textContent = t("p.start.live.text", { service: name });
+  const model = $("live-model").value || S.model;
+  $("live-model").replaceChildren(...MODELS.map((m) => h("option", { value: m.id, selected: m.id === model }, t("p.start.model", { model: m.label, cost: eur(costOf(S.entry.id, m.id).eur, lang) }))));
+  $("live-current").hidden = !S.keyHeld;
+  $("live-masked").textContent = S.keyHeld || "";
+  drawLive();
+}
+
+/** The cap's value, the estimate against it, and Start: it waits for a key and the acknowledgement. */
+function drawLive() {
+  const lang = getLang();
+  const cap = Number($("live-cap").value);
+  const model = $("live-model").value || S.model;
+  const cost = costOf(S.entry.id, model).eur;
+  $("live-cap-value").textContent = eur(cap, lang);
+  $("live-estimate").textContent = `${t("p.start.estimate", { service: t(`p.case.${S.entry.id}.short`), model: modelName(model), cost: eur(cost, lang) })}${cost > cap ? ` ${t("p.start.overCap")}` : ""}`;
+  $("live-start").disabled = !$("live-ack").checked || !($("live-key").value.trim() || S.keyHeld);
+}
+
+function showKey(on) {
+  const b = $("live-show");
+  $("live-key").type = on ? "text" : "password";
+  b.setAttribute("aria-pressed", String(on));
+  b.setAttribute("aria-label", t(on ? "p.start.hide" : "p.start.show"));
+  b.querySelector(".vc-icon").className = `vc-icon vc-icon--${on ? "eye-off" : "eye"}`;
+}
+
 async function startLive() {
   const msg = $("live-msg");
-  const key = $("live-key").value.trim();
+  const typed = $("live-key").value.trim();
   const framed = (() => { try { return window.top !== window.self; } catch { return true; } })();
-  const { looksLikeKey, setKey, forgetKey } = await import("./keystore.js");
+  const { looksLikeKey, setKey, getKey, forgetKey } = await import("./keystore.js");
+  const key = typed || getKey();
   msg.className = "vc-help vc-help--error";
   if (framed) { msg.textContent = t("p.live.framed"); return; }
+  if (!$("live-ack").checked) { msg.textContent = t("p.start.noAck"); $("live-ack").focus(); return; }
   if (!key) { msg.textContent = t("p.live.noKey"); $("live-key").focus(); return; }
   if (!looksLikeKey(key)) { msg.textContent = t("p.live.badKey"); $("live-key").focus(); return; }
   $("live-start").disabled = true;
@@ -625,19 +840,20 @@ async function startLive() {
   msg.textContent = t("p.live.checking");
   const { checkKey } = await import("./anthropic.js");
   const check = await checkKey(key);
-  $("live-start").disabled = false;
+  drawLive();
   msg.className = "vc-help vc-help--error";
   if (!check.ok) {
     msg.textContent = check.status === 0 ? t("p.live.unreachable") : check.status === 401 ? t("p.live.rejected") : t("p.live.other", { status: check.status });
     return;
   }
   setKey(key);
+  const budgetEur = Number($("live-cap").value);
+  S.model = $("live-model").value;
   $("start-dialog").close();
   $("live-key").value = "";
   pause();
   stopRun();
   const { createLiveAgent } = await import("./agent.js");
-  S.model = $("live-model").value;
   S.mode = "live";
   S.step = 0;
   S.follow = true;
@@ -647,10 +863,18 @@ async function startLive() {
   S.runId = newRunId();
   bus.beginRun({ run_id: S.runId, mode: "live" });
   const def = RUNS()[S.entry.id];
+  const entry = S.entry;
+  const runId = S.runId;
   bus.emit("run_start", { run_id: S.runId, mode: "live", query: def.query, entry_id: S.entry.id, lang: getLang(), model: S.model });
-  const agent = createLiveAgent({ onKeyRejected: () => forgetKey() });
+  const agent = createLiveAgent({ onKeyRejected: () => { forgetKey(); S.keyHeld = ""; } });
   S.live = agent;
-  agent.run({ query: def.query, entryId: S.entry.id, lang: getLang(), modelId: S.model }).finally(() => { setMode(); schedule(); });
+  agent.run({ query: def.query, entryId: S.entry.id, lang: getLang(), modelId: S.model, budgetEur }).finally(() => {
+    // The live run's result stays for this tab's life beside its pre-run in All services; nothing is stored.
+    const run = runId === S.runId ? digest(S.events) : null;
+    if (run?.score?.result && !run.notService) seen.live.set(entry.id, { run, at: new Date().toISOString().slice(0, 10) });
+    setMode();
+    schedule();
+  });
   setMode();
   schedule();
 }

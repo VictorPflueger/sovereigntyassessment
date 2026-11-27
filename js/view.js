@@ -1,6 +1,8 @@
 // Draws one step of js/story.js into the page: the stage on the left (what to look at) and the story on
 // the right (what it means, the agent's words, the decision log). Every number comes in as text. Lilac
-// marks what the agent wrote or suggested: its words, its lever, its memo.
+// marks what the agent wrote or suggested: its words, its lever, its memo. From 2.1.0 the story also holds
+// how the score is made and the key to the levels (Score), and the starting points for research and the
+// comparable services (Recommend); a block, a layer's score or the overall score opens its make-up.
 
 import { t, tn, getLang } from "./i18n/index.js";
 
@@ -14,7 +16,7 @@ export function h(tag, attrs = {}, ...kids) {
     else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
     else el.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) el.append(kid instanceof Node ? kid : String(kid));
+  for (const kid of kids.flat(Infinity)) if (kid !== null && kid !== undefined && kid !== false) el.append(kid instanceof Node ? kid : String(kid));
   return el;
 }
 const icon = (name) => h("span", { class: `vc-icon vc-icon--${name}`, "aria-hidden": "true" });
@@ -35,12 +37,17 @@ export function renderStep(step, view, act) {
   title.textContent = ["wait", "empty"].includes(kind) ? "" : t(`p.stage.${kind}`, { service: view.service.short });
   title.hidden = !title.textContent;
   const stage = document.getElementById("stage-body");
-  stage.replaceChildren(...(STAGES[kind] || STAGES.empty)(step.stage, act).filter(Boolean));
+  stage.replaceChildren(...(STAGES[kind] || STAGES.empty)(step.stage, act).filter(Boolean), ...(step.comparable ? [comparableList(step.comparable)] : []));
   stage.dataset.kind = kind;
   for (const el of stage.querySelectorAll(".memo-body")) { el.addEventListener("scroll", () => more(el), { passive: true }); requestAnimationFrame(() => more(el)); }
 
   document.getElementById("story-title").textContent = step.title;
   document.getElementById("story-lead").textContent = step.lead;
+  const extra = document.getElementById("story-extra");
+  const parts = storyExtra(step);
+  extra.replaceChildren(...parts);
+  extra.hidden = !parts.length;
+  extra.dataset.kind = parts.length ? kind : "";
   const said = step.agent || [];
   document.getElementById("agent").hidden = !said.length;
   const words = document.getElementById("agent-text");
@@ -57,6 +64,30 @@ export function more(el) {
 
 /** Forgets what was drawn, so the next render draws again (after a language switch). */
 export function redraw() { drawn = ""; }
+
+/**
+ * A key figure's tile: its value with what it rests on, its old value struck through when the decision moved
+ * it, its note, and (the weakest link's) the block it names, which opens its make-up, and what the figure
+ * leaves out in words (vc-stat__also).
+ */
+export function renderTile(el, v) {
+  const was = el.querySelector(".vc-stat__was");
+  const to = el.querySelector(".kpi-to");
+  if (was) { was.hidden = !v.was; was.textContent = v.was || ""; }
+  if (to) { to.hidden = !v.was; to.textContent = v.was ? t("p.kpi.now") : ""; }
+  el.querySelector(".kpi-main").textContent = v.value;
+  const of = el.querySelector(".kpi-of");
+  if (of) { of.hidden = !v.of; of.textContent = v.of ? ` ${v.of}` : ""; }
+  el.querySelector(".kpi-note").replaceChildren(v.block ? opener(`block:${v.block}`, "kpi-open", v.note) : v.note || "");
+  const also = el.querySelector(".kpi-also");
+  if (also) {
+    // Empty, it keeps its room, so the header keeps its height through a case.
+    also.dataset.empty = String(!v.also?.length);
+    also.replaceChildren(...(v.also || []).map((a) => h("span", { class: "kpi-also-line", dataset: { kind: a.kind } },
+      a.level !== null && a.level !== undefined ? level(a.level, { size: "xs" }) : null, a.block ? opener(`block:${a.block}`, "kpi-open", a.text) : a.text)));
+  }
+  el.dataset.tone = v.tone || "";
+}
 
 /** The decision log under the agent's words: who approved what, and when. Closed until opened. */
 export function renderLog(entries) {
@@ -97,9 +128,86 @@ function sourceList(list, show = 2) {
  * A level in a hexagon on Vici's diverging scale, with its number, so it never reads by colour alone. A
  * level with one side unknown keeps its plain number; the words beside it say which side is unknown.
  */
-function level(n, { size = "" } = {}) {
+export function level(n, { size = "" } = {}) {
   const v = n === null || n === undefined ? "gap" : String(n);
   return h("span", { class: `lvl${size ? ` lvl--${size}` : ""}`, dataset: { level: v } }, h("span", { class: "lvl-n" }, v === "gap" ? "?" : v));
+}
+
+/** A button that opens a make-up (js/app.js fills and places the popover): a block, a layer or the score. */
+export function opener(key, cls, text, label = null) {
+  return h("button", { type: "button", class: `${cls} mk-open`, "aria-haspopup": "dialog", "aria-expanded": "false", "aria-controls": "makeup", "aria-label": label, dataset: { makeup: key } }, text);
+}
+
+/** What the story shows under its lead: at Score how the overall score is made; at Recommend the starting
+ * points for research, each name opening its source. */
+function storyExtra(step) {
+  const out = [];
+  if (step.sum) out.push(h("p", { class: "sum-line" }, step.sum.text, " ", opener("overall", "sum-open", step.sum.open)));
+  const alts = step.alternatives || [];
+  if (alts.length) {
+    out.push(h("section", { class: "alts", "aria-labelledby": "alts-title" },
+      h("h3", { class: "alts-title", id: "alts-title" }, t("p.alt.label")),
+      h("ul", { class: "alt-blocks" }, alts.map((a) => h("li", { class: "alt-block", dataset: { block: a.block.id } },
+        level(a.block.level, { size: "sm" }),
+        h("p", { class: "alt-text" }, h("span", { class: "alt-head" }, t("p.alt.block", { block: a.block.name })), " ",
+          a.none ? h("span", { class: "alt-none" }, t("p.alt.none"))
+            : a.starting.map((p, i) => [i ? h("span", { class: "alt-sep", "aria-hidden": "true" }, " · ") : null, opener(p.key, "alt-open", p.name, t("p.alt.open", { name: p.name }))])))))));
+  }
+  return out;
+}
+
+/** The other assessed services of the case's function group, best first, each to open or to compare. */
+function comparableList(c) {
+  return h("section", { class: "comp panel", "aria-labelledby": "comp-title" },
+    h("h3", { class: "comp-title", id: "comp-title" }, t("p.comp.title", { group: c.group })),
+    c.pending ? h("p", { class: "comp-note" }, t("p.comp.pending"))
+      : c.none ? h("p", { class: "comp-note" }, t("p.comp.none"))
+        : h("ol", { class: "comp-list" }, c.items.map((x) => h("li", { class: `comp-item${x.current ? " comp-item--current" : ""}`, dataset: { case: x.id } },
+          x.current ? h("span", { class: "comp-name" }, x.name, h("span", { class: "comp-this" }, ` (${t("p.comp.this")})`))
+            : h("button", { type: "button", class: "comp-name comp-open", dataset: { openCase: x.id }, "aria-label": t("p.ov.openCase.label", { name: x.name }) }, x.name),
+          h("span", { class: "comp-score" }, h("strong", {}, x.score), ` ${x.of}`),
+          x.weakest ? h("span", { class: "comp-weak", title: null }, level(x.weakest.level, { size: "sm" }), h("span", {}, x.weakest.label)) : h("span", {}),
+          x.current ? h("span", { class: "comp-gap" }) : h("button", { type: "button", class: "vc-button vc-button--outline vc-button--sm comp-cmp", dataset: { cmpWith: x.id }, "aria-label": t("p.cmp.with", { name: x.name }) }, t("p.comp.compare"))))));
+}
+
+/**
+ * The make-up of a block, a layer's score or the overall score, as js/story.js words it (m), into the
+ * popover. Every figure is text from the story; nothing here computes.
+ */
+export function renderMakeup(pop, m) {
+  const title = h("p", { class: "mk-title", id: "makeup-title" }, m.level !== undefined ? level(m.level) : null, h("span", {}, m.title));
+  const kids = [title];
+  if (m.kind === "block") {
+    const side = (label, x) => h("div", {}, h("dt", {}, label), h("dd", {}, h("span", {}, x.who, x.where && x.who !== t("p.party.unknown") ? ` · ${x.where}` : "", ` · ${x.detail}`), level(x.level, { size: "sm" })));
+    kids.push(h("dl", { class: "mk-sides" }, side(t("p.made"), m.made), side(t("p.run"), m.run)));
+    kids.push(h("p", { class: "mk-rule" }, m.rule, " ", m.crit));
+    if (m.layer) kids.push(h("p", { class: "mk-layer" }, h("span", {}, t("p.mk.layer", { layer: m.layer.name })), " ", h("code", {}, m.layer.expr)));
+    if (m.sources?.length) kids.push(h("details", { class: "mk-sources" }, h("summary", {}, tn("p.src.quotes", m.sources.length)), h("ol", { class: "src-list src-list--short" }, m.sources.map(source))));
+  } else if (m.kind === "alt") {
+    kids.push(h("p", { class: "mk-rule" }, m.levelText, m.catalogue ? ` · ${m.catalogue}` : ""));
+    if (m.note) kids.push(h("p", { class: "mk-layer" }, m.note));
+    if (m.source) kids.push(h("ol", { class: "src-list src-list--short" }, source(m.source)));
+    kids.push(h("p", { class: "mk-rule muted" }, t("p.alt.label")));
+  } else if (m.kind === "layer") {
+    kids.push(h("p", { class: "mk-expr" }, h("code", {}, m.expr)));
+    kids.push(h("ul", { class: "mk-terms" }, m.blocks.map((b) => h("li", {}, b))));
+    kids.push(h("p", { class: "mk-rule" }, t("p.key.points")));
+  } else {
+    kids.push(h("p", { class: "mk-expr" }, h("code", {}, m.detail)));
+    if (m.left?.length) kids.push(h("ul", { class: "mk-terms" }, m.left.map((x) => h("li", {}, x))));
+    kids.push(h("p", { class: "mk-rule" }, t("p.key.points")));
+  }
+  kids.push(h("p", { class: "mk-esc" }, t("p.mk.esc")));
+  pop.replaceChildren(...kids);
+}
+
+/** "2 quotes": opens and closes the list of sources with the given id. */
+function quotesToggle(id, list) {
+  return h("button", { type: "button", class: "src-toggle", "aria-expanded": "false", "aria-controls": id, onclick: (e) => {
+    const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
+    e.currentTarget.setAttribute("aria-expanded", String(open));
+    document.getElementById(id).hidden = !open;
+  } }, tn("p.src.quotes", list.length));
 }
 
 /** A party in a table cell: the name, and where it belongs underneath. */
@@ -136,11 +244,7 @@ const STAGES = {
       ? r.blocks.flatMap((b, i) => {
         // Each block's quotes open under its row: the quote, its page and the date it was read.
         const id = `src-${b.id}`;
-        const more = b.sources.length ? h("button", { type: "button", class: "src-toggle", "aria-expanded": "false", "aria-controls": id, onclick: (e) => {
-          const open = e.currentTarget.getAttribute("aria-expanded") !== "true";
-          e.currentTarget.setAttribute("aria-expanded", String(open));
-          document.getElementById(id).hidden = !open;
-        } }, tn("p.src.quotes", b.sources.length)) : null;
+        const more = b.sources.length ? quotesToggle(id, b.sources) : null;
         return [
           h("tr", { dataset: { layer: r.layer, critical: String(b.critical) } },
             i === 0 ? h("th", { scope: "row" }, r.name) : h("td", { class: "same-layer" }),
@@ -152,17 +256,25 @@ const STAGES = {
       : [h("tr", { dataset: { layer: r.layer, status: r.status } }, h("th", { scope: "row" }, r.name), h("td", { class: "layer-none", colspan: "3" }, r.status === "open" ? t("p.layer.open") : r.reason || t(`p.layer.${r.status}`)))]))))),
   ],
 
+  // Each block says its criticality in words and carries the marks the weakest-link tile uses; its name
+  // opens how its level is made, a layer's score how that score is made. The key stands in the story.
   levels: (s) => [h("ol", { class: "layers layers--levels" }, s.rows.map((r) => h("li", { class: "layer", dataset: { layer: r.layer, status: r.status } },
     h("p", { class: "layer-name" }, r.name),
     r.blocks.length
-      ? h("ul", { class: "cells" }, r.blocks.map((b) => h("li", { class: "cell", dataset: { weakest: String(b.weakest), lowest: String(b.lowest), critical: String(b.critical) } },
+      ? h("ul", { class: "cells" }, r.blocks.map((b) => h("li", { class: "cell", dataset: { block: b.id, critical: String(b.critical), marks: b.marks.map((m) => m.kind).join(" ") } },
         level(b.level),
-        h("span", { class: "cell-name" }, b.name,
-          b.weakest ? h("span", { class: "cell-flag" }, t("p.flag.weakest")) : b.lowest ? h("span", { class: "cell-flag cell-flag--low" }, t("p.flag.lowest")) : null,
-          b.partly ? h("span", { class: "cell-flag cell-flag--unknown" }, t("p.flag.partly")) : null))))
+        h("span", { class: "cell-text" },
+          opener(`block:${b.id}`, "cell-name", b.name),
+          h("span", { class: "cell-meta" }, h("span", { class: "cell-crit" }, b.criticality),
+            b.marks.map((m) => h("span", { class: `cell-flag cell-flag--${m.kind}` }, m.text)))))))
       : h("p", { class: "layer-none" }, t(`p.layer.${r.status === "scored" ? "open" : r.status}`)),
-    h("p", { class: "layer-score" }, r.score !== null ? r.score : h("span", { class: "muted" }, t("p.noScore")))))),
-  h("ul", { class: "legend", "aria-label": t("p.legend") }, [4, 3, 2, 1, 0, null].map((n) => h("li", {}, level(n, { size: "sm" }), t(`p.legend.${n ?? "gap"}`))))],
+    r.score !== null
+      ? opener(`layer:${r.layer}`, "layer-score", r.score, t("p.mk.layerOpen", { layer: r.name, score: r.score }))
+      : h("p", { class: "layer-score" }, h("span", { class: "muted" }, t("p.noScore")))))),
+  s.key ? h("section", { class: "key", "aria-label": t("p.key.title") },
+    h("ul", { class: "key-levels" }, s.key.levels.map((l) => h("li", {}, level(l.level, { size: "sm" }), h("span", {}, l.text)))),
+    h("p", { class: "key-crit" }, s.key.crit.map((c, i) => [h("strong", {}, c.term), `: ${c.text}`, i < s.key.crit.length - 1 ? "; " : "."])),
+    h("p", { class: "key-points" }, s.key.points)) : null],
 
   review: (s) => [h("ul", { class: "review" }, s.blocks.map((b) => h("li", { class: "review-block" },
     h("div", { class: "review-head" }, level(b.level, { size: "lg" }),
@@ -176,8 +288,8 @@ const STAGES = {
     s.levers.map((l, i) => h("li", { class: "lever", dataset: { status: l.status } },
       h("div", { class: "lever-text" },
         h("p", { class: "lever-title" }, l.title, h("span", { class: "vc-tag vc-tag--sm vc-tag--feature" }, icon("sparkle"), t("p.suggested"))),
-        h("p", { class: "lever-why" }, l.rationale),
-        l.sources.length ? h("ol", { class: "src-list src-list--short" }, l.sources.map(source)) : null),
+        h("p", { class: "lever-why" }, l.rationale, l.sources.length ? quotesToggle(`src-${l.id}`, l.sources) : null),
+        l.sources.length ? h("ol", { class: "src-list src-list--short", id: `src-${l.id}`, hidden: true }, l.sources.map(source)) : null),
       h("dl", { class: "lever-figures" },
         h("div", {}, h("dt", {}, t("p.lever.score")), h("dd", {}, l.text.overall, l.text.delta ? h("span", { class: "delta" }, ` (${l.text.delta})`) : null)),
         h("div", {}, h("dt", {}, t("p.lever.weakest")), h("dd", {}, l.text.weakest))),
