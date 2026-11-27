@@ -238,7 +238,7 @@ export default Object.freeze({
   "p.alt.title": "Was an die Stelle der schwachen Bausteine treten könnte",
   "p.alt.label": "Ansatzpunkte für die Recherche, keine Empfehlung",
   "p.alt.block": "{block}, Stufe {level}",
-  "p.alt.none": "Keine öffentliche Quelle nennt bisher eine Alternative.",
+  "p.alt.none": "Die Suchen fanden keine in der EU hergestellte Alternative; die Recherchenotizen nennen sie.",
   "p.alt.level": "Stufe {n} nach der Methode",
   "p.alt.noLevel": "Stufe aus der Quelle nicht bekannt",
   "p.alt.catalogue": "hier bewertet: {score} auf {n} von 6 Ebenen",

@@ -94,6 +94,6 @@ Read on 2026-11-27 (English), for the starting points of version 2.1.0. TechCrun
 
 ## Searches without a named alternative
 
-Version 2.1.0 shows starting points for research for every weak block. Where none is shown, the searches below, made with the web search tool on 2026-11-27, found no public source that names an alternative which would raise the block's level.
+Version 2.1.0 shows starting points for research for every weak block. Where none is shown, the searches below, made with the web search tool on 2026-11-27, found no alternative made in the EU.
 
-- B-02, Kubernetes platform at the ITZBund: “Alternative zu Kubernetes Container-Orchestrierung europäisch Verwaltung souverän”; “European alternative to Kubernetes container orchestration made in EU open source”. The results name container platforms from outside the EU as alternatives to Kubernetes (Docker Swarm, Nomad, Apache Mesos, Amazon ECS), which would not raise the block's level, and list managed Kubernetes services of European providers, which run Kubernetes itself. No result names a container platform made in the EU that would take Kubernetes's place.
+- B-02, Kubernetes platform at the ITZBund: “Alternative zu Kubernetes Container-Orchestrierung europäisch Verwaltung souverän”; “European alternative to Kubernetes container orchestration made in EU open source”. The results name container platforms made outside the EU as alternatives to Kubernetes (Docker Swarm, Nomad, Apache Mesos, Amazon ECS), which would not raise the block's level, and list Kubernetes platforms and managed Kubernetes services of European providers, which are built on Kubernetes itself. No result names a replacement for Kubernetes made in the EU.

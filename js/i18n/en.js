@@ -240,7 +240,7 @@ export default Object.freeze({
   "p.alt.title": "What could take the weak blocks' place",
   "p.alt.label": "Starting points for research, not a recommendation",
   "p.alt.block": "{block}, level {level}",
-  "p.alt.none": "No public source names an alternative yet.",
+  "p.alt.none": "The searches found no alternative made in the EU; the research notes list them.",
   "p.alt.level": "level {n} by the method",
   "p.alt.noLevel": "level not known from the source",
   "p.alt.catalogue": "assessed here: {score} on {n} of 6 layers",
