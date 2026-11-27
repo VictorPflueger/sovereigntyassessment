@@ -39,7 +39,11 @@ const TEXT_PATHS = {
   rec_block_remove: (i) => [["reason", i.reason]],
   rec_layer: (i) => [["reason", i.reason]],
   ui_request_review: (i) => [["summary", i.summary]],
-  ui_propose_levers: (i) => (i.levers || []).flatMap((l, k) => [[`levers[${k}].title`, l.title], [`levers[${k}].rationale`, l.rationale]]),
+  ui_propose_levers: (i) => [
+    ...(i.levers || []).flatMap((l, k) => [[`levers[${k}].title`, l.title], [`levers[${k}].rationale`, l.rationale]]),
+    // A starting point's name is written as its source writes it, in one language; its note is the model's.
+    ...(i.starting_points || []).flatMap((p, k) => (p.note !== undefined ? [[`starting_points[${k}].note`, p.note]] : []))
+  ],
   ui_choose_service: (i) => [["question", i.question], ...(i.candidates || []).flatMap((c, k) => [[`candidates[${k}].name`, c.name], [`candidates[${k}].description`, c.description]])]
 };
 
@@ -103,7 +107,9 @@ export function evidenceItems(def) {
 
 /**
  * Sets each quote's verified flag from the research notes: true when the quote is listed under the same
- * URL in research/<entry>.md. Returns how many flags changed.
+ * URL in research/<entry>.md. Since 2.1.0 it also sets the quote's read date from that section's "Read on"
+ * line, so the screen shows when each quote was read rather than the run's date. Returns how many flags
+ * and dates changed.
  */
 export function applyFlags(def, research, refFacts = globalThis.window?.SA_REF_FACTS) {
   let changed = 0;
@@ -111,8 +117,14 @@ export function applyFlags(def, research, refFacts = globalThis.window?.SA_REF_F
   if (def.source !== "hand_authored") return 0;
   for (const { item } of evidenceItems(def)) {
     const note = research?.get(normaliseUrl(item.url));
-    const flag = !!(item.quote && ((note && note.quotes.has(normaliseText(item.quote))) || isRefFact(item, refFacts)));
+    const listed = !!(item.quote && note && note.quotes.has(normaliseText(item.quote)));
+    const flag = !!(item.quote && (listed || isRefFact(item, refFacts)));
     if (item.verified !== flag) { item.verified = flag; changed += 1; }
+    const readOn = listed && note.read_on ? note.read_on : undefined;
+    if (item.read_on !== readOn) {
+      if (readOn) item.read_on = readOn; else delete item.read_on;
+      changed += 1;
+    }
   }
   return changed;
 }
@@ -208,6 +220,21 @@ export function staticProblems(def, ctx = {}) {
         const hit = [...companies].filter((c) => new RegExp(`(^|[^\\p{L}\\p{N}])${c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^\\p{L}\\p{N}])`, "u").test(text));
         if (hit.length) add("lever_names_company", `steps[${n}] levers[${k}].${field}.${lang}`, `names ${hit.join(", ")}`);
       }
+    });
+  });
+
+  // Starting points for research (2.1.0, brief SA-03): each one stands under a recorded block, and a
+  // verified quote that supports "alternative" writes its name, so no name is the model's own choice.
+  const recorded = new Set((def.steps || []).filter((st) => st.tool === "rec_block").map((st) => st.input?.id));
+  (def.steps || []).forEach((step, n) => {
+    if (step.tool !== "ui_propose_levers") return;
+    (step.input?.starting_points || []).forEach((p, k) => {
+      const where = `steps[${n}] starting_points[${k}]`;
+      if (!recorded.has(p.block_id)) add("starting_point", where, `names block ${p.block_id}, which the run does not record`);
+      const name = normaliseText(p.name || "").toLowerCase();
+      if (!name) { add("starting_point", where, "a starting point needs its name"); return; }
+      const named = (p.evidence || []).some((e) => (e.supports || []).includes("alternative") && e.quote && normaliseText(e.quote).toLowerCase().includes(name));
+      if (!named) add("starting_point_unsourced", where, `no quote that supports "alternative" writes the name "${p.name}"`);
     });
   });
 

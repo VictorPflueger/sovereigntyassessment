@@ -38,6 +38,7 @@ export function prepareEvidence(input, registry) {
       for (const item of node.evidence) {
         if (item && typeof item === "object") {
           if (item.verified === true && item.quote) registry.addVerifiedQuote(item.url, item.quote, "recording");
+          if (item.read_on && item.quote) registry.noteReadOn?.(item.url, item.quote, item.read_on);
           delete item.verified;
           delete item.read_on;
           delete item.via;

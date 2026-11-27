@@ -113,7 +113,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://eudi-wallet.gov.de/en/about",
@@ -123,7 +124,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -133,7 +135,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -143,7 +146,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -153,7 +157,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -163,7 +168,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -261,7 +267,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -318,7 +325,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://netzpolitik.org/?p=512498",
@@ -328,7 +336,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://borncity.com/news/d-you-startet-am-2-januar-2027-deutschlands-digitale-identitaet/",
@@ -338,7 +347,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -408,7 +418,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -418,7 +429,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://support.apple.com/en-mide/118110",
@@ -470,7 +482,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://heise.de/-10418753",
@@ -480,7 +493,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"

@@ -19,7 +19,7 @@
 import { SERVER_TOOLS } from "./config.js";
 import { validate, describeErrors } from "./schema.js";
 import { auditText, FACT_RE } from "./facts.js";
-import { LAYERS, METHOD_VERSION, EQUAL_LAYER_WEIGHTS, score, whatIf } from "./engine.js";
+import { LAYERS, METHOD_VERSION, EQUAL_LAYER_WEIGHTS, score, whatIf, assessBlock } from "./engine.js";
 import { CLASSES } from "./classes.js";
 import { checkEvidence, gateBlock, normaliseText } from "./evidence.js";
 import { guardTool } from "./guards.js";
@@ -103,6 +103,12 @@ export const CLIENT_TOOLS = Object.freeze([
     input_schema: obj(["levers"], {
       levers: { type: "array", minItems: 1, maxItems: 3, items: obj(["lever_id", "title", "rationale", "changes", "evidence"], {
         lever_id: { type: "string", enum: ["L1", "L2", "L3"] }, title: { type: "string" }, rationale: { type: "string" }, changes: CHANGES, evidence: EVIDENCE(["alternative"])
+      }) },
+      // Version 2.1.0: research leads a source names for a weak block's function, never ranked (brief SA-03).
+      starting_points: { type: "array", maxItems: 12, items: obj(["block_id", "name", "evidence"], {
+        block_id: BLOCK_ID, name: { type: "string" }, note: { type: "string" }, catalogue_id: { type: "string" },
+        tech: PARTY, operator: PARTY, hosting: HOSTING, licence: LICENCE,
+        evidence: EVIDENCE(["alternative", "tech", "tech.parent", "operator", "operator.parent", "hosting", "licence"])
       }) }
     }) },
   { name: "ui_draft_memo", description: "Draft the memo for the chosen lever (or for keeping things as they are). Audited; code adds the header, the before and after figures and 'Draft. Nothing is sent.'",
@@ -144,7 +150,10 @@ const AUDITED = {
   rec_block_remove: (i) => (typeof i.reason === "string" ? [["reason", i.reason]] : []),
   rec_layer: (i) => [["reason", i.reason]],
   ui_request_review: (i) => [["summary", i.summary]],
-  ui_propose_levers: (i) => (i.levers || []).flatMap((l) => [[`${l.lever_id}.title`, l.title], [`${l.lever_id}.rationale`, l.rationale]]),
+  ui_propose_levers: (i) => [
+    ...(i.levers || []).flatMap((l) => [[`${l.lever_id}.title`, l.title], [`${l.lever_id}.rationale`, l.rationale]]),
+    ...(i.starting_points || []).flatMap((p, k) => [[`starting_points[${k}].name`, p.name], ...(typeof p.note === "string" ? [[`starting_points[${k}].note`, p.note]] : []), ...partyNames(p, `starting_points[${k}].`)])
+  ].filter(([, v]) => typeof v === "string"),
   ui_draft_memo: (i) => [["subject", i.subject], ["body", i.body]],
   ui_final_report: (i) => [["markdown", i.markdown]]
 };
@@ -596,6 +605,17 @@ export function createToolbox(ctx) {
         if (ev.error) return ev.error;
         checks[l.lever_id] = ev.checks;
       }
+      const sps = i.starting_points || [];
+      const spMissing = [...new Set(sps.map((p) => p.block_id).filter((id) => !run.blocks.has(id)))];
+      if (spMissing.length) return { error: `A starting point names no recorded block: ${spMissing.join(", ")}. Recorded blocks: ${[...run.blocks.keys()].join(", ")}.` };
+      const spBadCatalogue = sps.filter((p) => p.catalogue_id && !entryById(p.catalogue_id, catalogueData)).map((p) => p.catalogue_id);
+      if (spBadCatalogue.length) return { error: `No catalogue entry ${spBadCatalogue.join(", ")}: give catalogue_id only for a service cat_lookup knows.` };
+      const spChecks = [];
+      for (const [k, p] of sps.entries()) {
+        const ev = evidenceFor(`starting_point:${p.block_id}:${k}`, p.evidence);
+        if (ev.error) return ev.error;
+        spChecks.push(ev.checks);
+      }
       const a = audit("ui_propose_levers", i);
       if (a.reject) return a.reject;
       const opts = { layerWeights: run.weights, layerStatus: layerStatusMap() };
@@ -603,10 +623,20 @@ export function createToolbox(ctx) {
         const w = whatIf(effectiveBlocks(), l.lever_id, l.changes, opts);
         run.whatifs[l.lever_id] = { changes: structuredClone(l.changes), facts: w.facts };
         for (const k of Object.keys(w.facts)) run.known.add(k);
-        return { lever_id: l.lever_id, title: l.title, rationale: l.rationale, changes: structuredClone(l.changes), evidence: checks[l.lever_id], whatif: { facts: w.facts } };
+        // The what-if's blocks, so the screen can name the lowest block after the lever (2.1.0).
+        const blocksAfter = w.result.blocks.map((b) => ({ id: b.id, layer: b.layer, criticality: b.criticality, level: b.level, unscored: b.unscored }));
+        return { lever_id: l.lever_id, title: l.title, rationale: l.rationale, changes: structuredClone(l.changes), evidence: checks[l.lever_id], whatif: { facts: w.facts, blocks: blocksAfter } };
+      });
+      // A starting point's level is the engine's, and only where verified quotes name both its maker and its operator.
+      const starting_points = sps.map((p, k) => {
+        const g = gateBlock({ tech: p.tech || { name: "unknown", country: "UNKNOWN", parent: null }, operator: p.operator || { name: "unknown", country: "UNKNOWN", parent: null }, hosting: p.hosting || "UNKNOWN", licence: p.licence || "unknown", exit: "unknown" }, spChecks[k]);
+        const assessed = assessBlock({ id: `SP-${k}`, layer: run.blocks.get(p.block_id).recorded.layer, criticality: "supporting", ...g.effective });
+        const known = assessed.tech_class !== "UNKNOWN" && assessed.operator_class !== "UNKNOWN";
+        return { block_id: p.block_id, name: p.name, ...(p.note ? { note: p.note } : {}), ...(p.catalogue_id ? { catalogue_id: p.catalogue_id } : {}),
+          tech_class: assessed.tech_class, operator_class: assessed.operator_class, level: known ? assessed.level : null, evidence: spChecks[k] };
       });
       const options_seq = ++run.optionsSeq;
-      run.leverSet = { options_seq, levers, keep: { facts: { ...run.result.facts } }, values: values(), lang, ...(a.unchecked ? { unchecked: a.unchecked } : {}) };
+      run.leverSet = { options_seq, levers, keep: { facts: { ...run.result.facts } }, values: values(), lang, ...(starting_points.length ? { starting_points } : {}), ...(a.unchecked ? { unchecked: a.unchecked } : {}) };
       run.levers = "proposed";
       phase("awaiting_decision");
       emit("levers", run.leverSet);
@@ -811,7 +841,8 @@ export function createToolbox(ctx) {
     if (run.leverSet) {
       run.leverSet = {
         ...run.leverSet,
-        levers: run.leverSet.levers.map((l) => ({ ...l, whatif: { facts: { ...run.whatifs[l.lever_id].facts } } })),
+        // Block levels do not depend on the layer weights, so the what-if's blocks stay as they were.
+        levers: run.leverSet.levers.map((l) => ({ ...l, whatif: { ...l.whatif, facts: { ...run.whatifs[l.lever_id].facts } } })),
         keep: { facts: { ...run.result.facts } },
         values: values()
       };

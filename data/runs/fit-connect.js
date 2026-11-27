@@ -85,7 +85,8 @@
        "status",
        "governance"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/intro/",
@@ -95,7 +96,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -105,7 +107,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -235,7 +238,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -246,7 +250,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -256,7 +261,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -266,7 +272,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -276,7 +283,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -322,7 +330,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.connect-professional.de/anbieterkompass/global-access-internet-services-gmbh.8908004/index.html",
@@ -333,7 +342,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -381,7 +391,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -391,7 +402,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -438,7 +450,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -448,7 +461,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.cio.de/article/3666246/dataport-konsolidiert-5-rechenzentren.html",
@@ -458,7 +472,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -468,7 +483,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://digital.hamburg.de/digitale-stadt/dataport-hamburgs-zentraler-it-dienstleister-644538",
@@ -478,7 +494,8 @@
       "supports": [
        "hosting"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -523,7 +540,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://docs.fitko.de/fit-connect/docs/faq/",
@@ -533,7 +551,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -602,7 +621,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -612,7 +632,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -622,7 +643,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -712,7 +734,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sonatype.com/blog/2010/09/sonatype-headquarters-moves-to-maryland?hs_amp=true",
@@ -723,7 +746,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://central.sonatype.com/artifact/dev.fitko.fitconnect/sdk-client",
@@ -733,7 +757,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -805,7 +830,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        }
       ]
      }

@@ -80,7 +80,8 @@
        "owner",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -90,7 +91,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.arbeitsagentur.de/bundid",
@@ -100,7 +102,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.arbeitsagentur.de/bundid",
@@ -110,7 +113,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -166,7 +170,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://bmds.bund.de/fileadmin/BMDS/Dokumente/AM_Gesamtarchitektur.pdf",
@@ -282,7 +287,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://github.com/kubernetes/kubernetes",
@@ -292,7 +298,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://cncf.io/about/who-we-are/",
@@ -302,7 +309,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://linuxfoundation.org/legal/privacy-policy",
@@ -312,7 +320,8 @@
       "supports": [
        "tech.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
@@ -322,7 +331,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sva.de/sites/default/files/2021-11/SVA%20Referenz%20ITZBund.pdf",
@@ -332,7 +342,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -406,7 +417,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -416,7 +428,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -426,7 +439,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -473,7 +487,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -483,7 +498,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -573,7 +589,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -583,7 +600,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "high"
@@ -631,7 +649,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -641,7 +660,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -651,7 +671,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -661,7 +682,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -671,7 +693,8 @@
       "supports": [
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://support.apple.com/en-mide/118110",

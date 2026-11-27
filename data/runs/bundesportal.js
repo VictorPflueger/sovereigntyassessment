@@ -105,7 +105,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.gesetze-im-internet.de/egovg/__9a.html",
@@ -115,7 +116,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.gesetze-im-internet.de/egovg/__9a.html",
@@ -125,7 +127,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.bundestag.de/presse/hib/814130-814130",
@@ -135,7 +138,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://bmds.bund.de/fileadmin/BMDS/Dokumente/260129_Deutschland-Stack_Standard_barrierefrei.pdf",
@@ -145,7 +149,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -201,7 +206,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://bmds.bund.de/fileadmin/BMDS/Dokumente/AM_Gesamtarchitektur.pdf",
@@ -274,7 +280,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "low"
@@ -338,7 +345,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://id.bund.de/en/",
@@ -348,7 +356,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Deutschland-Stack_Hartenstein.pdf",
@@ -358,7 +367,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -410,7 +420,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -462,7 +473,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -532,7 +544,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        }
       ]
      }

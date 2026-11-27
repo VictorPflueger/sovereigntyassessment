@@ -1,18 +1,12 @@
-// Session-only storage for the user's Anthropic API key.
-// The key lives in sessionStorage (cleared when the tab closes), is shown masked, is never logged
-// or exported, and is only ever attached to requests to api.anthropic.com (see anthropic.js).
-
-import { STORAGE } from "./config.js";
+// The user's Anthropic API key, held in this page's memory only (version 2.1.0, Vici's nothing-kept rule):
+// never in local or session storage, a cookie, a URL, a log or an export, and gone when the tab closes or
+// reloads. It is shown masked and only ever attached to requests to api.anthropic.com (see anthropic.js).
 
 const KEY_PATTERN = /^sk-ant-[A-Za-z0-9_-]{20,}$/;
-let memoryFallback = null;
+let held = null;
 
 export function getKey() {
-  try {
-    return sessionStorage.getItem(STORAGE.apiKey) || memoryFallback;
-  } catch {
-    return memoryFallback;
-  }
+  return held;
 }
 
 export function hasKey() {
@@ -20,19 +14,12 @@ export function hasKey() {
 }
 
 export function setKey(raw) {
-  const key = String(raw || "").trim();
-  try {
-    sessionStorage.setItem(STORAGE.apiKey, key);
-    memoryFallback = null;
-  } catch {
-    memoryFallback = key; // private mode without storage: keep for this page only
-  }
-  return key;
+  held = String(raw || "").trim() || null;
+  return held;
 }
 
 export function forgetKey() {
-  try { sessionStorage.removeItem(STORAGE.apiKey); } catch { /* ignore */ }
-  memoryFallback = null;
+  held = null;
 }
 
 /** Format check only; the real check is a free GET /v1/models call. */

@@ -98,7 +98,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html",
@@ -108,7 +109,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://dserver.bundestag.de/btd/20/130/2013075.pdf",
@@ -118,7 +120,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -176,7 +179,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -186,7 +190,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high",
@@ -247,7 +252,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://personalausweisportal.de/Webs/PA/EN/business/technology/eID-server/eid-server-node.html",
@@ -257,7 +263,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://netzpolitik.org/2026/online-ausweis-der-eperso-ist-tot-lange-lebe-der-eperso/",
@@ -267,7 +274,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -331,7 +339,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.d-trust.net/files/dokumente/pdf/produktblatt_berechtigungszertifikate.pdf",
@@ -341,7 +350,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://netzpolitik.org/2026/online-ausweis-der-eperso-ist-tot-lange-lebe-der-eperso/",
@@ -351,7 +361,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -402,7 +413,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -412,7 +424,8 @@
       "supports": [
        "licence"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.ausweisapp.bund.de/en/open-source",
@@ -422,7 +435,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -479,7 +493,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -570,7 +585,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -580,7 +596,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -590,7 +607,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -600,7 +618,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.apple.com/legal/privacy/en/affiliated-company/",
@@ -610,7 +629,8 @@
       "supports": [
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://support.apple.com/en-mide/118110",

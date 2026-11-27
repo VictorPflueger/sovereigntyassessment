@@ -81,7 +81,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf",
@@ -92,7 +93,8 @@
        "how",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf",
@@ -103,7 +105,8 @@
        "how",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/beschluesse/2026/Beschluss_2026_03_Deutschland-Stack_Standards.pdf",
@@ -114,7 +117,8 @@
        "how",
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }

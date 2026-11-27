@@ -64,6 +64,7 @@ export function createEvidenceRegistry() {
   const docs = [];              // fetched documents in conversation order: { url, title, kind: "text"|"pdf"|"other" }
   const cited = new Map();      // url → [cited_text, normalised]
   const known = new Map();      // url → [{ quote (normalised), via }]  pre-verified quotes
+  const readOn = new Map();     // url → [{ quote (normalised), date }]  when a recording's quote was read (2.1.0)
   const unmapped = [];          // citations that could not be mapped to a URL, with the reason
 
   const push = (map, key, value) => {
@@ -143,6 +144,17 @@ export function createEvidenceRegistry() {
     known.set(key, list);
   }
 
+  /** The date a recording says a quote was read (YYYY-MM-DD); a replay shows it instead of the run's date. */
+  function noteReadOn(url, quote, date) {
+    const key = normaliseUrl(url);
+    const q = normaliseText(quote);
+    if (!q || !/^\d{4}-\d{2}-\d{2}$/.test(String(date || ""))) return;
+    const list = readOn.get(key) || [];
+    if (!list.some((x) => x.quote === q)) list.push({ quote: q, date });
+    readOn.set(key, list);
+  }
+  const readOnOf = (url, quote) => (readOn.get(normaliseUrl(url)) || []).find((x) => x.quote === normaliseText(quote))?.date || null;
+
   const isAllowed = (url) => urls.has(normaliseUrl(url));
 
   /**
@@ -168,7 +180,7 @@ export function createEvidenceRegistry() {
   }
 
   return {
-    allowUrl, addDocument, addCitation, addVerifiedQuote, isAllowed, verifyQuote, citedQuote,
+    allowUrl, addDocument, addCitation, addVerifiedQuote, noteReadOn, readOnOf, isAllowed, verifyQuote, citedQuote,
     /** The URLs this run may cite, as first written, for an instructive error. */
     allowedUrls: () => [...urls.values()].map((e) => e.url),
     /** Titles of the search results and pages this run read, for the fact audit's evidence. */
@@ -207,7 +219,7 @@ export function checkEvidence(registry, items = [], { readOn = null } = {}) {
       quote,
       lang: item.lang,
       supports: [...(item.supports || [])],
-      ...(item.read_on || readOn ? { read_on: item.read_on || readOn } : {}),
+      ...(item.read_on || registry.readOnOf?.(item.url, quote) || readOn ? { read_on: item.read_on || registry.readOnOf?.(item.url, quote) || readOn } : {}),
       verified: v.verified,
       via: v.via,
       ...(fromCitation ? { quote_from: "citation" } : {})

@@ -125,9 +125,15 @@ const catalogue = (() => {
 })();
 const FAMILIES = {
   "p.step.": STEP_IDS,
-  "p.layer.": [...LAYERS, "open", "no_evidence", "not_applicable"],
+  "p.layer.": [...LAYERS, ...LAYERS.map((l) => `${l}.in`), "open", "no_evidence", "not_applicable"],
   "p.class.": [...CLASSES, "UNKNOWN"],
   "p.crit.": ["critical", "important", "supporting"],
+  "p.mk.licence.": ["open_source", "proprietary", "unknown"],
+  "p.mk.hosting.": ["EU", "NON_EU", "UNKNOWN"],
+  "p.mk.rule.": ["lower", "capped", "unscored"],
+  "p.mk.crit.": ["critical", "important", "supporting"],
+  "p.key.": ["critical", "important", "supporting", "critical.term", "important.term", "supporting.term"],
+  "p.group.": ["identity", "payments", "data_exchange", "platforms", "portals"],
   "p.legend.": ["0", "1", "2", "3", "4", "gap"],
   "p.stage.": ["service", "choice", "layers", "levels", "review", "levers", "memo"],
   "p.memo.": ["pending", "approved", "rejected"],

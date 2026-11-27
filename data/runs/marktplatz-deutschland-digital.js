@@ -136,7 +136,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Crew_Gesucht_Community-Funtktionen_Marktplatz_Deutschland_Fell.pdf",
@@ -146,7 +147,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Crew_Gesucht_Community-Funtktionen_Marktplatz_Deutschland_Fell.pdf",
@@ -156,7 +158,8 @@
       "supports": [
        "what"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
@@ -166,7 +169,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/fileadmin/it-planungsrat/der-it-planungsrat/fachkongress/fachkongress_2026/pr%C3%A4sentationen/Tag2_Crew_Gesucht_Community-Funtktionen_Marktplatz_Deutschland_Fell.pdf",
@@ -176,7 +180,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/",
@@ -186,7 +191,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
@@ -196,7 +202,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
@@ -206,7 +213,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
@@ -216,7 +224,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
@@ -226,7 +235,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ]
    }
@@ -290,7 +300,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/",
@@ -301,7 +312,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
@@ -311,7 +323,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -404,7 +417,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://t3n.de/news/shopware-6-version-1165877/",
@@ -414,7 +428,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.shopware.com/en/privacy/website/",
@@ -424,7 +439,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
@@ -434,7 +450,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
@@ -444,7 +461,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -502,7 +520,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.dbb.de/fileadmin/user_upload/dbb/epaper/2026/dbb_magazin_26_10/27/",
@@ -512,7 +531,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://vergabeblog.de/2026-03-24/marktplatz-deutschland-digital-mdd-startet-produktivbetrieb/",
@@ -522,7 +542,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.it-planungsrat.de/aktuelles/details/marktplatz-deutschland-digital-startet-produktivbetrieb",
@@ -532,7 +553,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      },
      {
       "url": "https://www.channelpartner.de/article/4243773/sechs-bundeslander-starten-open-source-bildungsplattform.html",
@@ -542,7 +564,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-20"
      }
     ],
     "confidence": "medium"
@@ -629,7 +652,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-20"
        }
       ]
      }

@@ -78,8 +78,9 @@ export const FX_USD_EUR = 0.894;
 // The only shared key is Vici's theme choice, "vc-theme"; whether the guide was seen in this tab is
 // Vici's own sessionStorage entry, and js/lang.js marks it for both languages.
 const P = `${APP.id}.`;
+// Since version 2.1.0 the API key lives in the page's memory only (js/keystore.js): nothing but the
+// language choice is this app's own key in browser storage.
 export const STORAGE = {
-  apiKey: `${P}anthropic.key`,          // sessionStorage: this tab only
   lang: `${P}lang`                      // localStorage: the language choice
 };
 export const THEME_KEY = "vc-theme";    // Vici's own key, shared by all of Victor's pages

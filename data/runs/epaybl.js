@@ -87,7 +87,8 @@
       "supports": [
        "owner"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/38_OZG-Sprechstunde_Basisdienste_ePayLSA_130923.pdf",
@@ -97,7 +98,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf",
@@ -107,7 +109,8 @@
       "supports": [
        "how"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf",
@@ -117,7 +120,8 @@
       "supports": [
        "status"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ]
    }
@@ -193,7 +197,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://medienservice.sachsen.de/medien/news/1079912/download_pdf",
@@ -203,7 +208,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -300,7 +306,8 @@
       "supports": [
        "tech"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.thestar.com.my/tech/tech-news/2025/07/07/belgian-banks-join-european-payments-initiative-to-expand-wero-wallet-across-europe",
@@ -311,7 +318,8 @@
        "tech",
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf",
@@ -321,7 +329,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -440,7 +449,8 @@
       "supports": [
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.paypal.com/de/webapps/mpp/ua/useragreement-emea-full",
@@ -450,7 +460,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.paypal.com/de/webapps/mpp/ua/useragreement-emea-full",
@@ -460,7 +471,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sec.gov/Archives/edgar/data/1633917/000163391721000018/exhibit2101subsidiarylistf.htm",
@@ -470,7 +482,8 @@
       "supports": [
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.sec.gov/Archives/edgar/data/1633917/000163391721000018/exhibit2101subsidiarylistf.htm",
@@ -480,7 +493,8 @@
       "supports": [
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://newsroom.paypal-corp.com/2026-04-29-PayPal-Announces-Strategic-Reorganization-to-Accelerate-Growth",
@@ -491,7 +505,8 @@
        "tech",
        "operator.parent"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "high"
@@ -550,7 +565,8 @@
        "operator",
        "exit"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.mhkbd.nrw/system/files/media/document/file/standardisierung_epayment_v1_0.pdf",
@@ -560,7 +576,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -611,7 +628,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      },
      {
       "url": "https://www.mhkbd.nrw/system/files/media/document/file/standardisierung_epayment_v1_0.pdf",
@@ -621,7 +639,8 @@
       "supports": [
        "operator"
       ],
-      "verified": true
+      "verified": true,
+      "read_on": "2026-11-19"
      }
     ],
     "confidence": "medium"
@@ -694,7 +713,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        },
        {
         "url": "https://ozg.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MF/OZG/Bilder/Veranstaltungen/OZG-Sprechstunden/73.Kommunendigital-Sprechstunde_MODUL-F_epayLSA_nicht_barrierfrei.pdf",
@@ -704,7 +724,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        },
        {
         "url": "https://epicompany.eu/media-insights/five-belgian-banks-join-epi-to-bring-wero-to-even-more-european-customers",
@@ -714,7 +735,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        },
        {
         "url": "https://epicompany.eu/media-insights/five-belgian-banks-join-epi-to-bring-wero-to-even-more-european-customers",
@@ -724,7 +746,8 @@
         "supports": [
          "alternative"
         ],
-        "verified": true
+        "verified": true,
+        "read_on": "2026-11-19"
        }
       ]
      }

@@ -6,7 +6,10 @@
  * pages say (DATA_SOURCES.md lists them). The live agent's cat_lookup
  * returns an entry with its URLs, which makes them fetchable; the fact audit counts an entry's texts
  * as part of the run's evidence. Live mode accepts any service; Simulation offers the entries that have
- * a pre-run (from version 0.2.0).
+ * a pre-run (from version 0.2.0). From version 2.1.0 each entry also has a function group (identity and
+ * sign-in, payments, data exchange and mailboxes, platforms, cloud and code, portals and apps; this
+ * prototype stands apart as "self"), which the Recommend step uses for comparable services and the
+ * overview for its sections.
  * A script, not JSON, because the page's security policy allows no fetch from its own origin.
  */
 (function () {
@@ -26,7 +29,7 @@
     as_of: READ,
     entries: [
       {
-        id: "bundid", category: "base_service",
+        id: "bundid", category: "base_service", group: "identity",
         names: { en: "BundID", de: "BundID" },
         aliases: ["Nutzerkonto Bund", "Nutzerkonto des Bundes", "Bund ID", "BundID-Konto", "id.bund.de"],
         description: {
@@ -40,7 +43,7 @@
         urls: [url("https://id.bund.de/en/", "BundID", "en"), BMDS]
       },
       {
-        id: "online-ausweis", category: "base_service",
+        id: "online-ausweis", category: "base_service", group: "identity",
         names: { en: "Online ID (eID)", de: "Online-Ausweis (eID)" },
         aliases: ["Online-Ausweis", "Onlineausweis", "eID", "Online-Ausweisfunktion", "eID-Funktion", "Personalausweis", "AusweisApp"],
         description: {
@@ -57,7 +60,7 @@
         ]
       },
       {
-        id: "eudi-wallet", category: "base_service",
+        id: "eudi-wallet", category: "base_service", group: "identity",
         names: { en: "EUDI Wallet “d-you”", de: "EUDI-Wallet „d-you“" },
         aliases: ["d-you", "EUDI-Wallet", "EUDI Wallet", "digitale Brieftasche", "digital wallet"],
         description: {
@@ -75,7 +78,7 @@
         ]
       },
       {
-        id: "muk", category: "base_service",
+        id: "muk", category: "base_service", group: "identity",
         names: { en: "Mein Unternehmenskonto (MUK)", de: "Mein Unternehmenskonto (MUK)" },
         aliases: ["MUK", "Mein Unternehmenskonto", "Unternehmenskonto", "Organisationskonto", "ELSTER-Unternehmenskonto"],
         description: {
@@ -93,7 +96,7 @@
         ]
       },
       {
-        id: "fit-connect", category: "base_service",
+        id: "fit-connect", category: "base_service", group: "data_exchange",
         names: { en: "FIT-Connect", de: "FIT-Connect" },
         aliases: ["FIT Connect", "Zustelldienst", "FITKO FIT-Connect"],
         description: {
@@ -110,7 +113,7 @@
         ]
       },
       {
-        id: "noots", category: "base_service",
+        id: "noots", category: "base_service", group: "data_exchange",
         names: { en: "NOOTS (National Once-Only Technical System)", de: "NOOTS (Nationales Once-Only-Technical-System)" },
         aliases: ["NOOTS", "National Once-Only Technical System", "Nationales Once-Only-Technical-System", "Registermodernisierung", "Once-Only"],
         description: {
@@ -124,7 +127,7 @@
         urls: [url("https://noots.gov.de/", "NOOTS – das Nationale Once-Only-Technical-System - Wissensplattform", "de"), BMDS]
       },
       {
-        id: "zapuk", category: "base_service",
+        id: "zapuk", category: "base_service", group: "data_exchange",
         names: { en: "ZaPuK (target architecture for mailbox and communication solutions)", de: "ZaPuK (Zielarchitektur für Postfach- und Kommunikationslösungen)" },
         aliases: ["ZaPuK", "Zielarchitektur für Postfach- und Kommunikationslösungen", "Zielarchitektur Postfach"],
         description: {
@@ -143,7 +146,7 @@
         ]
       },
       {
-        id: "zbds", category: "base_service",
+        id: "zbds", category: "base_service", group: "payments",
         names: { en: "ZBDS (central payment component)", de: "ZBDS (Zentrale Bezahlkomponente)" },
         aliases: ["ZBDS", "Zentrale Bezahlkomponente"],
         description: {
@@ -158,7 +161,7 @@
           "Deutschland-Stack – Wohin geht die Reise?", "de")]
       },
       {
-        id: "epaybl", category: "base_service",
+        id: "epaybl", category: "base_service", group: "payments",
         names: { en: "ePayBL", de: "ePayBL" },
         aliases: ["ePayment Bund-Länder", "ePay BL", "ePayBL 4", "Basiskomponente Zahlungsverkehr"],
         description: {
@@ -172,7 +175,7 @@
         urls: [url("https://www.epaybl.de/", "Online bezahlen in der öffentlichen Verwaltung - ePayBL", "de"), BMDS]
       },
       {
-        id: "kipitz", category: "platform_or_access",
+        id: "kipitz", category: "platform_or_access", group: "platforms",
         names: { en: "KIPITZ (federal AI platform)", de: "KIPITZ (KI-Plattform des Bundes)" },
         aliases: ["KIPITZ", "KI-Plattform des Bundes", "KI-Portal des ITZBund"],
         description: {
@@ -186,7 +189,7 @@
         urls: [url("https://www.bundestag.de/presse/hib/kurzmeldungen-1202030", "Bundesverwaltung nutzt KI als unterstützendes Werkzeug", "de"), BMDS]
       },
       {
-        id: "low-code", category: "platform_or_access",
+        id: "low-code", category: "platform_or_access", group: "platforms",
         names: { en: "Low-code and workflow automation", de: "Low-Code und Workflowautomatisierung" },
         aliases: ["Low-Code", "LowCode", "Workflowautomatisierung", "Workflow-Automatisierung", "Low-Code-Plattform", "workflow automation"],
         description: {
@@ -201,7 +204,7 @@
           "Deutschland-Stack: Anlage Standards zum Beschlussvorschlag 49. IT-Planungsrat", "de"), BMDS]
       },
       {
-        id: "marktplatz-deutschland-digital", category: "platform_or_access",
+        id: "marktplatz-deutschland-digital", category: "platform_or_access", group: "platforms",
         names: { en: "Marktplatz Deutschland Digital (MDD)", de: "Marktplatz Deutschland Digital (MDD)" },
         aliases: ["MDD", "Marktplatz Deutschland Digital", "Marktplatz der Zukunft"],
         description: {
@@ -221,7 +224,7 @@
         ]
       },
       {
-        id: "opencode", category: "platform_or_access",
+        id: "opencode", category: "platform_or_access", group: "platforms",
         names: { en: "openCode", de: "openCode" },
         aliases: ["openCode", "Open CoDE", "OpenCoDE", "opencode.de"],
         description: {
@@ -235,7 +238,7 @@
         urls: [url("https://opencode.de/en/about-opencode", "About openCode | openCode.de", "en"), BMDS]
       },
       {
-        id: "dvc", category: "platform_or_access",
+        id: "dvc", category: "platform_or_access", group: "platforms",
         names: { en: "DVC (German Administration Cloud)", de: "DVC (Deutsche Verwaltungscloud)" },
         aliases: ["DVC", "Deutsche Verwaltungscloud", "German Administration Cloud", "government cloud", "Verwaltungscloud"],
         description: {
@@ -256,7 +259,7 @@
         ]
       },
       {
-        id: "bundesportal", category: "platform_or_access",
+        id: "bundesportal", category: "platform_or_access", group: "portals",
         names: { en: "Federal Portal (Bundesportal)", de: "Bundesportal" },
         aliases: ["Bundesportal", "Verwaltungsportal des Bundes", "verwaltung.bund.de", "DeutschlandPortal", "Deutschland-Portal", "Federal Portal"],
         description: {
@@ -274,7 +277,7 @@
         ]
       },
       {
-        id: "deutschland-app", category: "platform_or_access",
+        id: "deutschland-app", category: "platform_or_access", group: "portals",
         names: { en: "Deutschland-App", de: "Deutschland-App" },
         aliases: ["D-APP", "Deutschland App", "Bürger-App", "Germany app"],
         description: {
@@ -292,7 +295,7 @@
       },
       {
         // This prototype, assessed with its own method. The Portfolio leaves the category out.
-        id: "sovereignty-assessment", category: "self_assessment",
+        id: "sovereignty-assessment", category: "self_assessment", group: "self",
         names: { en: "Sovereignty Assessment (this prototype)", de: "Souveränitätsbewertung (dieser Prototyp)" },
         aliases: ["Sovereignty Assessment", "Souveränitätsbewertung", "this prototype", "dieser Prototyp", "self-assessment", "Selbstbewertung", "sovereigntyassessment"],
         description: {
