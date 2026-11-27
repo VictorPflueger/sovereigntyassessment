@@ -66,6 +66,12 @@ async function runOf(id, lang = "en", choice = "keep") {
   }
   return played.get(k);
 }
+/** The run as the Recommend step shows it before the person's choice: every event up to the lever decision. */
+async function runBeforeChoice(id, lang = "en") {
+  const p = await playCase(win.SA_RUNS[id], lang, { choice: "keep", memo: "approved" });
+  const cut = p.events.findIndex((ev) => ev.type === "lever_decision");
+  return digest(cut < 0 ? p.events : p.events.slice(0, cut));
+}
 const nameOf = (result, id, lang = "en") => { const b = result.blocks.find((x) => x.id === id); return b && typeof b.name === "object" ? b.name[lang] : b?.name; };
 const order = (a, b) => a.level - b.level || LAYERS.indexOf(a.layer) - LAYERS.indexOf(b.layer) || String(a.id).localeCompare(String(b.id));
 /** The naive computation the tests trust: straight from the scored blocks. */
@@ -203,7 +209,8 @@ await group("comparable", "five function groups, this prototype apart; comparabl
   const bundid = comparable(entries(), scores, "bundid");
   check.ok(bundid.length >= 2, "BundID has at least two comparable services");
   for (const lang of ["en", "de"]) {
-    const view = story({ run: await runOf("bundid", lang), lang, mode: "simulation", entry: entryOf("bundid"), others: scores });
+    // The comparable services stand at Recommend until the person chooses; after the choice the step shows the result.
+    const view = story({ run: await runBeforeChoice("bundid", lang), lang, mode: "simulation", entry: entryOf("bundid"), others: scores });
     const items = view.steps[4].comparable?.items || [];
     check.ok(items.filter((x) => !x.current).length >= 2, `BundID ${lang}: two comparable services on screen`);
     for (const x of items.filter((y) => !y.current)) check.equal(x.score, String(Math.round(scores[x.id].overall)), `BundID ${lang}: ${x.id}'s score`);

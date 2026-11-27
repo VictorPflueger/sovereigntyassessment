@@ -48,6 +48,10 @@ const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 // ---- the checks can fail ----------------------------------------------------------------------------
 control(guideProblems(html.replace(/<dialog\b[^>]*vc-guide[\s\S]*?<\/dialog>/g, "")).length > 0, "control: guideProblems catches a page without its guides");
 control(guideProblems(html.replace('<div class="kpis"', '<p class="vc-stat" data-vc-kpi="Blocks checked" data-vc-kpi-de="Geprüfte Bausteine">6</p><div class="kpis"')).some((p) => /Blocks checked|Geprüfte Bausteine/.test(p)), "control: guideProblems catches a key figure no How it works chapter explains");
+// Version 2.1.0's lessons in Vici: a key figure for part of the data says what lies outside it, and a session
+// cost in a replay says what a live run would cost and that the replay is free.
+control(guideProblems(html.replace(/<p class="vc-stat__also kpi-also"[^>]*><\/p>/, "")).some((p) => /data-vc-part|vc-stat__also/.test(p)), "control: guideProblems catches the weakest-link tile without its vc-stat__also line");
+control(guideProblems(html.replace(/(<div class="kpi vc-stat" id="kpi-cost"[\s\S]*?<p class="vc-stat__value kpi-value">)[\s\S]*?(<\/div>)/, '$1<span class="kpi-main">€0.62</span></p><p class="vc-stat__note kpi-note">estimated, simulated run</p>$2')).some((p) => /live run|costs nothing/.test(p)), "control: guideProblems catches a session cost that reads as money spent");
 control(bylineProblems(html.replace(/href="https:\/\/victorpflueger\.github\.io\/VIP\/index\.html"/, 'href="#"')).length > 0, "control: bylineProblems catches a byline without the website link");
 control(writingProblems(page(["BundID scores 77 — much more."])).length > 0 && writingProblems(page(["A seamless assessment."])).length > 0, "control: writingProblems catches an em dash and a stock word");
 control(recordIdProblems("<p>The weakest block is B-03, see RF-05.</p>", ["B-03", "RF-05"]).length === 2 && !recordIdProblems("<p>The weakest block is the Kubernetes platform.</p>", ["B-03", "RF-05"]).length, "control: recordIdProblems catches a block id and a fact id on a screen, and passes names");
@@ -154,7 +158,7 @@ try {
   await browser.close();
 }
 
-// ---- every text the presenter writes, for the seventeen cases along every decision path ---------------
+// ---- every text the presenter writes, for the eighteen cases along every decision path ----------------
 const win = DATA;
 const { digest } = await mod("js/run.js");
 const { story } = await mod("js/story.js");

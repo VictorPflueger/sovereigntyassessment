@@ -28,12 +28,31 @@
 //   keep     the notes "indicative, not an official assessment" and "not an official service of the
 //            German Federal Government" (no dash), quote, link and date read for every finding shown,
 //            drafts only with nothing sent, and the decision log
-//   cases    all seventeen cases from the menu, through every step, without an error
+//   cases    all eighteen cases from the menu, through every step, without an error
 //   layout   1920 × 1080 and 1280 × 720, light and dark, English and German, every step of BundID: no
 //            page scroll, the stage and the story fit, the header and its tiles apart and inside, every
 //            target at least 24 px
+// Version 2.1.0's cases, each against the engine's figures for every case it names:
+//   weak-links         every assessed case, both languages: the weakest-link tile names a lower block
+//                      and "not critical", counts the critical blocks no source names, says in words
+//                      where no link is weak, and the score step marks the same blocks
+//   fit-connect-agree  FIT-Connect at 1280 × 720: tile, stage and story agree
+//   criticality        every block's criticality in words on the score step, defined once in its key
+//   makeup             every layer's arithmetic on screen, and the blocks it names
+//   makeup-keys        the make-up opens by click and by Enter, Esc closes it and focus returns
+//   overall-makeup     the overall score's one line and its arithmetic in one click
+//   alternatives       comparable services with their scores; starting points labelled, sourced, alphabetical
+//   overview           All services: every case with its figures, best first, the rest apart
+//   compare            two or three services side by side, one click back, "viewed" marks
+//   overview-layout    the overview and Compare fit 1280 × 720 and keep Vici's sizes at 1920 × 1080
+//   nrw                the Serviceportal.NRW plays to its end and says once what its six layers are
+//   cost               a replay says it costs nothing, and what a live run would cost
+//   criteria           the level criteria at the story's body size, with criticality and points
+//   guide-figures      the guide's figures are the engine's, pages and quotes counted from the pre-run
 // Usage: node tests/showcase.mjs [case…]
+import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 import { pathToFileURL } from "node:url";
 import { APP_ROOT, wanted, launchBrowser, serveStatic, outDir, NETWORK_NOISE } from "./lib/harness.mjs";
 import { loadData, playCase } from "./lib/play.mjs";
@@ -74,8 +93,8 @@ for (const lang of ["en", "de"]) {
 }
 const eurText = (x, lang) => (lang === "en" ? `€${x.toFixed(2)}` : `${x.toFixed(2).replace(".", ",")} €`);
 const LABELS = {
-  en: { steps: ["Understand", "Research", "Score", "Your review", "Recommend"], kpis: ["Overall score", "Weakest critical link", "Exclusive non-EU control", "Session cost"], guide: "How it works", turn: "Your turn:", sentence: "real sources", note: "indicative, not an official assessment", foot: "not an official service of the German Federal Government", play: "Play", pause: "Pause", replay: "Replay" },
-  de: { steps: ["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"], kpis: ["Gesamtwert", "Schwächstes kritisches Glied", "Exklusive Nicht-EU-Kontrolle", "Sitzungskosten"], guide: "So funktioniert's", turn: "Sie sind dran:", sentence: "echten Quellen", note: "indikativ, keine amtliche Bewertung", foot: "kein offizielles Angebot der Bundesregierung", play: "Abspielen", pause: "Pause", replay: "Neu abspielen" }
+  en: { steps: ["Understand", "Research", "Score", "Your review", "Recommend"], kpis: ["Overall score", "Weakest critical link", "Exclusive non-EU control", "Session cost"], tiles: ["Overall score", "Weakest critical link", "Exclusive non-EU control", "A live run would cost"], guide: "How it works", turn: "Your turn:", sentence: "real sources", note: "indicative, not an official assessment", foot: "not an official service of the German Federal Government", play: "Play", pause: "Pause", replay: "Replay" },
+  de: { steps: ["Verstehen", "Recherchieren", "Bewerten", "Ihre Prüfung", "Empfehlen"], kpis: ["Gesamtwert", "Schwächstes kritisches Glied", "Exklusive Nicht-EU-Kontrolle", "Sitzungskosten"], tiles: ["Gesamtwert", "Schwächstes kritisches Glied", "Exklusive Nicht-EU-Kontrolle", "Ein Live-Lauf kostet"], guide: "So funktioniert's", turn: "Sie sind dran:", sentence: "echten Quellen", note: "indikativ, keine amtliche Bewertung", foot: "kein offizielles Angebot der Bundesregierung", play: "Abspielen", pause: "Pause", replay: "Neu abspielen" }
 };
 
 const server = await serveStatic(APP_ROOT, 8400 + Math.floor(Math.random() * 300));
@@ -211,7 +230,8 @@ if (wanted("kpis")) {
       }));
       const where = `${size[0]}×${size[1]} ${lang}`;
       expect(name, `${where}: two to four tiles, each with data-vc-kpi and data-vc-kpi-de`, tiles.length >= 2 && tiles.length <= 4 && tiles.every((t) => t.en && t.de), JSON.stringify(tiles.map((t) => [t.en, t.de])));
-      expect(name, `${where}: the tiles say their names in the page's language`, tiles.map((t) => t.label).join("|") === LABELS[lang].kpis.join("|"), tiles.map((t) => t.label).join("|"));
+      // In a replay the cost tile's label says what its figure is, "A live run would cost" (D6); live, it reads Session cost.
+      expect(name, `${where}: the tiles say their names in the page's language`, tiles.map((t) => t.label).join("|") === LABELS[lang].tiles.join("|"), tiles.map((t) => t.label).join("|"));
       // Top right: one row of tiles in the header, under its name and controls (D8), ending at the window's right edge.
       expect(name, `${where}: the tiles sit top right, in one row inside the header`, tiles.every((t) => t.top >= t.header[0] && t.bottom <= t.header[1] + 0.5 && t.right <= size[0] && Math.abs(t.top - tiles[0].top) < 1) && tiles.every((t, i) => i === 0 || t.left >= tiles[i - 1].right) && tiles.at(-1).right > size[0] - 40, JSON.stringify(tiles.map((t) => [Math.round(t.left), Math.round(t.right), Math.round(t.top), Math.round(t.bottom)])));
       const E = EXPECT[lang];
@@ -219,7 +239,7 @@ if (wanted("kpis")) {
       expect(name, `${where}: Overall score is the engine's, on its layers`, v[0] === `${E.score} ${E.of}`, v[0]);
       expect(name, `${where}: Weakest critical link is the engine's, by its name`, v[1] === `${E.weakest} ${lang === "en" ? "of" : "von"} 4` && nb(tiles[1].note) === nb(E.weakestName), `${v[1]} / ${tiles[1].note}`);
       expect(name, `${where}: Exclusive non-EU control is the engine's share`, v[2] === E.exclusive && nb(tiles[2].note).includes(String(E.critical)), `${v[2]} / ${tiles[2].note}`);
-      expect(name, `${where}: Session cost is what a live run would cost, and this replay is free`, v[3] === `≈ ${eurText(E.cost, lang)} ${lang === "en" ? "for a live run" : "im Live-Lauf"}` && nb(tiles[3].note) === (lang === "en" ? "this replay: €0" : "diese Wiedergabe: 0 €"), `${v[3]} / ${tiles[3].note}`);
+      expect(name, `${where}: Session cost is what a live run would cost, and this replay is free`, v[3] === `≈ ${eurText(E.cost, lang)}` && nb(tiles[3].note) === (lang === "en" ? "this replay: €0" : "diese Wiedergabe: 0 €"), `${v[3]} / ${tiles[3].note}`);
       expect(name, `${where}: no error`, !errors.length, errors.join(" | "));
       await context.close();
     }
@@ -622,7 +642,7 @@ if (wanted("cases")) {
 }
 
 // ---- 2.1.0: every case's figures, computed here from the gated blocks of its pre-run -----------------------------
-// The answers to the domain review (SA-01 to SA-07) are read off the page and compared with these.
+// The answers to the review (SA-01 to SA-07) are read off the page and compared with these.
 const { links, layerSum } = await mod("js/chain.js");
 const { digest } = await mod("js/run.js");
 const { fmtDateShort } = await mod("js/format.js");
@@ -646,8 +666,8 @@ const ENDED = ENTRIES.filter((e) => ENG[e.id].en.notService).map((e) => e.id);
 const SELF = ENTRIES.filter((e) => e.category === "self_assessment").map((e) => e.id);
 const scoredOf = (r) => LAYERS.filter((l) => r.layers[l].score !== null).length;
 const W = {
-  en: { level: (n) => `Level ${n} of 4`, of: (n) => `on ${n} of 6 layers`, lowest: "Lowest overall", notCritical: "not critical", noneCritical: "none critical", unknown: /critical blocks? not known/, noWeak: /^(No weak link|No block is lower)/, mark: { weakest: "weakest critical link", lowest: "lowest overall", unknown: "not known from the sources" }, crit: { critical: "critical", important: "important", supporting: "supporting" }, label: "Starting points for research, not a recommendation", points: "Level 4 is 100 points", noneLower: "none lower", live: "for a live run", replay: "this replay: €0", simFree: "the simulation costs nothing", state: "the six layers are the Deutschland-Stack's", viewed: "viewed" },
-  de: { level: (n) => `Stufe ${n} von 4`, of: (n) => `auf ${n} von 6 Ebenen`, lowest: "Niedrigste insgesamt", notCritical: "nicht kritisch", noneCritical: "keiner kritisch", unknown: /kritische[r]? Bausteine? (aus den Quellen )?nicht bekannt/, noWeak: /^(Kein schwaches Glied|Kein Baustein liegt niedriger)/, mark: { weakest: "schwächstes kritisches Glied", lowest: "niedrigste insgesamt", unknown: "aus den Quellen nicht bekannt" }, crit: { critical: "kritisch", important: "wichtig", supporting: "unterstützend" }, label: "Ansatzpunkte für die Recherche, keine Empfehlung", points: "Stufe 4 sind 100 Punkte", noneLower: "keiner niedriger", live: "im Live-Lauf", replay: "diese Wiedergabe: 0 €", simFree: "die Simulation kostet nichts", state: "die sechs Ebenen sind die des Deutschland-Stacks", viewed: "angesehen" }
+  en: { ties: (n) => `and ${n} more at this level`, level: (n) => `Level ${n} of 4`, of: (n) => `on ${n} of 6 layers`, lowest: "Lowest overall", notCritical: "not critical", noneCritical: "none critical", unknown: /critical blocks? not known/, noWeak: /^(No weak link|No block is lower)/, mark: { weakest: "weakest critical link", lowest: "lowest overall", unknown: "not known from the sources" }, crit: { critical: "critical", important: "important", supporting: "supporting" }, label: "Starting points for research, not a recommendation", points: "Level 4 is 100 points", noneLower: "none lower", live: "for a live run", would: "A live run would cost", replay: "this replay: €0", simFree: "the simulation costs nothing", state: "the six layers are the Deutschland-Stack's", viewed: "viewed" },
+  de: { ties: (n) => `und ${n} ${n === 1 ? "weiterer" : "weitere"} auf dieser Stufe`, level: (n) => `Stufe ${n} von 4`, of: (n) => `auf ${n} von 6 Ebenen`, lowest: "Niedrigste insgesamt", notCritical: "nicht kritisch", noneCritical: "keiner kritisch", unknown: /kritische[r]? Bausteine? (aus den Quellen )?nicht bekannt/, noWeak: /^(Kein schwaches Glied|Kein Baustein liegt niedriger)/, mark: { weakest: "schwächstes kritisches Glied", lowest: "niedrigste insgesamt", unknown: "aus den Quellen nicht bekannt" }, crit: { critical: "kritisch", important: "wichtig", supporting: "unterstützend" }, label: "Ansatzpunkte für die Recherche, keine Empfehlung", points: "Stufe 4 sind 100 Punkte", noneLower: "keiner niedriger", live: "im Live-Lauf", would: "Ein Live-Lauf kostet", replay: "diese Wiedergabe: 0 €", simFree: "die Simulation kostet nichts", state: "die sechs Ebenen sind die des Deutschland-Stacks", viewed: "angesehen" }
 };
 /** Opens a case at a step, paused; from Your review on, the findings confirmed as a person would. */
 async function caseAt(page, id, step) {
@@ -665,7 +685,7 @@ const readChain = (page) => page.evaluate(() => {
   const t = (el) => (el ? el.innerText.replace(/[  ]/g, " ").replace(/\s+/g, " ").trim() : "");
   const tile = document.getElementById("kpi-weakest");
   return {
-    value: t(tile.querySelector(".vc-stat__value")), note: t(tile.querySelector(".kpi-note")), noteBlock: tile.querySelector(".kpi-note [data-makeup]")?.dataset.makeup || null,
+    value: t(tile.querySelector(".vc-stat__value")), note: t(tile.querySelector(".kpi-note [data-makeup]") || tile.querySelector(".kpi-note")), ties: t(tile.querySelector(".kpi-note .kpi-ties")), noteBlock: tile.querySelector(".kpi-note [data-makeup]")?.dataset.makeup || null,
     also: [...tile.querySelectorAll(".kpi-also-line")].map((l) => ({ text: t(l.querySelector("[data-makeup]") || l), level: l.querySelector(".lvl")?.dataset.level ?? null, block: l.querySelector("[data-makeup]")?.dataset.makeup || null, visible: l.getBoundingClientRect().height > 0 })),
     cells: [...document.querySelectorAll("#stage-body .cell")].map((c) => ({ id: c.dataset.block, marks: (c.dataset.marks || "").split(" ").filter(Boolean), name: t(c.querySelector(".cell-name")), crit: t(c.querySelector(".cell-crit")), flags: [...c.querySelectorAll(".cell-flag")].map(t) }))
   };
@@ -689,6 +709,7 @@ if (wanted("weak-links")) {
       const cell = (bid) => c.cells.find((x) => x.id === bid);
       if (L.weakest) {
         expect(name, `${where}: the tile shows the weakest critical link, by name`, c.value === w.level(L.weakest.level) && c.note === E.names[L.weakest.id] && c.noteBlock === `block:${L.weakest.id}`, `${c.value} / ${c.note}`);
+        expect(name, `${where}: the tile counts the other critical blocks at that level`, c.ties === (L.weakest.ties ? w.ties(L.weakest.ties) : ""), `"${c.ties}" with ${L.weakest.ties} ties`);
         expect(name, `${where}: the step marks the tile's block`, cell(L.weakest.id)?.marks.includes("weakest") && cell(L.weakest.id)?.flags.includes(w.mark.weakest), JSON.stringify(cell(L.weakest.id)));
       }
       if (L.lower.length) {
@@ -927,9 +948,10 @@ if (wanted("overview")) {
       const entry = ENTRIES.find((e) => e.id === r.id);
       const ex = E.result.exclusive_non_eu;
       expect(name, `${lang} ${r.id}: score and layers are the engine's`, r.score === String(Math.round(E.result.overall)) && r.of === W[lang].of(scoredOf(E.result)), `${r.score} ${r.of}`);
-      expect(name, `${lang} ${r.id}: the weakest critical link, by level and name`, L.weakest ? r.weakLevel === String(L.weakest.level) && r.weakest.startsWith(E.names[L.weakest.id]) : true, `${r.weakLevel} ${r.weakest}`);
-      expect(name, `${lang} ${r.id}: the lowest level where lower, else words`, L.lower.length ? r.lowLevel === String(L.lower[0].level) && r.lower.startsWith(E.names[L.lower[0].id]) : r.lowLevel === null && (L.unknownCritical.length ? W[lang].unknown.test(r.lower) : r.lower === W[lang].noneLower), `${r.lowLevel} ${r.lower}`);
-      expect(name, `${lang} ${r.id}: exclusive non-EU control, group and as-of date`, r.exclusive === (ex === null ? r.exclusive : `${Math.round(ex * 100)} %`) && (entry.group === "self" ? r.group === "" : r.group === t2(`p.group.${entry.group}`, lang)) && r.asOf === nb(fmtDateShort(win.SA_RUNS[r.id].as_of, lang)), `${r.exclusive} / ${r.group} / ${r.asOf}`);
+      expect(name, `${lang} ${r.id}: the weakest critical link, by level and name, with the critical blocks no source names`, (L.weakest ? r.weakLevel === String(L.weakest.level) && r.weakest.startsWith(E.names[L.weakest.id]) : true) && (L.unknownCritical.length ? W[lang].unknown.test(r.weakest) : !W[lang].unknown.test(r.weakest)), `${r.weakLevel} ${r.weakest}`);
+      expect(name, `${lang} ${r.id}: the lowest level where lower and not critical, else words`, L.lower.length ? r.lowLevel === String(L.lower[0].level) && r.lower.startsWith(E.names[L.lower[0].id]) && !W[lang].unknown.test(r.lower) : r.lowLevel === null && r.lower === W[lang].noneLower, `${r.lowLevel} ${r.lower}`);
+      const critical = E.result.blocks.filter((b) => !b.unscored && b.criticality === "critical").length;
+      expect(name, `${lang} ${r.id}: exclusive non-EU control of how many critical blocks, group and as-of date`, r.exclusive === (ex === null ? r.exclusive : `${Math.round(ex * 100)} % ${lang === "de" ? "von" : "of"} ${critical} ${lang === "de" ? "kritischen" : "critical"}`) && (entry.group === "self" ? r.group === "" : r.group === t2(`p.group.${entry.group}`, lang)) && r.asOf === nb(fmtDateShort(win.SA_RUNS[r.id].as_of, lang)), `${r.exclusive} / ${r.group} / ${r.asOf}`);
     }
     expect(name, `${lang}: this prototype stands apart`, rows.filter((r) => r.apart && !r.ended).map((r) => r.id).join() === SELF.join(), JSON.stringify(rows.filter((r) => r.apart).map((r) => r.id)));
     const ended = rows.filter((r) => r.ended);
@@ -960,7 +982,7 @@ if (wanted("compare")) {
     v.cols.forEach((id, i) => {
       const E = ENG[id][lang];
       const f = v.figures;
-      expect(name, `${lang} ${id}: the four figures are the engine's`, f.score[i].score === String(Math.round(E.result.overall)) && f.weakest[i].level === String(E.links.weakest.level) && f.weakest[i].text.includes(E.names[E.links.weakest.id]) && (E.links.lower.length ? f.lower[i].level === String(E.links.lower[0].level) : f.lower[i].level === null) && f.exclusive[i].text === `${Math.round(E.result.exclusive_non_eu * 100)} %`, JSON.stringify(Object.fromEntries(Object.entries(f).map(([k, x]) => [k, x[i]]))));
+      expect(name, `${lang} ${id}: the four figures are the engine's`, f.score[i].score === String(Math.round(E.result.overall)) && f.weakest[i].level === String(E.links.weakest.level) && f.weakest[i].text.includes(E.names[E.links.weakest.id]) && (E.links.lower.length ? f.lower[i].level === String(E.links.lower[0].level) : f.lower[i].level === null) && f.exclusive[i].text === `${Math.round(E.result.exclusive_non_eu * 100)} % ${lang === "de" ? "von" : "of"} ${E.result.blocks.filter((b) => !b.unscored && b.criticality === "critical").length} ${lang === "de" ? "kritischen" : "critical"}`, JSON.stringify(Object.fromEntries(Object.entries(f).map(([k, x]) => [k, x[i]]))));
       for (const l of LAYERS) {
         const s = layerSum(E.result, l);
         const cell = v.layers[l][i];
@@ -1089,7 +1111,7 @@ if (wanted("cost")) {
     const { context, page, errors } = await open(`lang=${lang}`, { size: [1280, 720] });
     const w = W[lang];
     const tile = await page.evaluate(() => { const t = document.getElementById("kpi-cost"); const n = (e) => e.innerText.replace(/[  ]/g, " ").replace(/\s+/g, " ").trim(); return { label: n(t.querySelector(".vc-stat__label")), value: n(t.querySelector(".kpi-main")), of: n(t.querySelector(".kpi-of")), note: n(t.querySelector(".kpi-note")) }; });
-    expect(name, `${lang}: the tile's euro figure is what a live run would cost, in words`, tile.value === `≈ ${eurText(COST, lang)}` && tile.of === w.live, JSON.stringify(tile));
+    expect(name, `${lang}: the tile's euro figure is what a live run would cost, in words`, tile.value === `≈ ${eurText(COST, lang)}` && tile.label === w.would && !tile.of, JSON.stringify(tile));
     expect(name, `${lang}: and this replay costs nothing`, tile.note === w.replay, tile.note);
     const guide = await page.evaluate((lang) => [...document.querySelectorAll(`#guide-${lang} [data-vc-chapter="how"] tbody tr`)].at(-1)?.innerText.replace(/[  ]/g, " ").replace(/\s+/g, " ") || "", lang);
     expect(name, `${lang}: the guide's key-figure row says the same`, guide.includes(eurText(COST, lang)) && guide.includes(w.live) && guide.includes(w.replay), guide);
@@ -1144,6 +1166,22 @@ if (wanted("criteria")) {
 // ---- guide-figures --------------------------------------------------------------------------------------------
 if (wanted("guide-figures")) {
   const name = "guide-figures";
+  const BUNDID_READ = (() => {
+    const box = { window: {} };
+    vm.runInNewContext(fs.readFileSync(path.join(APP_ROOT, "data/runs/bundid.js"), "utf8"), box);
+    // The research before Your review, as the Research step counts it.
+    const all = box.window.SA_RUNS.bundid;
+    const def = { ...all, steps: all.steps.slice(0, all.steps.findIndex((st) => st.tool === "ui_request_review")) };
+    const quotes = new Set();
+    const walk = (v) => {
+      if (Array.isArray(v)) return v.forEach(walk);
+      if (!v || typeof v !== "object") return;
+      if (typeof v.url === "string" && typeof v.quote === "string" && v.verified !== false) quotes.add(`${v.url}|${v.quote.replace(/\s+/g, " ").trim()}`);
+      Object.values(v).forEach(walk);
+    };
+    walk(def.steps);
+    return { pages: new Set(def.steps.filter((st) => st.fetch).map((st) => st.fetch.url)).size, quotes: quotes.size };
+  })();
   for (const lang of ["en", "de"]) {
     const { context, page, errors } = await open(`lang=${lang}`, { size: [1280, 720] });
     const E = ENG.bundid[lang];
@@ -1152,6 +1190,9 @@ if (wanted("guide-figures")) {
     const w = W[lang];
     expect(name, `${lang}: the guide's figures are BundID's, from the engine`, figs.score === String(Math.round(E.result.overall)) && figs.layers === w.of(scoredOf(E.result)) && figs.weakest === w.level(L.weakest.level) && figs["weakest-name"] === E.names[L.weakest.id] && figs.exclusive === `${Math.round(E.result.exclusive_non_eu * 100)} %`, JSON.stringify(figs));
     expect(name, `${lang}: the lowest-overall line`, figs.lowest?.startsWith(`${w.lowest}: ${E.names[L.lower[0].id]}, ${w.notCritical}`), figs.lowest);
+    expect(name, `${lang}: the talk track's lower level is the lowest block's`, figs["lowest-level"] === String(L.lower[0].level), figs["lowest-level"]);
+    // Pages read and quotes kept by the research before Your review, counted from the pre-run file.
+    expect(name, `${lang}: ${BUNDID_READ.pages} pages read and ${BUNDID_READ.quotes} quotes kept, as the pre-run holds them`, figs.pages === String(BUNDID_READ.pages) && figs.quotes === String(BUNDID_READ.quotes), `${figs.pages} / ${figs.quotes}`);
     expect(name, `${lang}: the critical blocks no source names`, figs.unknown === String(L.unknownCritical.length), figs.unknown);
     expect(name, `${lang}: the free replay`, figs.cost === eurText(COST, lang) && figs.replay === w.replay, `${figs.cost} / ${figs.replay}`);
     expect(name, `${lang}: no error`, !errors.length, errors.join(" | "));

@@ -1,23 +1,30 @@
 // How lean the prototype stays: limits a change has to argue with. Node.js only.
-//   shell    the presenter is 7 modules of its own (main, app, view, story, run, estimate, lang) of at
-//            most 1,500 lines; everything else in js/ is 1.0.0's engine, tools, agent and simulation
-//   app      at most 6,000 lines of JavaScript in js/ (10,115 in 1.0.0) and one stylesheet of at most
-//            450 lines (1,681 in seven files in 1.0.0); vici/ is Vici's, tests/ and tools/ aren't the app
+//   shell    the presenter is 10 modules of its own (main, app, view, story, run, estimate, lang, and
+//            2.1.0's chain, cases and overview) of at most 2,400 lines; everything else in js/ is 1.0.0's
+//            engine, tools, agent and simulation
+//   app      at most 6,600 lines of JavaScript in js/ (10,115 in 1.0.0) and one stylesheet of at most
+//            560 lines (1,681 in seven files in 1.0.0); vici/ is Vici's, tests/ and tools/ aren't the app
+//            Version 2.1.0 moved these limits on purpose (TECH_NOTES.md §25): a review of 2.0.0 asked for
+//            All services and Compare, the make-up of every figure, the starting points and the lower
+//            blocks, which 2.0.0's limits of 7 modules, 1,500 shell lines, 6,000 lines and 450 CSS lines
+//            could not hold.
 //   network  one module makes requests, js/anthropic.js, in a live run; no module and not the page
 //            names another host to call, and the security policy connects to api.anthropic.com only
 //   cut      nothing of 1.0.0's console is on the page or in its scripts: no control bar, console
 //            replay, drawer, map, spider, Compare, Portfolio, exports, recorder, method view,
 //            Diagnostics, intro, mode cards, typed service or catalogue chips
-//   docs     README.md at most 900 words, DEMO_SCRIPT.md at most 700, DESIGN.md at most 700 and
-//            DATA_SOURCES.md at most 600; PLAN.md and REVIEW.md live in the git history
+//   docs     README.md at most 900 words, DEMO_SCRIPT.md at most 1,400 (its English and German halves;
+//            700 for the English-only script of 2.0.0), DESIGN.md at most 700 and DATA_SOURCES.md at most
+//            600; PLAN.md lives in the git history, and REVIEW.md is version 2.1.0's cold read and reviews
+//            (1.0.0's is in the history at 1dc145e)
 // Each rule is first tried on a planted example that must break it. Prints CUTS OK and LEAN OK.
 // Usage: node tests/lean.mjs
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { APP_ROOT } from "./lib/harness.mjs";
 
-const LIMITS = { shellModules: 7, shellLines: 1500, jsLines: 6000, cssFiles: 1, cssLines: 450, readme: 900, script: 700, design: 700, sources: 600 };
-const SHELL = ["main.js", "app.js", "view.js", "story.js", "run.js", "estimate.js", "lang.js"];
+const LIMITS = { shellModules: 10, shellLines: 2400, jsLines: 6600, cssFiles: 1, cssLines: 560, readme: 900, script: 1400, design: 700, sources: 600 };
+const SHELL = ["main.js", "app.js", "view.js", "story.js", "run.js", "estimate.js", "lang.js", "chain.js", "cases.js", "overview.js"];
 const NET = /\bfetch\s*\(|XMLHttpRequest|WebSocket|new EventSource|navigator\.sendBeacon/;
 const HOSTS = /https?:\/\/([a-z0-9.-]+\.[a-z]{2,})/gi;
 const CALLED = new Set(["api.anthropic.com"]);
@@ -87,8 +94,8 @@ check(/const FIRST = "bundid"/.test(app) && /function buildCaseMenu\(\)/.test(ap
 // ---- docs ---------------------------------------------------------------------------------------------------------
 const count = (f) => (existsSync(path.join(APP_ROOT, f)) ? words(read(f)) : Infinity);
 for (const [f, max] of [["README.md", LIMITS.readme], ["DEMO_SCRIPT.md", LIMITS.script], ["DESIGN.md", LIMITS.design], ["DATA_SOURCES.md", LIMITS.sources]]) check(count(f) <= max, `docs: ${f} has ${count(f)} words, at most ${max}`);
-const kept = ["PLAN.md", "REVIEW.md"].filter((f) => existsSync(path.join(APP_ROOT, f)));
-check(!kept.length, `docs: PLAN.md and REVIEW.md live in the git history${kept.length ? ` (still here: ${kept.join(", ")})` : ""}`);
+const kept = ["PLAN.md"].filter((f) => existsSync(path.join(APP_ROOT, f)));
+check(!kept.length && existsSync(path.join(APP_ROOT, "REVIEW.md")), `docs: PLAN.md lives in the git history, and REVIEW.md holds version 2.1.0's cold read${kept.length ? ` (still here: ${kept.join(", ")})` : ""}`);
 
 let failed = 0;
 for (const [list, token] of [[results, null], [cut, "CUTS OK"]]) {
