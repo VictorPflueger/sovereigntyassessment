@@ -300,7 +300,8 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
       const src = sources(p.evidence)[0] || null;
       const cat = p.catalogue_id ? scoreOf(p.catalogue_id) : null;
       return {
-        key: `alt:${id}:${inLang(p.name, "en")}`, name: inLang(p.name, lang), note: p.note ? plain(p.note) : "",
+        // A service of the catalogue goes by the name it has here; any other by the name its source gives.
+        key: `alt:${id}:${inLang(p.name, "en")}`, name: p.catalogue_id ? t(`p.case.${p.catalogue_id}.short`, null, lang) : inLang(p.name, lang), note: p.note ? plain(p.note) : "",
         level: p.level ?? null,
         levelText: p.level === null || p.level === undefined ? t("p.alt.noLevel", null, lang) : t("p.alt.level", { n: fmtInt(p.level, lang) }, lang),
         source: src,
@@ -347,8 +348,9 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     title: s5title,
     lead: notService ? t("p.s5.lead.none", null, lang) : t(decided ? "p.s5.lead.decided" : "p.s5.lead", null, lang),
     agent: agent(4),
-    alternatives,
-    comparable: comparableView,
+    // The starting points stand beside the decision; once it is taken, the step is about the memo.
+    alternatives: decided ? [] : alternatives,
+    comparable: decided ? null : comparableView,
     stage: notService ? { kind: "empty", text: t("p.stage.notNeeded", null, lang) }
       : memoStage && decided ? memoStage
         : run.levers ? { kind: "levers", levers: leverCards, keep: { overall: keepScore === null || keepScore === undefined ? t("p.noScore", null, lang) : fmtScore(keepScore, lang), status: decided === "keep" ? "approved" : decided ? "closed" : "open" } }
@@ -382,7 +384,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
   // How long Play stays on a step: the time to read its title and lead, between 7 and 14 seconds.
   for (const s of steps) s.read = Math.min(14000, Math.max(7000, 3000 + 230 * words(`${s.title} ${s.lead}`)));
 
-  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete, makeups };
+  return { service, steps, kpis: kpis(), log: log(), ended, finished, decided: !!decided, complete, makeups, unknownCritical: chain?.unknownCritical.length ?? null };
 
   function kpis() {
     const k = {};
@@ -406,7 +408,7 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     } else {
       const after = chosen && chosen.weakest !== null && weakest && chosen.weakest !== weakest.level ? chosen.weakest : null;
       k.weakest = weakest
-        ? { value: t("p.kpi.level", { n: fmtInt(after ?? weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: after !== null ? t("p.kpi.weakest.lever", { n: fmtInt(weakest.level, lang) }, lang) : weakest.name, block: after !== null ? null : weakest.id, tone: after !== null ? "done" : "" }
+        ? { value: t("p.kpi.level", { n: fmtInt(after ?? weakest.level, lang) }, lang), of: t("p.kpi.of4", null, lang), note: after !== null ? t("p.kpi.weakest.lever", { n: fmtInt(weakest.level, lang) }, lang) : weakest.name, blockId: after !== null ? null : weakest.id, tone: after !== null ? "done" : "" }
         : { value: t("p.kpi.none", null, lang), of: "", note: t("p.kpi.noCritical", null, lang) };
       k.weakest.also = alsoLines(chosen ? leverChain(chosen.id) : chain);
       const exAfter = chosen && chosen.exclusive !== null && Math.round(chosen.exclusive * 100) !== Math.round((result.exclusive_non_eu ?? 0) * 100) ? chosen.exclusive : null;
@@ -436,10 +438,10 @@ export function story({ run, lang = "en", mode = "simulation", entry = null, oth
     const out = [];
     if (c.lower.length) {
       const low = c.lower[0];
-      const vars = { level: fmtInt(low.level, lang), block: blockName(low.id), n: fmtInt(c.lower.length, lang), weakest: fmtInt(c.weakest.level, lang) };
-      out.push({ kind: "lower", level: low.level, block: low.id, text: t(c.lower.length === 1 ? "p.kpi.also.lower" : "p.kpi.also.lowerMany", vars, lang) });
+      const vars = { level: fmtInt(low.level, lang), block: blockName(low.id), more: fmtInt(c.lower.length - 1, lang), weakest: fmtInt(c.weakest.level, lang) };
+      out.push({ kind: "lower", level: low.level, blockId: low.id, text: t(c.lower.length === 1 ? "p.kpi.also.lower" : "p.kpi.also.lowerMany", vars, lang) });
     } else if (!c.weakest && c.lowest) {
-      out.push({ kind: "lower", level: c.lowest.level, block: c.lowest.id, text: t("p.kpi.also.lower", { level: fmtInt(c.lowest.level, lang), block: blockName(c.lowest.id) }, lang) });
+      out.push({ kind: "lower", level: c.lowest.level, blockId: c.lowest.id, text: t("p.kpi.also.lower", { level: fmtInt(c.lowest.level, lang), block: blockName(c.lowest.id) }, lang) });
     }
     if (c.unknownCritical.length) {
       out.push({ kind: "unknown", level: null, text: tn("p.kpi.also.unknown", c.unknownCritical.length, { n: fmtInt(c.unknownCritical.length, lang), names: andList(c.unknownCritical.map(blockName), lang) }, lang) });

@@ -78,13 +78,13 @@ export function renderTile(el, v) {
   el.querySelector(".kpi-main").textContent = v.value;
   const of = el.querySelector(".kpi-of");
   if (of) { of.hidden = !v.of; of.textContent = v.of ? ` ${v.of}` : ""; }
-  el.querySelector(".kpi-note").replaceChildren(v.block ? opener(`block:${v.block}`, "kpi-open", v.note) : v.note || "");
+  el.querySelector(".kpi-note").replaceChildren(v.blockId ? opener(`block:${v.blockId}`, "kpi-open", v.note) : v.note || "");
   const also = el.querySelector(".kpi-also");
   if (also) {
     // Empty, it keeps its room, so the header keeps its height through a case.
     also.dataset.empty = String(!v.also?.length);
     also.replaceChildren(...(v.also || []).map((a) => h("span", { class: "kpi-also-line", dataset: { kind: a.kind } },
-      a.level !== null && a.level !== undefined ? level(a.level, { size: "xs" }) : null, a.block ? opener(`block:${a.block}`, "kpi-open", a.text) : a.text)));
+      a.level !== null && a.level !== undefined ? level(a.level, { size: "xs" }) : null, a.blockId ? opener(`block:${a.blockId}`, "kpi-open", a.text) : a.text)));
   }
   el.dataset.tone = v.tone || "";
 }

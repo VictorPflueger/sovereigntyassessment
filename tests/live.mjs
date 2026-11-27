@@ -18,15 +18,22 @@
 //                   Session cost tile shows it as measured
 //   guardrails      the sequence rules and the fact audit's two retries; the accepted text is marked unchecked
 //   not-a-service   a run that finds no service ends without blocks and says so
-//   key             checked with GET /v1/models first; session storage only, under sa.anthropic.key; never in
-//                   the page or the console; a rejected key is forgotten and the dialog says why
+//   key             checked with GET /v1/models first; held in the page's memory only, in no storage, never in
+//                   the page or the console; a rejected key is forgotten and the dialog says why; Forget key
+//   nothing-kept    Vici's storageProblems finds no script that touches storage but the theme and language
+//                   modules, and after a whole live run, All services and Compare, the browser holds nothing
+//                   but vc-theme, sa.lang and Vici's guide note (storedKeyProblems)
+//   cost-tile       in a live run the tile says Session cost and shows the measured cost, in both languages,
+//                   and nothing of a replay's words
+//   (caps also keeps the visitor's own cap from the live-run dialog)
 // Every case fails on a page error, an unexpected console error, a policy violation, a request to any host
 // but the stand-in, or a protocol violation the stand-in found.
 // Usage: node tests/live.mjs [case…]
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
-import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, MOCK_KEY, KEYS } from "./lib/harness.mjs";
+import { readdirSync, readFileSync } from "node:fs";
+import { APP_ROOT, ONLY, outDir, wanted, launchBrowser, serveStatic, NETWORK_NOISE, MOCK_KEY, KEYS, viciDir, REQUIRE_VICI } from "./lib/harness.mjs";
 import { createFakeClaude, text, tool, search, searchError, fetchText, fetchPdf, fetchError, resultFor } from "./lib/fake-claude.mjs";
 
 const { MODELS, FX_USD_EUR, ANTHROPIC } = await import(pathToFileURL(path.join(APP_ROOT, "js/config.js")).href);
@@ -99,12 +106,14 @@ const run = (page) => page.evaluate(() => {
 const PILL = { done: "Done", not_a_service: "Done", stopped: "Stopped", aborted: "Aborted", error: "Error" };
 const pill = async (page) => PILL[(await run(page)).end] || null;
 
-/** From a case to a running live run, the way a presenter starts it: Start agent, the key, start. */
-async function startLive(page, { entry = "bundid", key = MOCK_KEY } = {}) {
+/** From a case to a running live run, the way a presenter starts it: Start agent, the key, the box, start. */
+async function startLive(page, { entry = "bundid", key = MOCK_KEY, cap = null } = {}) {
   if (entry !== "bundid") await page.evaluate((id) => window.sovereignty.openCase(window.SA_CATALOGUE.entries.find((e) => e.id === id), 0), entry);
   await page.click("#start");
   await page.waitForSelector("#start-dialog[open]");
   await page.fill("#live-key", key);
+  if (cap !== null) await page.$eval("#live-cap", (el, v) => { el.value = String(v); el.dispatchEvent(new Event("input", { bubbles: true })); }, cap);
+  await page.check("#live-ack");
   await page.click("#live-start");
   if (key === MOCK_KEY) await page.waitForFunction(() => window.sovereignty.S.mode === "live", null, { timeout: 10000 });
 }
@@ -267,14 +276,17 @@ for (const [name, message, says] of [["disabled-search", "web search is not enab
     checks.pill = await pill(page);
     checks.requests = fake.requests.length;
     checks.alert = await textOf(page, "#story-alert");
-    checks.key = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
     checks.start = await page.isVisible("#start");
+    // The key stays in the page's memory: Start agent shows it masked.
+    await page.click("#start");
+    await page.waitForSelector("#start-dialog[open]");
+    checks.key = (await page.isVisible("#live-current")) ? await textOf(page, "#live-masked") : null;
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
   await finish(`${name}: a 400 stops the live run cleanly and says why`, t, checks, [
     [checks.requests === 1, `one request, no retry and nothing after it (${checks.requests})`],
     [checks.pill === "Stopped", `the run stops (${checks.pill})`],
     [says.test(checks.alert || "") && checks.start, `the page says why, and Start agent offers the simulation again (${checks.alert})`],
-    [checks.key === MOCK_KEY, "the key stays: it was not rejected"]
+    [checks.key === `${MOCK_KEY.slice(0, 7)}…${MOCK_KEY.slice(-4)}`, `the key stays: it was not rejected (${checks.key})`]
   ]);
 }
 
@@ -325,7 +337,7 @@ if (wanted("caps")) {
   const looping = createFakeClaude(() => ({ blocks: [tool("ui_progress", { text: "Still researching." })], stop: "tool_use", usage: { input_tokens: 100, output_tokens: 10 } }));
   const t = await newPage(looping);
   try {
-    await startLive(t.page);
+    await startLive(t.page, { cap: 3 });
     await ended(t.page, 120000);
     await t.page.waitForTimeout(1000);
     checks.calls = looping.requests.length;
@@ -339,7 +351,7 @@ if (wanted("caps")) {
   ]);
   const t2 = await newPage(costly);
   try {
-    await startLive(t2.page);
+    await startLive(t2.page, { cap: 3 });
     await ended(t2.page);
     await t2.page.waitForTimeout(1000);
     checks.costCalls = costly.requests.length;
@@ -348,9 +360,26 @@ if (wanted("caps")) {
   } catch (err) { checks.FAILED = checks.FAILED || String(err.message).split("\n")[0]; }
   await t2.context.close();
   t.fake.violations.push(...costly.violations);
+  // The visitor's own cap: €0.50 in the dialog, and a first call of 100,000 output tokens (about €0.89) is the last.
+  const capped = createFakeClaude([
+    { blocks: [tool("ui_progress", { text: "I start with the catalogue." })], stop: "tool_use", usage: { input_tokens: 1000, output_tokens: 100000 } },
+    { blocks: [text("This call must never happen.")], stop: "end_turn" }
+  ]);
+  const t3 = await newPage(capped);
+  try {
+    await startLive(t3.page, { cap: 0.5 });
+    await ended(t3.page);
+    await t3.page.waitForTimeout(500);
+    checks.capCalls = capped.requests.length;
+    checks.capNotice = (await noticed(t3.page, /^notice\.costCap$/)).length;
+    checks.capEur = (await run(t3.page)).cost?.eur;
+  } catch (err) { checks.FAILED = checks.FAILED || String(err.message).split("\n")[0]; }
+  await t3.context.close();
+  t.fake.violations.push(...capped.violations);
   await finish("caps: no 41st model call, and none once €3 is spent", t, checks, [
     [checks.calls === 40 && checks.pill === "Stopped" && checks.notice === 1, `forty calls, then the run stops (${checks.calls}, ${checks.pill}, ${checks.notice})`],
-    [checks.costCalls === 1 && checks.costPill === "Stopped" && checks.costNotice === 1, `no call after €3 is spent (${checks.costCalls}, ${checks.costPill}, ${checks.costNotice})`]
+    [checks.costCalls === 1 && checks.costPill === "Stopped" && checks.costNotice === 1, `no call after €3 is spent (${checks.costCalls}, ${checks.costPill}, ${checks.costNotice})`],
+    [checks.capCalls === 1 && checks.capNotice === 1 && checks.capEur > 0.5 && checks.capEur < 3, `the visitor's cap of €0.50 stops the run after the call that passed it (${checks.capCalls}, ${checks.capNotice}, €${checks.capEur})`]
   ]);
 }
 
@@ -478,25 +507,128 @@ if (wanted("key")) {
     await page.waitForFunction(() => /rejected this key/.test(document.getElementById("live-msg").textContent), null, { timeout: 10000 });
     checks.rejected = await textOf(page, "#live-msg");
     checks.afterWrong = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
+    await page.check("#live-ack");
     await page.fill("#live-key", MOCK_KEY);
     await page.click("#live-start");
     await page.waitForFunction(() => window.sovereignty.S.mode === "live", null, { timeout: 10000 });
     await ended(page);
     checks.api = t.api.filter((x) => !x.startsWith("OPTIONS"));
-    checks.session = await page.evaluate((k) => sessionStorage.getItem(k), KEYS.apiKey);
-    checks.localHasKey = await page.evaluate((key) => Object.keys(localStorage).some((k) => (localStorage.getItem(k) || "").includes(key) || k.includes(key)), MOCK_KEY);
+    checks.stored = await page.evaluate((key) => [localStorage, sessionStorage].some((st) => Object.keys(st).some((k) => k.includes(key) || (st.getItem(k) || "").includes(key))), MOCK_KEY);
+    // Start agent again: the key in memory shows masked, and Forget key forgets it.
+    await page.click("#start");
+    await page.waitForSelector("#start-dialog[open]");
+    checks.masked = await textOf(page, "#live-masked");
+    checks.ackAgain = await page.isChecked("#live-ack");
+    await page.click("#live-forget");
+    checks.forgotten = await page.waitForSelector("#live-current", { state: "hidden", timeout: 3000 }).then(() => true, () => false);
+    checks.startAfterForget = await page.evaluate(() => document.getElementById("live-start").disabled);
     checks.keys = await page.evaluate(() => [...Object.keys(localStorage), ...Object.keys(sessionStorage)]);
     checks.pageHasKey = (await page.content()).includes(MOCK_KEY);
     checks.consoleHasKey = t.log.console.some((x) => x.includes(MOCK_KEY));
     checks.field = await page.inputValue("#live-key");
   } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
-  await finish("key: checked with GET /v1/models first, kept in this tab's session storage only, never on the page or in the console", t, checks, [
+  await finish("key: checked with GET /v1/models first, held in the page's memory only, never on the page or in the console", t, checks, [
     [/Anthropic rejected this key \(401\)/.test(checks.rejected || "") && checks.afterWrong === null, `a rejected key is not kept, and the dialog says why (${checks.rejected})`],
     [checks.api?.[0] === "GET /v1/models" && checks.api.filter((x) => x === "GET /v1/models").length === 2 && checks.api.slice(2).every((x) => x === "POST /v1/messages"), `each key is checked with the free models call first (${JSON.stringify(checks.api)})`],
-    [checks.session === MOCK_KEY && checks.localHasKey === false, "the key lives in this tab's session storage only"],
+    [checks.stored === false, "the key is in no storage: the page's memory holds it"],
+    [checks.masked === `${MOCK_KEY.slice(0, 7)}…${MOCK_KEY.slice(-4)}` && checks.ackAgain === false && checks.forgotten && checks.startAfterForget, `opened again, the dialog shows the key masked, the box unticked, and Forget key forgets it (${checks.masked}, ${checks.ackAgain}, ${checks.forgotten}, ${checks.startAfterForget})`],
     [checks.keys?.every((k) => k.startsWith("sa.") || k === "vc-theme" || k.startsWith("vc-guide:")), `storage keys sa.*, vc-theme and Vici's guide note only (${JSON.stringify(checks.keys)})`],
     [checks.pageHasKey === false && checks.consoleHasKey === false && checks.field === "", "neither the page nor the console shows the key, and the field is emptied"]
   ]);
+}
+
+// ---- nothing-kept -------------------------------------------------------------------------------------------------------------
+/** A whole assessment for the stand-in: a profile, two blocks, four layer statuses, the score, the review, a lever, the memo, the report. */
+function wholeRun() {
+  const ev = [{ url: ID_URL, title: "BundID", quote: "operated by the ITZBund in its data centres in Germany", lang: "en", supports: ["tech", "operator", "hosting"] }];
+  return [
+    { blocks: [...fetchText(ID_URL, "BundID", PAGE), tool("rec_profile", FACTS_PROFILE(ID_URL, "The account is operated by the ITZBund"))], stop: "tool_use", usage: { input_tokens: 3000, output_tokens: 200, web_fetch_requests: 1 } },
+    { blocks: [tool("rec_block", { layer: "infrastructure", name: "Data centres of the ITZBund", role: "Hosts the account", criticality: "critical", tech: { name: "ITZBund", country: "DE", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, hosting: "EU", licence: "unknown", exit: "possible", confidence: "high", evidence: ev }),
+      tool("rec_block", { layer: "applications", name: "Account software", role: "Runs the account", criticality: "critical", tech: { name: "ITZBund", country: "DE", parent: null }, operator: { name: "ITZBund", country: "DE", parent: null }, hosting: "EU", licence: "unknown", exit: "possible", confidence: "high", evidence: ev })], stop: "tool_use", usage: { input_tokens: 4000, output_tokens: 600 } },
+    { blocks: ["devsecops", "platform", "base_service", "access"].map((layer) => tool("rec_layer", { layer, status: "no_evidence", reason: "No public source was found for this layer." })), stop: "tool_use", usage: { input_tokens: 5000, output_tokens: 300 } },
+    { blocks: [tool("eng_score", {})], stop: "tool_use", usage: { input_tokens: 5500, output_tokens: 50 } },
+    { blocks: [tool("ui_request_review", { summary: "Please review the findings." })], stop: "tool_use", usage: { input_tokens: 6000, output_tokens: 100 } },
+    { blocks: [tool("eng_whatif", { lever_id: "L1", changes: [{ block_id: "B-02", made_in: "EU" }] })], stop: "tool_use", usage: { input_tokens: 6500, output_tokens: 100 } },
+    { blocks: [tool("ui_propose_levers", { levers: [{ lever_id: "L1", title: "A second operator in the EU", rationale: "With it the score would reach {{fact:whatif.L1.overall}}.", changes: [{ block_id: "B-02", made_in: "EU" }], evidence: [{ url: ID_URL, title: "BundID", lang: "en", supports: ["alternative"] }] }] })], stop: "tool_use", usage: { input_tokens: 7000, output_tokens: 200 } },
+    { blocks: [tool("ui_draft_memo", { lever_id: "L1", subject: "Proposal: a second operator", body: "We propose to check a second operator in the EU." })], stop: "tool_use", usage: { input_tokens: 7500, output_tokens: 200 } },
+    { blocks: [tool("ui_final_report", { outcome: "assessed", markdown: "# BundID\n\nThe overall score is {{fact:score.overall}}, indicative." })], stop: "tool_use", usage: { input_tokens: 8000, output_tokens: 200 } },
+    { blocks: [text("The assessment is published.")], stop: "end_turn", usage: { input_tokens: 8500, output_tokens: 20 } }
+  ];
+}
+if (wanted("nothing-kept")) {
+  const checks = {};
+  const dir = viciDir();
+  // Every script the page runs, as Vici's check reads them: only the theme and language modules may use storage.
+  const ALLOW = ["js/theme.js", "js/lang.js", "js/i18n/index.js", "vici/dist/vici.js"];
+  if (dir) {
+    const { storageProblems, storedKeyProblems } = await import(pathToFileURL(path.join(dir, "scripts", "lib", "storage.mjs")).href);
+    const files = ["index.html", "vici/dist/vici.js", ...readdirSync(path.join(APP_ROOT, "js")).filter((f) => f.endsWith(".js")).map((f) => `js/${f}`), ...readdirSync(path.join(APP_ROOT, "js/i18n")).map((f) => `js/i18n/${f}`)];
+    const sources = Object.fromEntries(files.map((f) => [f, readFileSync(path.join(APP_ROOT, f), "utf8")]));
+    checks.static = storageProblems(sources, { allow: ALLOW });
+    checks.control = storageProblems({ ...sources, "js/app.js": `${sources["js/app.js"]}\nlocalStorage.setItem("sa.results", "x");` }, { allow: ALLOW }).length > 0;
+    const fake = createFakeClaude(wholeRun());
+    const t = await newPage(fake);
+    const { page } = t;
+    try {
+      await startLive(page);
+      await reviewConfirm(page);
+      await chooseLever(page);
+      await approveMemo(page);
+      await ended(page);
+      await page.waitForTimeout(300);
+      // The live result stands beside its pre-run in All services, and in Compare, for this tab only.
+      await page.click("#overview-open");
+      checks.liveRow = await page.$$eval('#overview-body tr[data-key="live:bundid"]', (e) => e.length);
+      await page.check('#overview-body [data-pick="live:bundid"]');
+      await page.check('#overview-body [data-pick="bundid"]');
+      await page.click("#ov-cmp");
+      checks.compare = await page.$$eval("#cmp-body thead th[data-key]", (e) => e.map((x) => x.dataset.key));
+      await page.keyboard.press("Escape");
+      const stored = await page.evaluate(async () => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage), databases: (await indexedDB.databases?.() || []).map((d) => d.name), caches: await caches.keys(), cookie: document.cookie }));
+      checks.stored = stored;
+      checks.storedProblems = storedKeyProblems(stored, { prefix: "sa" });
+      checks.control2 = storedKeyProblems({ ...stored, local: [...stored.local, "sa.results"] }, { prefix: "sa" }).length > 0;
+    } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
+    await finish("nothing-kept: only the theme and language modules touch storage, and after a whole live run only vc-theme, sa.lang and Vici's guide note stay", t, checks, [
+      [checks.control && checks.control2, "control: a planted store is caught, in the code and in the browser"],
+      [Array.isArray(checks.static) && !checks.static.length, `storageProblems is empty (${JSON.stringify(checks.static)})`],
+      [checks.liveRow === 1 && JSON.stringify(checks.compare) === JSON.stringify(["live:bundid", "bundid"]), `the live run's result stands in All services and in Compare (${checks.liveRow}, ${JSON.stringify(checks.compare)})`],
+      [Array.isArray(checks.storedProblems) && !checks.storedProblems.length, `storedKeyProblems is empty (${JSON.stringify(checks.stored)}: ${JSON.stringify(checks.storedProblems)})`]
+    ]);
+  } else {
+    results.push({ name: "nothing-kept: needs a ViciDesign checkout (VICI_DIR)", ok: !REQUIRE_VICI, problems: ["no ViciDesign checkout"], checks, pageErrors: [], consoleErrors: [], csp: [] });
+  }
+}
+
+// ---- cost-tile -----------------------------------------------------------------------------------------------------------------
+if (wanted("cost-tile")) {
+  for (const lang of ["en", "de"]) {
+    const usage = { input_tokens: 20000, output_tokens: 3000, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, web_search_requests: 1, web_fetch_requests: 0 };
+    const fake = createFakeClaude([
+      { blocks: [tool("ui_progress", { text: "I look for the service." })], stop: "tool_use", usage },
+      { blocks: [tool("ui_final_report", { outcome: "stopped", markdown: "The test stops here." })], stop: "tool_use", usage },
+      { blocks: [text("Stopped.")], stop: "end_turn", usage }
+    ]);
+    const t = await newPage(fake, { lang });
+    const { page } = t;
+    const checks = {};
+    try {
+      const before = await page.evaluate(() => document.querySelector("#kpi-cost").innerText);
+      await startLive(page);
+      await ended(page);
+      await page.waitForTimeout(300);
+      const r = await run(page);
+      const eurOf = (x) => (lang === "en" ? `€${Number(x).toFixed(2)}` : `${Number(x).toFixed(2).replace(".", ",")} €`);
+      checks.before = before.replace(/\s+/g, " ");
+      checks.tile = await page.evaluate(() => { const n = (sel) => document.querySelector(sel).innerText.replace(/[\u00a0\u202f]/g, " ").replace(/\s+/g, " ").trim(); return { label: n("#kpi-cost .vc-stat__label"), value: n("#kpi-cost .vc-stat__value"), note: n("#kpi-cost .vc-stat__note") }; });
+      checks.want = eurOf(r.cost?.eur).replace(/\u00a0/g, " ");
+    } catch (err) { checks.FAILED = String(err.message).split("\n")[0]; }
+    const L = lang === "en" ? { label: "Session cost", note: /^measured, /, replay: /live run|replay/ } : { label: "Sitzungskosten", note: /^gemessen, /, replay: /Live-Lauf|Wiedergabe/ };
+    await finish(`cost-tile: ${lang}: in a live run the tile shows the measured cost under Session cost`, t, checks, [
+      [L.replay.test(checks.before || ""), `before the run, the tile speaks of a live run and the free replay (${checks.before})`],
+      [checks.tile?.label === L.label && checks.tile.value === checks.want && L.note.test(checks.tile.note) && !L.replay.test(`${checks.tile.value} ${checks.tile.note}`), `after it, ${L.label} shows the measured cost (${JSON.stringify(checks.tile)} vs ${checks.want})`]
+    ]);
+  }
 }
 
 // ---- report ---------------------------------------------------------------------------------------------------------------------
@@ -505,6 +637,9 @@ await close();
 await writeFile(path.join(OUT, "live-results.json"), JSON.stringify(results, null, 2));
 for (const r of results) {
   console.log(`${r.ok ? "PASS" : "FAIL"}  ${r.name}`);
+  // A case passes when each of its results does: LIVE OK <case>.
+  const id = r.name.split(":")[0];
+  if (r.ok && results.filter((x) => x.name.split(":")[0] === id).every((x) => x.ok) && results.filter((x) => x.name.split(":")[0] === id).at(-1) === r) console.log(`LIVE OK ${id}`);
   if (!r.ok) {
     for (const p of r.problems) console.log(`      ${p}`);
     if (r.pageErrors.length) console.log(`      page errors: ${r.pageErrors.join(" | ")}`);

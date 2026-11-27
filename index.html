@@ -226,15 +226,15 @@
       </section>
       <section class="vc-guide__chapter" data-vc-chapter="how" data-vc-nav="How it works">
         <h3>Code scores every block, four figures sum it up</h3>
-        <p class="vc-guide__lead">The agent records who makes and who runs each block; code, not the AI, sets each level from 0 to 4 and computes the four figures.</p>
+        <p class="vc-guide__lead">The agent records who makes and who runs each block; code, not the AI, computes the levels and the four figures.</p>
         <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
-          <caption>Key figures</caption>
+          <caption class="vc-visually-hidden">Key figures</caption>
           <thead><tr><th scope="col">Figure</th><th scope="col">What it measures</th><th scope="col">BundID</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Overall score</th><td>The mean of the layers' scores, out of 100, on the layers with evidence; indicative</td><td><span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span></td></tr>
-            <tr><th scope="row">Weakest critical link</th><td>The lowest level among the blocks the service cannot run without</td><td><span data-fig="weakest">Level 3 of 4</span>, <span data-fig="weakest-name">Kubernetes platform at the ITZBund</span></td></tr>
-            <tr><th scope="row">Exclusive non-EU control</th><td>The share of critical blocks run from outside the EU</td><td><span data-fig="exclusive">0&nbsp;%</span> of <span data-fig="critical">4</span></td></tr>
-            <tr><th scope="row">Session cost</th><td>What the model calls cost: estimated here, measured in a live run</td><td>about <span data-fig="cost">€0.52</span></td></tr>
+            <tr><th scope="row">Overall score</th><td>The mean of the layers with evidence, out of 100</td><td><span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span></td></tr>
+            <tr><th scope="row">Weakest critical link</th><td>The lowest level of the blocks the service cannot run without</td><td><span data-fig="weakest">Level 3 of 4</span>, <span data-fig="weakest-name">Kubernetes platform at the ITZBund</span>. <span data-fig="lowest">Lowest overall: AusweisApp on iPhones through the App Store, not critical; 1 more below level 3</span>. Critical blocks no source names: <span data-fig="unknown">0</span></td></tr>
+            <tr><th scope="row">Exclusive non-EU control</th><td>Critical blocks run from outside the EU</td><td><span data-fig="exclusive">0&nbsp;%</span> of <span data-fig="critical">4</span></td></tr>
+            <tr><th scope="row">Session cost</th><td>What a live run would cost</td><td>≈&nbsp;<span data-fig="cost">€0.62</span> for a live run; <span data-fig="replay">this replay: €0</span></td></tr>
           </tbody>
         </table></div>
       </section>
@@ -269,11 +269,11 @@
         <h3>Show it in five minutes</h3>
         <p class="vc-guide__lead">It plays by itself and stops where you act; Space pauses.</p>
         <ol class="vc-guide__path">
-          <li><strong>Understand: point at the four figures.</strong> <span class="vc-guide__say">“Who makes and runs BundID: <span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span>, indicative.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Research: open one block's quotes.</strong> <span class="vc-guide__say">“<span data-fig="blocks">6</span> building blocks, each with a quote, a link and the date it was read.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Score: point at the weakest critical link.</strong> <span class="vc-guide__say">“No critical block runs from outside the EU; weakest: Kubernetes, <span data-fig="weakest">Level 3 of 4</span>.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Your review: press Confirm the findings.</strong> <span class="vc-guide__say">“A person checks first: the AusweisApp for iPhones comes from Apple, level 0.”</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Recommend: press Approve the lever, then Approve the draft.</strong> <span class="vc-guide__say">“An app marketplace run in the EU lifts the score to <span data-fig="lever">81</span>. Nothing is sent.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Understand: point at the four figures.</strong> <span class="vc-guide__say">“BundID: <span data-fig="score">77</span> <span data-fig="layers">on 5 of 6 layers</span>, <span data-fig="blocks">6</span> blocks; this replay costs nothing.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Score: open the App Store block.</strong> <span class="vc-guide__say">“Weakest critical link: <span data-fig="weakest">Level 3 of 4</span>; lower but not critical: the App Store, level 0.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Confirm the findings, then open a starting point.</strong> <span class="vc-guide__say">“A marketplace run in the EU lifts it to <span data-fig="lever">81</span>; starting points are for research.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>All services: compare BundID with the EUDI wallet.</strong> <span class="vc-guide__say">“<span data-fig="score">77</span> against <span data-fig="score@eudi-wallet">67</span>, layer by layer.”</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Open the Serviceportal NRW.</strong> <span class="vc-guide__say">“A state's platform on the same six layers: <span data-fig="score@serviceportal-nrw">91</span>.”</span> <span class="vc-guide__time">1 min</span></li>
         </ol>
       </section>
     </div>
@@ -305,15 +305,15 @@
       </section>
       <section class="vc-guide__chapter" data-vc-chapter="how" data-vc-nav="So funktioniert's">
         <h3>Code bewertet jeden Baustein, vier Kennzahlen zeigen es</h3>
-        <p class="vc-guide__lead">Der Agent hält fest, wer jeden Baustein herstellt und betreibt; Code, nicht die KI, vergibt die Stufen von 0 bis 4 und rechnet die vier Kennzahlen.</p>
+        <p class="vc-guide__lead">Der Agent findet Hersteller und Betreiber; Code, nicht die KI, rechnet.</p>
         <div class="vc-table-wrap"><table class="vc-table vc-table--compact">
-          <caption>Kennzahlen</caption>
+          <caption class="vc-visually-hidden">Kennzahlen</caption>
           <thead><tr><th scope="col">Kennzahl</th><th scope="col">Was sie misst</th><th scope="col">BundID</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Gesamtwert</th><td>Der Mittelwert der Ebenen, von 100, über die Ebenen mit Belegen; indikativ</td><td><span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
-            <tr><th scope="row">Schwächstes kritisches Glied</th><td>Die niedrigste Stufe unter den Bausteinen, ohne die der Dienst nicht läuft</td><td><span data-fig="weakest">Stufe 3 von 4</span>, <span data-fig="weakest-name">Kubernetes-Plattform beim ITZBund</span></td></tr>
-            <tr><th scope="row">Exklusive Nicht-EU-Kontrolle</th><td>Der Anteil kritischer Bausteine, betrieben von außerhalb der EU</td><td><span data-fig="exclusive">0&nbsp;%</span> von <span data-fig="critical">4</span></td></tr>
-            <tr><th scope="row">Sitzungskosten</th><td>Was die Modellaufrufe kosten: hier geschätzt, in einem Live-Lauf gemessen</td><td>etwa <span data-fig="cost">0,52&nbsp;€</span></td></tr>
+            <tr><th scope="row">Gesamtwert</th><td>Mittel der belegten Ebenen, von 100</td><td><span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span></td></tr>
+            <tr><th scope="row">Schwächstes kritisches Glied</th><td>Niedrigste Stufe der Bausteine, ohne die der Dienst stillsteht</td><td><span data-fig="weakest">Stufe 3 von 4</span>, <span data-fig="weakest-name">Kubernetes-Plattform beim ITZBund</span>. <span data-fig="lowest">Niedrigste insgesamt: AusweisApp auf iPhones über den App Store, nicht kritisch; 1 weitere unter Stufe 3</span>. Kritische Bausteine ohne Quelle: <span data-fig="unknown">0</span></td></tr>
+            <tr><th scope="row">Exklusive Nicht-EU-Kontrolle</th><td>Kritische Bausteine, von außerhalb der EU betrieben</td><td><span data-fig="exclusive">0&nbsp;%</span> von <span data-fig="critical">4</span></td></tr>
+            <tr><th scope="row">Sitzungskosten</th><td>Was ein Live-Lauf kosten würde</td><td>≈&nbsp;<span data-fig="cost">0,62&nbsp;€</span> im Live-Lauf; <span data-fig="replay">diese Wiedergabe: 0 €</span></td></tr>
           </tbody>
         </table></div>
       </section>
@@ -348,11 +348,11 @@
         <h3>In fünf Minuten vorführen</h3>
         <p class="vc-guide__lead">Er spielt von selbst und hält, wo Sie handeln; die Leertaste hält an.</p>
         <ol class="vc-guide__path">
-          <li><strong>Verstehen: auf die vier Kennzahlen zeigen.</strong> <span class="vc-guide__say">„Wer die BundID herstellt und betreibt: <span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span>, indikativ.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Recherchieren: die Zitate eines Bausteins öffnen.</strong> <span class="vc-guide__say">„<span data-fig="blocks">6</span> Bausteine, jeder mit Zitat, Link und Lesedatum.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Bewerten: auf das schwächste kritische Glied zeigen.</strong> <span class="vc-guide__say">„Schwächster: Kubernetes, <span data-fig="weakest">Stufe 3 von 4</span>; keiner läuft von außerhalb der EU.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Ihre Prüfung: Befunde bestätigen drücken.</strong> <span class="vc-guide__say">„Erst prüft ein Mensch: Die AusweisApp fürs iPhone kommt von Apple, Stufe 0.“</span> <span class="vc-guide__time">1 min</span></li>
-          <li><strong>Empfehlen: Hebel freigeben, dann Entwurf freigeben drücken.</strong> <span class="vc-guide__say">„Ein App-Marktplatz in der EU hebt den Wert auf <span data-fig="lever">81</span>. Nichts wird versendet.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Verstehen: auf die vier Kennzahlen zeigen.</strong> <span class="vc-guide__say">„BundID: <span data-fig="score">77</span> <span data-fig="layers">auf 5 von 6 Ebenen</span>, <span data-fig="blocks">6</span> Bausteine; die Wiedergabe kostet nichts.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Bewerten: den App-Store-Baustein öffnen.</strong> <span class="vc-guide__say">„Schwächstes kritisches Glied: <span data-fig="weakest">Stufe 3 von 4</span>. Der App Store: 0, nicht kritisch.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Bestätigen, dann einen Ansatzpunkt öffnen.</strong> <span class="vc-guide__say">„Ein Marktplatz in der EU hebt ihn auf <span data-fig="lever">81</span>; Ansatzpunkte dienen der Recherche.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Alle Dienste: mit der EUDI-Wallet vergleichen.</strong> <span class="vc-guide__say">„<span data-fig="score">77</span> gegen <span data-fig="score@eudi-wallet">67</span>, Ebene für Ebene.“</span> <span class="vc-guide__time">1 min</span></li>
+          <li><strong>Das Serviceportal NRW öffnen.</strong> <span class="vc-guide__say">„Die Plattform eines Landes auf denselben sechs Ebenen: <span data-fig="score@serviceportal-nrw">91</span>.“</span> <span class="vc-guide__time">1 min</span></li>
         </ol>
       </section>
     </div>

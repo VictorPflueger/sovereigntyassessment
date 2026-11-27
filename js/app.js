@@ -18,7 +18,7 @@ import { digest, STEP_IDS } from "./run.js";
 import { story, eur } from "./story.js";
 import { renderStep, renderLog, renderTile, renderMakeup, redraw, h, more } from "./view.js";
 import { estimateCost } from "./estimate.js";
-import { fmtDate } from "./format.js";
+import { fmtDate, fmtScore } from "./format.js";
 import { overviewModel, compareModel, scoresOf } from "./cases.js";
 import { renderOverview, renderCompare } from "./overview.js";
 
@@ -519,9 +519,22 @@ function fillGuides(lang = getLang()) {
     cost: eur(costOf(FIRST).eur, lang), blocks: String(r.blockList.length || ""), pages: String(r.research.filter((x) => x.kind === "fetch" && x.ok).length || ""),
     quotes: String(new Set(r.evidence.filter((c) => c.verified && c.quote).map((c) => `${c.url}|${c.quote}`)).size || ""),
     lever: Number.isFinite(overall) ? String(Math.round(overall)) : "",
-    "as-of": fmtDate(RUNS()[FIRST].as_of, lang)
+    "as-of": fmtDate(RUNS()[FIRST].as_of, lang),
+    // What the tile leaves out, the critical blocks no source names, and the free replay (2.1.0).
+    lowest: k.weakest.also?.find((a) => a.kind === "lower")?.text || "", unknown: v.unknownCritical === null ? "" : String(v.unknownCritical),
+    replay: t("p.kpi.cost.replay", null, lang)
   };
-  document.querySelectorAll(`#guide-${lang} [data-fig]`).forEach((el) => { if (figs[el.dataset.fig]) el.textContent = figs[el.dataset.fig]; });
+  // The other cases the talk track names, from their own pre-runs: score@id and layers@id.
+  const other = (key) => {
+    const [what, id] = key.split("@");
+    const o = others?.[id];
+    if (!o || o.notService) return "";
+    return what === "score" ? fmtScore(o.overall, lang) : t("p.kpi.layers", { n: o.layers }, lang);
+  };
+  document.querySelectorAll(`#guide-${lang} [data-fig]`).forEach((el) => {
+    const value = el.dataset.fig.includes("@") ? other(el.dataset.fig) : figs[el.dataset.fig];
+    if (value) el.textContent = value;
+  });
 }
 
 // ---- cases, keys, mode, language --------------------------------------------------------------------------
@@ -538,6 +551,10 @@ function buildCaseMenu() {
         h("span", { class: "case-item" }, h("span", { class: "case-item-title", dataset: { i18n: `p.case.${e.id}` } }, t(`p.case.${e.id}`)), h("span", { class: "case-item-tip", dataset: { i18n: `p.case.${e.id}.tip` } }, t(`p.case.${e.id}.tip`)))));
     }
   }
+  // Every case side by side, one click from the menu too (SA-04).
+  items.push(h("p", { class: "vc-menu__label", dataset: { i18n: "p.menu.all" } }, t("p.menu.all")),
+    h("button", { type: "button", class: "vc-menu__item case-all", role: "menuitem", onclick: () => { $("case-menu").hidePopover?.(); openOverview(); } },
+      h("span", { class: "case-item" }, h("span", { class: "case-item-title", dataset: { i18n: "p.ov.open" } }, t("p.ov.open")), h("span", { class: "case-item-tip", dataset: { i18n: "p.menu.all.tip" } }, t("p.menu.all.tip")))));
   $("case-menu").replaceChildren(...items);
   $("case-menu").addEventListener("toggle", (e) => $("case-button").setAttribute("aria-expanded", String(e.newState === "open")));
 }

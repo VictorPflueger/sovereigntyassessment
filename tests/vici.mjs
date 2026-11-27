@@ -2,12 +2,14 @@
 // guides and their key figures (guideProblems), the byline (bylineProblems), the Writing guideline's
 // checkable patterns (writingProblems), the AI notice of a page that can start a live run
 // (aiNoticeProblems) and names, not record ids (recordIdProblems). They run on the page as served, on the page as rendered in English and in German,
-// on every text the presenter writes for the seventeen cases along every decision path in both
+// on every text the presenter writes for the eighteen cases along every decision path in both
 // languages, on the dictionaries and on the docs. ViciDesign's check-guide-render.mjs drives the guide
 // over http. vici/ holds Vici's files byte for byte, at the commit vici/README.md and the workflow name.
 //
-// Each imported check first fails on a planted control. Prints VICI CONTROLS OK, VICI STANDARDS OK and
-// VICI OK. The functions come from a ViciDesign checkout (VICI_DIR, or ../ViciDesign); without one the
+// The prototype brief's other checks (2.1.0): the security policy (policyProblems), exactly one Vici
+// live-run dialog (liveDialogProblems) and storage only in the theme and language modules (storageProblems).
+// Each imported check first fails on a planted control. Prints VICI CONTROLS OK, VICI STANDARDS OK,
+// VICI BRIEF CHECKS OK and VICI OK. The functions come from a ViciDesign checkout (VICI_DIR, or ../ViciDesign); without one the
 // suite says so and passes, unless --require-vici is given or it runs on GitHub Actions.
 // Usage: node tests/vici.mjs [--require-vici]
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
@@ -28,6 +30,9 @@ const { bylineProblems } = await lib("byline.mjs");
 const { writingProblems } = await lib("writing.mjs");
 const { aiNoticeProblems, canRunLive, AI_NOTICE } = await lib("ai.mjs");
 const { recordIdProblems } = await lib("ids.mjs");
+const { policyProblems } = await lib("policy.mjs");
+const { liveDialogProblems } = await lib("live.mjs");
+const { storageProblems } = await lib("storage.mjs");
 const mod = (p) => import(pathToFileURL(path.join(APP_ROOT, p)).href);
 
 const read = (f) => readFileSync(path.join(APP_ROOT, f), "utf8");
@@ -35,6 +40,7 @@ const html = read("index.html");
 const page = (paragraphs, lang = "en-GB") => `<html lang="${lang}"><body>${paragraphs.map((t) => `<p>${String(t).replace(/</g, "&lt;")}</p>`).join("")}</body></html>`;
 const controls = [];
 const standards = [];
+const brief = [];
 const control = (ok, what) => controls.push([!!ok, what]);
 const check = (ok, what) => standards.push([!!ok, what]);
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -46,6 +52,21 @@ control(bylineProblems(html.replace(/href="https:\/\/victorpflueger\.github\.io\
 control(writingProblems(page(["BundID scores 77 — much more."])).length > 0 && writingProblems(page(["A seamless assessment."])).length > 0, "control: writingProblems catches an em dash and a stock word");
 control(recordIdProblems("<p>The weakest block is B-03, see RF-05.</p>", ["B-03", "RF-05"]).length === 2 && !recordIdProblems("<p>The weakest block is the Kubernetes platform.</p>", ["B-03", "RF-05"]).length, "control: recordIdProblems catches a block id and a fact id on a screen, and passes names");
 control(aiNoticeProblems(html.split(AI_NOTICE.en).join("An assistant")).length > 0 && !aiNoticeProblems('<meta http-equiv="Content-Security-Policy" content="connect-src \'none\'"><p>Replay</p>').length, "control: aiNoticeProblems catches a live page that never says it is an AI, and leaves a page that cannot run live alone");
+
+// ---- the prototype brief's checks: the policy, the live-run dialog, storage ---------------------------------
+const STORAGE_ALLOW = ["js/theme.js", "js/lang.js", "js/i18n/index.js", "vici/dist/vici.js"];
+const scriptFiles = ["index.html", "vici/dist/vici.js", ...readdirSync(path.join(APP_ROOT, "js")).filter((f) => f.endsWith(".js")).map((f) => `js/${f}`), ...readdirSync(path.join(APP_ROOT, "js/i18n")).map((f) => `js/i18n/${f}`)];
+const scripts = Object.fromEntries(scriptFiles.map((f) => [f, read(f)]));
+brief.push([policyProblems(html.replace("<body", "<body style=\"margin:0\"")).length > 0, "control: policyProblems catches a style attribute"]);
+brief.push([liveDialogProblems(html.replace('id="live-start" disabled', 'id="live-start"')).length > 0 && liveDialogProblems(html.replace(/<dialog class="vc-dialog vc-live[\s\S]*?<\/dialog>/, "")).length === 0, "control: liveDialogProblems catches a start button enabled in the markup"]);
+brief.push([storageProblems({ ...scripts, "js/app.js": `${scripts["js/app.js"]}\nsessionStorage.setItem("sa.x", 1);` }, { allow: STORAGE_ALLOW }).length > 0, "control: storageProblems catches a module that keeps something"]);
+const pol = policyProblems(html);
+brief.push([!pol.length, `the page keeps Vici's strict policy: no inline script, style or handler${pol.length ? `: ${pol.join("; ")}` : ""}`]);
+const lives = (html.replace(/<!--[\s\S]*?-->/g, "").match(/<dialog\b[^>]*class="[^"]*\bvc-live\b/g) || []).length;
+const live = liveDialogProblems(html);
+brief.push([lives === 1 && !live.length, `exactly one Vici live-run dialog, its parts in order (${lives})${live.length ? `: ${live.join("; ")}` : ""}`]);
+const st = storageProblems(scripts, { allow: STORAGE_ALLOW });
+brief.push([!st.length, `only the theme and language modules touch browser storage (${scriptFiles.length} scripts)${st.length ? `: ${st.join("; ")}` : ""}`]);
 
 // ---- the page as served -------------------------------------------------------------------------------
 const g = guideProblems(html);
@@ -61,13 +82,14 @@ check(!w.length, `index.html keeps Vici's writing rules${w.length ? `: ${w.join(
 const a = aiNoticeProblems(html);
 check(canRunLive(html) && !a.length, `the page can start a live run and says "${AI_NOTICE.en}"${a.length ? `: ${a.join("; ")}` : ""}`);
 check(new RegExp(`id="start" data-vc-live[^>]*>[^<]*</button>\\s*<span class="vc-tag vc-tag--feature[^"]*"[^>]*>[\\s\\S]{0,160}${esc(AI_NOTICE.en)}</span>`).test(html), "the AI notice stands in a lilac tag right beside Start agent");
-check(new RegExp(`${esc(AI_NOTICE.en)}[\\s\\S]{0,1600}id="live-start" data-vc-live`).test(html), "the live card says it too, before its key and its start button");
+check(new RegExp(`${esc(AI_NOTICE.en)}</span></span>\\s*<button[^>]*id="live-start"[^>]*data-vc-live`).test(html), "the live-run dialog says it too, right beside its start button");
 const DE = (await mod("js/i18n/de.js")).default;
 check(Object.values(DE).includes(AI_NOTICE.de), `the German page says "${AI_NOTICE.de}"`);
 const header = (html.match(/<header class="app-header"[\s\S]*?<\/header>/) || [""])[0];
 check(/>SIMULATION</.test(header) && /"LIVE"/.test(read("js/app.js")), "the header says SIMULATION, or LIVE during a live run, in capitals");
-const strip = (html.match(/<\/header>(?:\s*<!--[\s\S]*?-->)?\s*<div class="intro"[^>]*>([\s\S]*?)<\/div>\s*(?:<!--[\s\S]*?-->\s*)?<nav/) || [])[1] || "";
-check(/<p class="intro-text"[^>]*>[^<]{40,200}<\/p>/.test(strip) && /real sources/.test(strip) && /indicative, not an official assessment/.test(strip) && /class="vc-byline"/.test(strip), "one sentence under the header says what the prototype does, that its sources are real and its scores indicative, beside the byline");
+const intro = (header.match(/<div class="intro"[^>]*>([\s\S]*?)<\/div>/) || [])[1] || "";
+const foot = (html.match(/<div class="stage-foot"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/) || [])[1] || "";
+check(/<p class="intro-text"[^>]*>[^<]{40,200}<\/p>/.test(intro) && /real sources/.test(intro) && /indicative, not an official assessment/.test(intro) && /class="vc-byline"/.test(foot), "one sentence in the header says what the prototype does, that its sources are real and its scores indicative; the byline stands at the foot of the stage");
 check((html.match(/class="vc-byline"/g) || []).length === 1, "the page carries one byline");
 
 // The ids of the prototype's data: the catalogue's entries, the reference facts and every block the
@@ -138,7 +160,8 @@ const { digest } = await mod("js/run.js");
 const { story } = await mod("js/story.js");
 const entries = win.SA_CATALOGUE.entries;
 const said = { en: new Set(), de: new Set() };
-const SKIP = new Set(["id", "kind", "status", "layer", "decision", "act", "secondaryAct", "url", "lang", "index"]);
+// The fields that only key the page's elements: ids, kinds, and (2.1.0) a make-up's or a row's key.
+const SKIP = new Set(["id", "kind", "status", "layer", "decision", "act", "secondaryAct", "url", "lang", "index", "key", "blockId"]);
 // A source (a quote with its page's title and address) is the page's own words, not the presenter's.
 const collect = (set, v) => {
   if (typeof v === "string") { if (/\p{L}/u.test(v)) set.add(v); return; }
@@ -160,17 +183,25 @@ for (const def of Object.values(win.SA_RUNS)) {
       for (const n of [...cuts, r.events.length]) {
         for (const mode of ["simulation", "live"]) {
           const v = story({ run: digest(r.events.slice(0, n)), lang, mode, entry });
-          collect(said[lang], v.steps.map(({ label, title, lead, agent, turn, stage }) => ({ label, title, lead, agent, turn, stage })));
-          collect(said[lang], [v.kpis, v.log.map((l) => `${l.who} ${l.what}`)]);
+          collect(said[lang], v.steps.map(({ label, title, lead, agent, turn, stage, sum, alternatives, comparable }) => ({ label, title, lead, agent, turn, stage, sum, alternatives, comparable })));
+          collect(said[lang], [v.kpis, v.log.map((l) => `${l.who} ${l.what}`), v.makeups]);
         }
       }
     }
   }
 }
+// All services and Compare, for every case, in both languages.
+const { overviewModel, compareModel } = await mod("js/cases.js");
+for (const lang of ["en", "de"]) {
+  const all = [];
+  for (const def of Object.values(win.SA_RUNS)) all.push({ entry: entries.find((e) => e.id === def.entry_id), def, run: digest((await playCase(def, "en", { choice: "L1" })).events) });
+  collect(said[lang], overviewModel({ cases: all, lang, viewed: new Set(["bundid"]) }));
+  collect(said[lang], compareModel({ cases: all, keys: ["bundid", "eudi-wallet", "serviceportal-nrw"], lang }));
+}
 for (const lang of ["en", "de"]) {
   const sentences = [...said[lang]];
   const written = writingProblems(page(sentences, lang === "de" ? "de" : "en-GB"));
-  check(sentences.length > 300 && !written.length, `${lang === "en" ? "English" : "German"}: the ${sentences.length} texts the presenter writes on ${paths / 2} paths through the seventeen cases keep the writing rules${written.length ? `: ${written.join("; ")}` : ""}`);
+  check(sentences.length > 300 && !written.length, `${lang === "en" ? "English" : "German"}: the ${sentences.length} texts the presenter writes on ${paths / 2} paths through the eighteen cases keep the writing rules${written.length ? `: ${written.join("; ")}` : ""}`);
   for (const [re, what] of FORBIDDEN) {
     const hit = sentences.find((x) => re.test(x));
     check(!hit, `${lang === "en" ? "English" : "German"}: no text on any path shows ${what}${hit ? `: "${hit.slice(0, 120)}"` : ""}`);
@@ -217,7 +248,7 @@ const report = (results, token) => {
   failed += f;
   return f ? null : token;
 };
-const tokens = [report(controls, "VICI CONTROLS OK"), report(standards, "VICI STANDARDS OK")].filter(Boolean);
+const tokens = [report(controls, "VICI CONTROLS OK"), report(standards, "VICI STANDARDS OK"), report(brief, "VICI BRIEF CHECKS OK")].filter(Boolean);
 console.log(`(Vici's checks from ${dir})`);
 if (failed) { console.log(`\n${failed} checks failed.`); process.exit(1); }
-console.log(`\nAll ${controls.length + standards.length} checks passed.\n${tokens.join("\n")}\nVICI OK`);
+console.log(`\nAll ${controls.length + standards.length + brief.length} checks passed.\n${tokens.join("\n")}\nVICI OK`);

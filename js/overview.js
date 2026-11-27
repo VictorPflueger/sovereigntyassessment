@@ -15,8 +15,8 @@ function link(x) {
 function caseCell(r, tag = "th") {
   return h(tag, { scope: tag === "th" ? "row" : null, class: "ov-name" },
     h("button", { type: "button", class: "ov-open", dataset: { openCase: r.id }, "aria-label": t("p.ov.openCase.label", { name: r.name }) }, r.name),
-    r.live ? h("span", { class: "vc-tag vc-tag--sm vc-tag--feature" }, t("p.ov.live")) : null,
-    r.viewed ? h("span", { class: "vc-tag vc-tag--sm ov-viewed" }, t("p.ov.viewed")) : null);
+    r.live ? h("span", { class: "vc-tag vc-tag--feature" }, t("p.ov.live")) : null,
+    r.viewed ? h("span", { class: "vc-tag ov-viewed" }, t("p.ov.viewed")) : null);
 }
 
 function row(r, picks, { pick = true } = {}) {
