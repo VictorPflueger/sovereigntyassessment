@@ -1,14 +1,17 @@
 # Vici, copied into this prototype
 
 These files come unchanged from Vici, Victor Pflüger's design system
-(<https://victorpflueger.github.io/ViciDesign/index.html>), from its main branch at commit **`d04a318`**
-(25 November 2026), on the way to Vici 2.0: the How it works guide (`vc-guide`) with one guide per
+(<https://victorpflueger.github.io/ViciDesign/index.html>), from its main branch at commit **`4398d82`**
+(27 November 2026), on the way to Vici 2.0: the How it works guide (`vc-guide`) with one guide per
 language (ViciDesign#13), the 2.0 byline, key figures with `vc-stat__was` (ViciDesign#11) that answer
 first (ViciDesign#18), the rule that a figure computed from part of the data says so in its value (added
 for this prototype, ViciDesign#17), names, not record ids (ViciDesign#16), Presenting step by step with
 Play, Your turn, `vc-attention` and `--vc-step-fill` (ViciDesign#15) and Play ending on Replay
 (ViciDesign#19) once the story is over (ViciDesign#20), the AI notice and the prototype
-brief this prototype follows. Its files still call themselves 1.0.0 until 2.0 is released. The
+brief this prototype follows; and the four lessons of this prototype's 2.1.0: a key figure never
+contradicts the screen (`vc-stat__also`, ViciDesign#53), a session cost in a simulation never reads as
+money spent, its label saying what the figure is (ViciDesign#54, #57), nothing the story needs lives only in a hover or a tooltip (ViciDesign#55)
+and two scales on one screen meet once, in words (ViciDesign#56). Its files still call themselves 1.0.0 until 2.0 is released. The
 prototype loads them from here rather than from a CDN, so every page is served from this site alone.
 
 | File here | What it is |
